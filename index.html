@@ -600,6 +600,33 @@
     .staff-main-tabs { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 8px; justify-content: flex-start; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
     .staff-main-tabs::-webkit-scrollbar { display: none; }
     .staff-main-tab-btn { flex-shrink: 0; }
+
+    /* 4. FIX lỗi giao diện header trên di động: .topbar-inner vốn là 1 hàng flex canh giữa theo
+       chiều dọc (logo | nav | nút Đăng nhập). Trên màn hình hẹp, nav nhiều mục tự xuống dòng bên
+       trong khiến cả khối bị kéo cao, đẩy logo/nút Đăng nhập trôi nổi giữa các dòng nav (ảnh chụp
+       màn hình lỗi thực tế). Tách nav xuống thành 1 dải RIÊNG cuộn ngang (giống cách đã làm cho
+       .staff-main-tabs), logo + nút Đăng nhập giữ nguyên gọn 1 hàng trên cùng. */
+    .topbar-inner{ flex-wrap: wrap; row-gap: 8px; padding: 10px 16px; }
+    .logo{ order: 1; }
+    .login-btn{ order: 2; padding: 7px 18px; font-size: 13px; }
+    nav.main-nav{
+      order: 3; flex-basis: 100%; width: 100%;
+      flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; gap: 18px; padding-bottom: 2px;
+    }
+    nav.main-nav::-webkit-scrollbar{ display: none; }
+    nav.main-nav > span,
+    nav.main-nav > .nav-dropdown,
+    nav.main-nav > .staff-nav-link{ flex-shrink: 0; white-space: nowrap; }
+
+    /* 5. Tab trang lớn (Internet/Truyền hình, Di động/Sim số, Gói cước Data/5G) — trước đây bó hẹp
+       theo flex nên dễ tràn/xén mép phải màn hình nhỏ. Cho cuộn ngang, không co chữ xuống dòng nữa. */
+    .page-tabs{
+      flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; padding: 12px 16px 0;
+    }
+    .page-tabs::-webkit-scrollbar{ display: none; }
+    .page-tab{ flex-shrink: 0; white-space: nowrap; padding: 9px 16px; font-size: 13px; }
   }
 </style>
 </head>

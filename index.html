@@ -133,21 +133,24 @@
   .hero-pill:hover{background:#fff;}
   .hero-pill .pill-ico{font-size:15px;}
 
-  /* Responsive: banner xếp dọc (ảnh xuống dưới, canh giữa) trên tablet/mobile
+  /* Responsive: banner xếp dọc, canh giữa trên tablet/mobile.
      FIX lỗi giao diện: .hero-split vốn có flex-wrap:wrap (cần cho desktop, hàng ngang 2 khối).
      Khi đổi sang flex-direction:column mà VẪN giữ flex-wrap:wrap và container không có chiều
      cao cố định, trình duyệt không xác định được lúc nào nên "wrap" sang cột mới — nhiều engine
-     mobile xử lý sai, đẩy khối hero-media xuống rất xa, tạo khoảng trống đỏ khổng lồ như ảnh chụp
-     thực tế. Đặt lại flex-wrap:nowrap (chỉ có 2 khối, không cần wrap khi đã xếp dọc) và bỏ
-     justify-content:space-between (chỉ có ý nghĩa ở bố cục hàng ngang) để 2 khối luôn sát nhau. */
+     mobile xử lý sai, đẩy khối minh hoạ xuống rất xa, tạo khoảng trống đỏ khổng lồ như ảnh chụp
+     thực tế. Đặt lại flex-wrap:nowrap và bỏ justify-content:space-between (chỉ có ý nghĩa ở bố
+     cục hàng ngang) để nội dung luôn sát nhau.
+     BỔ SUNG theo yêu cầu: ẩn hẳn khối hình minh hoạ (.hero-media, chỉ mang tính trang trí —
+     đã đánh dấu aria-hidden) trên di động, để banner gọn lại đúng theo chiều cao tiêu đề/phụ đề/
+     nút bấm, không còn phần nào bị kéo dãn/thừa khoảng trống. */
   @media (max-width:860px){
-    .hero-split{flex-direction:column;flex-wrap:nowrap;justify-content:flex-start;gap:20px;text-align:center;}
-    .hero-content{text-align:center;}
+    .hero-split{flex-direction:column;flex-wrap:nowrap;justify-content:flex-start;gap:16px;text-align:center;}
+    .hero-content{text-align:center;width:100%;}
     .hero-content h1{max-width:none;margin:0 auto;}
     .hero-features{justify-items:center;}
     .hero-features .feat{text-align:center;}
     .hero-pills{justify-content:center;}
-    .hero-media{order:2;width:150px;margin-top:0;}
+    .hero-media{display:none;}
   }
   @media (max-width:560px){
     .hero-features{grid-template-columns:repeat(2,1fr);}

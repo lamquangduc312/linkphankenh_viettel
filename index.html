@@ -164,8 +164,6 @@
   }
   @media (max-width:560px){
     .hero-features{grid-template-columns:repeat(2,1fr);}
-    .hero-pills{flex-direction:column;}
-    .hero-pill{width:100%;justify-content:center;}
   }
 
   /* ---------- Section ---------- */
@@ -648,6 +646,43 @@
     }
     .page-tabs::-webkit-scrollbar{ display: none; }
     .page-tab{ flex-shrink: 0; white-space: nowrap; padding: 9px 16px; font-size: 13px; }
+
+    /* 6. Tiêu đề đầu trang (vd "Danh sách gói Internet - Truyền hình") — cỡ chữ co giãn theo màn
+       hình để luôn vừa 1 dòng, không xuống dòng; nếu máy quá hẹp vẫn cho cuộn ngang thay vì bị xén. */
+    .section h2{
+      font-size: clamp(13px, 4vw, 19px); white-space: nowrap;
+      overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+    .section h2::-webkit-scrollbar{ display: none; }
+
+    /* 7. Tab con trong từng trang (vd "Gói internet" / "Mesh wifi tốc độ cao" / "Combo internet -
+       truyền hình" / "Combo internet - camera") — cho cuộn ngang 1 dòng thay vì xuống dòng dồn cục. */
+    .tabs{
+      flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; padding-bottom: 4px;
+    }
+    .tabs::-webkit-scrollbar{ display: none; }
+    .tab-btn{ flex-shrink: 0; white-space: nowrap; }
+
+    /* 8. Thanh "chọn nhanh" trang Di động (Gói cước di động / Dịch vụ SIM số / Dịch vụ GTGT / Dịch vụ
+       quốc tế) — trước đây xếp cột full-width trên mobile, nay đổi sang cuộn ngang 1 dòng cho đồng nhất
+       với các thanh tab khác trong toàn bộ giao diện. */
+    .hero-pills{
+      flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; padding-bottom: 4px;
+    }
+    .hero-pills::-webkit-scrollbar{ display: none; }
+    .hero-pill{ flex-shrink: 0; white-space: nowrap; }
+
+    /* 9. Tab danh mục gói cước Data/5G (Gói cước HOT / 5G / Miễn phí MXH / Siêu ưu đãi / Roaming /
+       Gói tặng) — cùng kiểu cuộn ngang 1 dòng, tránh vỡ layout khi đủ 6 mục trên màn hình hẹp. */
+    .data-cat-tabs{
+      flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; padding-bottom: 4px; gap: 18px;
+    }
+    .data-cat-tabs::-webkit-scrollbar{ display: none; }
+    .data-cat-tab{ flex-shrink: 0; white-space: nowrap; }
   }
 </style>
 </head>

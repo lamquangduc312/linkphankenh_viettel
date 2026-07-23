@@ -498,9 +498,15 @@
 
   /* Biểu đồ cột ngang (đóng góp doanh số theo người) — dựng bằng HTML/CSS thay vì SVG để
      nhãn tên (độ dài thay đổi) tự ngắt/truncate bằng CSS thay vì phải đo chữ trong SVG. */
+  /* FIX lỗi thiếu thông tin: .hbar-label trước đây cố định width:96px + text-overflow:ellipsis khiến
+     các tên dịch vụ/tên người dài (vd "FTTH (Internet cáp quang)", "Combo Internet + Truyền hình",
+     "Chuyển sang trả sau/trả trước", "Đăng ký thông tin thuê bao", "Lan tỏa cài đặt App") bị cắt cụt
+     thành "...". Giữ nguyên 1 hàng (label | thanh tiến trình | số liệu) như cũ, chỉ bỏ ellipsis,
+     nới rộng cột nhãn và cho phép chữ tự xuống dòng trong đúng cột đó nếu tên quá dài — không còn
+     mất chữ, không tách thành 2 tầng riêng. */
   .hbar-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;cursor:default;}
   .hbar-row:last-child{margin-bottom:0;}
-  .hbar-label{width:96px;flex-shrink:0;font-size:12px;color:var(--text-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .hbar-label{width:132px;flex-shrink:0;font-size:11.5px;color:var(--text-dark);white-space:normal;line-height:1.25;word-break:break-word;}
   .hbar-track{flex:1;height:16px;background:var(--bg);border-radius:4px;overflow:hidden;}
   .hbar-fill{height:100%;border-radius:0 4px 4px 0;min-width:2px;}
   .hbar-value{width:52px;flex-shrink:0;text-align:right;font-size:12px;font-weight:700;color:var(--text-dark);}
@@ -5217,10 +5223,33 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
     return MONTHS_12.slice(0, 12);
   }
 
+  // FIX lỗi thiếu thông tin: trước đây cột "Khách hàng" hiển thị placeholder "Khách hàng 132"
+  // (chỉ ghép chữ + số ngẫu nhiên). Đổi sang sinh HỌ TÊN THẬT kiểu Việt Nam bằng random có seed
+  // (dựa trên h — mã hash của mỗi đơn) để mỗi đơn hàng luôn ra cùng 1 tên cố định, không đổi
+  // qua các lần render lại (giữ tính nhất quán như các trường dữ liệu demo khác trong file).
+  const CUST_HO_POOL = ['Nguyễn','Trần','Lê','Phạm','Hoàng','Huỳnh','Phan','Vũ','Võ','Đặng','Bùi','Đỗ','Hồ','Ngô','Dương','Lý'];
+  const CUST_TEN_NAM_POOL = ['Văn Bình','Văn Cường','Văn Dũng','Văn Hải','Văn Hùng','Văn Khánh','Văn Long','Văn Minh','Văn Nam','Văn Sơn','Văn Thắng','Văn Tuấn','Văn Việt','Đức Anh','Quốc Huy'];
+  const CUST_TEN_NU_POOL = ['Thị Lan','Thị Hương','Thị Thảo','Thị Ngọc','Thị Nga','Thị Trang','Thị Vân','Thị Yến','Thị Thủy','Thu Hà','Mai Anh','Ngọc Linh','Phương Anh','Kim Ngân','Bảo Trân'];
+
+  function randomCustomerName(h) {
+    const ho = CUST_HO_POOL[Math.floor(randomSeeded(h + 6) * CUST_HO_POOL.length)];
+    const tenPool = randomSeeded(h + 7) < 0.5 ? CUST_TEN_NAM_POOL : CUST_TEN_NU_POOL;
+    const ten = tenPool[Math.floor(randomSeeded(h + 8) * tenPool.length)];
+    return ho + ' ' + ten;
+  }
+
   function collectOrders(personKey, rangeKey, createdDate) {
     const wanted = new Set(monthsForRange(rangeKey).map(monthKey));
     const createdYm = createdDate ? monthKey(createdDate) : null;
     let orders = [];
+
+    // FIX lỗi thiếu thông tin: trước đây cột CTV hiển thị cứng chuỗi "Cộng tác viên" thay vì tên
+    // thật. Tra đúng CTV theo id nằm trong personKey (dạng "ctv:<id>") để lấy họ tên/SĐT thật.
+    let ctvInfo = null;
+    if (personKey.startsWith('ctv:')) {
+      const ctvId = personKey.slice('ctv:'.length);
+      ctvInfo = ctvList.find(c => c.id === ctvId) || null;
+    }
 
     // Support for when rangeKey is literally 'YYYY-MM'
     if (rangeKey.match(/^\d{4}-\d{2}$/)) {
@@ -5271,11 +5300,11 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
             trangThai,
             dichVuKey: svc.key,
             loaiDichVu: svc.name,
-            hoTenKhachHang: 'Khách hàng ' + (h % 1000),
+            hoTenKhachHang: randomCustomerName(h),
             sdtKhachHang: '09' + String(h % 100000000).padStart(8, '0'),
             tenNVKD: STAFF_DEMO.hoTen,
-            tenCTV: personKey.startsWith('ctv:') ? 'Cộng tác viên' : null,
-            sdtCTV: personKey.startsWith('ctv:') ? '09...' : null,
+            tenCTV: ctvInfo ? ctvInfo.hoTen : null,
+            sdtCTV: ctvInfo ? ctvInfo.sdt : null,
             tenNVKyThuat: randomSeeded(h + 4) > 0.5 ? 'Nguyễn Kỹ Thuật' : null
           });
         }
@@ -5455,7 +5484,7 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
       bodyHtml += `<div style="font-size:12px;font-weight:700;color:${g.color};margin:${rowIdx === 0 ? '0' : '16px'} 0 8px;text-transform:uppercase;letter-spacing:.02em;">${g.icon} ${escapeHtml(g.label)}</div>`;
       groupRows.forEach(r => {
         bodyHtml += `
-          <div class="hbar-row" data-hbar-idx="${rowIdx}" style="margin-bottom: 10px;">
+          <div class="hbar-row" data-hbar-idx="${rowIdx}">
             <div class="hbar-label" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div>
             <div class="hbar-track" style="display:flex; padding: 0;">
               <div class="hbar-fill" style="width:${r.staff / maxVal * 100}%; background:#EE0033; border-radius: 4px 0 0 4px; border-right: ${r.staff && r.ctv ? '1px solid #fff' : 'none'};"></div>

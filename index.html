@@ -133,6 +133,16 @@
   .hero-pill:hover{background:#fff;}
   .hero-pill .pill-ico{font-size:15px;}
 
+  /* Thanh "chọn nhanh" cho trang Di động — tách riêng khỏi banner đỏ trang trí, đặt cố định
+     ở đầu trang để giữ vị trí truy cập nhanh 4 dịch vụ (banner minh hoạ được đẩy xuống cuối trang). */
+  .quick-nav-card{
+    max-width:1280px;margin:0 auto;background:#fff;border:1px solid var(--border);border-radius:16px;
+    padding:18px 22px;box-shadow:0 4px 14px rgba(0,0,0,.05);
+  }
+  .quick-nav-title{font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.03em;}
+  .quick-nav-card .hero-pill{background:var(--viettel-red-light,#FFE5EA);color:var(--viettel-red);border:1px solid transparent;}
+  .quick-nav-card .hero-pill:hover{background:#FFD3DC;}
+
   /* Responsive: banner xếp dọc, canh giữa trên tablet/mobile.
      FIX lỗi giao diện: .hero-split vốn có flex-wrap:wrap (cần cho desktop, hàng ngang 2 khối).
      Khi đổi sang flex-direction:column mà VẪN giữ flex-wrap:wrap và container không có chiều
@@ -398,7 +408,7 @@
      (khách hàng thật bấm link chia sẻ, hoặc chính NVKD/CTV tự xem trước bằng nút "Xem trang liên kết") ---------- */
   .ref-badge{
     position:fixed;bottom:18px;left:18px;z-index:150;background:#fff;border:1px solid var(--border);
-    border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.2);padding:14px 16px;max-width:295px;
+    border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.2);padding:14px 16px;max-width:344px;
   }
   .ref-badge-close{
     position:absolute;top:8px;right:10px;background:none;border:none;font-size:17px;
@@ -422,20 +432,22 @@
   .ref-badge-btn-row{display:flex;gap:8px;}
   .ref-badge-contact-btn{
     display:flex;align-items:center;justify-content:center;gap:6px;font-size:12.5px;font-weight:700;
-    padding:10px 8px;border-radius:12px;border:none;color:#fff;text-decoration:none;flex:1;min-width:0;
+    padding:11px 8px;border-radius:12px;border:none;color:#fff;text-decoration:none;flex:1;min-width:0;
     transition:transform .12s ease, box-shadow .15s ease, filter .15s ease;
   }
-  .ref-badge-contact-btn span.ref-badge-btn-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .ref-badge-contact-btn:hover{transform:translateY(-1px);filter:brightness(1.04);}
+  /* Khung huy hiệu đã nới rộng (344px) đủ chỗ để 2 nút chia đều 1:1 — cả số điện thoại lẫn
+     "Nhắn Zalo" đều hiển thị trọn vẹn, không cần lệch tỷ lệ hay cắt "...". */
+  .ref-badge-contact-btn span.ref-badge-btn-label{white-space:nowrap;}
+  .ref-badge-contact-btn:hover{transform:translateY(-2px);filter:brightness(1.05);}
   .ref-badge-contact-btn:active{transform:translateY(0);}
   .ref-badge-btn-ico{
     display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:22px;height:22px;
-    border-radius:50%;font-size:12px;background:rgba(255,255,255,.28);
+    border-radius:50%;font-size:12px;background:rgba(255,255,255,.3);
   }
-  .ref-badge-btn-call{background:linear-gradient(135deg,#EE0033,#C4002A);box-shadow:0 4px 10px rgba(238,0,51,.3);}
-  .ref-badge-btn-call:hover{box-shadow:0 6px 16px rgba(238,0,51,.38);}
-  .ref-badge-btn-zalo{background:linear-gradient(135deg,#2196F3,#0068FF);box-shadow:0 4px 10px rgba(0,104,255,.3);}
-  .ref-badge-btn-zalo:hover{box-shadow:0 6px 16px rgba(0,104,255,.38);}
+  .ref-badge-btn-call{background:linear-gradient(135deg,#EE0033,#C4002A);box-shadow:0 4px 10px rgba(238,0,51,.32);}
+  .ref-badge-btn-call:hover{box-shadow:0 7px 18px rgba(238,0,51,.4);}
+  .ref-badge-btn-zalo{background:linear-gradient(135deg,#2196F3,#0068FF);box-shadow:0 4px 10px rgba(0,104,255,.32);}
+  .ref-badge-btn-zalo:hover{box-shadow:0 7px 18px rgba(0,104,255,.4);}
 
   /* ---------- Kênh nhân viên kinh doanh địa bàn ---------- */
   .staff-locked{max-width:480px;margin:60px auto;text-align:center;background:#fff;border:1px solid var(--border);border-radius:14px;padding:40px 30px;}
@@ -991,6 +1003,32 @@
 
 <!-- ================= PAGE 1: INTERNET / TRUYỀN HÌNH ================= -->
 <section class="page active" id="page-internet">
+  <div class="section">
+    <h2>Danh sách gói Internet - Truyền hình</h2>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="tab-goi-internet">Gói Internet</button>
+      <button class="tab-btn" data-tab="tab-mesh-cao">Mesh Wifi tốc độ cao</button>
+      <button class="tab-btn" data-tab="tab-combo">Combo Internet - Truyền hình</button>
+      <button class="tab-btn" data-tab="tab-camera">Combo Internet - Camera</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-goi-internet">
+      <div class="card-grid" id="grid-goi-internet"></div>
+    </div>
+    <div class="tab-panel" id="tab-mesh-cao">
+      <div class="card-grid" id="grid-mesh-cao"></div>
+    </div>
+    <div class="tab-panel" id="tab-combo">
+      <div class="card-grid" id="grid-combo"></div>
+    </div>
+    <div class="tab-panel" id="tab-camera">
+      <div class="card-grid" id="grid-camera"></div>
+    </div>
+  </div>
+
+  <div class="selection-summary" id="internet-summary"></div>
+
+  <!-- Banner giới thiệu — theo yêu cầu, chuyển xuống cuối trang thay vì đầu trang -->
   <div class="hero">
     <div class="hero-card">
       <div class="hero-inner hero-split">
@@ -1020,62 +1058,22 @@
       </div>
     </div>
   </div>
-
-  <div class="section">
-    <h2>Danh sách gói Internet - Truyền hình</h2>
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="tab-goi-internet">Gói Internet</button>
-      <button class="tab-btn" data-tab="tab-mesh-cao">Mesh Wifi tốc độ cao</button>
-      <button class="tab-btn" data-tab="tab-combo">Combo Internet - Truyền hình</button>
-      <button class="tab-btn" data-tab="tab-camera">Combo Internet - Camera</button>
-    </div>
-
-    <div class="tab-panel active" id="tab-goi-internet">
-      <div class="card-grid" id="grid-goi-internet"></div>
-    </div>
-    <div class="tab-panel" id="tab-mesh-cao">
-      <div class="card-grid" id="grid-mesh-cao"></div>
-    </div>
-    <div class="tab-panel" id="tab-combo">
-      <div class="card-grid" id="grid-combo"></div>
-    </div>
-    <div class="tab-panel" id="tab-camera">
-      <div class="card-grid" id="grid-camera"></div>
-    </div>
-  </div>
-
-  <div class="selection-summary" id="internet-summary"></div>
 </section>
 
 <!-- ================= PAGE 2: SIM SO ================= -->
 <section class="page" id="page-sim">
-  <div class="hero">
-    <div class="hero-card hero-mobile">
-      <div class="hero-inner hero-split">
-        <div class="hero-content hero-text">
-          <h1>Dịch vụ di động</h1>
-          <p class="hero-subtitle">Kết nối không giới hạn, theo cách của bạn.</p>
-          <div class="hero-pills">
-            <button class="hero-pill" data-target="goi-cuoc"><span class="pill-ico">📱</span>Gói cước di động</button>
-            <button class="hero-pill" data-target="sim-so"><span class="pill-ico">💳</span>Dịch vụ SIM số</button>
-            <button class="hero-pill" data-target="gtgt"><span class="pill-ico">🎁</span>Dịch vụ GTGT</button>
-            <button class="hero-pill" data-target="quoc-te"><span class="pill-ico">🌐</span>Dịch vụ quốc tế</button>
-          </div>
-          <div class="hero-pill-note" id="hero-pill-note" style="display:none;font-size:12px;color:rgba(255,255,255,.85);margin-top:10px;"></div>
-        </div>
-        <div class="hero-media" aria-hidden="true">
-          <svg viewBox="0 0 260 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="130" cy="112" r="100" fill="#fff" fill-opacity=".08"/>
-            <path d="M130 196C82 176 40 142 40 100 40 70 62 48 90 48c22 0 38 13 40 30 2-17 18-30 40-30 28 0 50 22 50 52 0 42-42 76-90 96Z" fill="#fff" fill-opacity=".14"/>
-            <rect x="88" y="58" width="52" height="94" rx="12" fill="#fff" fill-opacity=".95"/>
-            <rect x="98" y="72" width="32" height="56" rx="4" fill="var(--viettel-red)" fill-opacity=".25"/>
-            <circle cx="114" cy="140" r="5" fill="var(--viettel-red)"/>
-            <rect x="150" y="86" width="40" height="68" rx="10" fill="#fff" fill-opacity=".82"/>
-            <rect x="158" y="96" width="24" height="40" rx="3" fill="var(--viettel-red)" fill-opacity=".2"/>
-            <circle cx="170" cy="146" r="4" fill="var(--viettel-red)"/>
-          </svg>
-        </div>
+  <!-- Thanh chọn nhanh — giữ nguyên vị trí đầu trang theo yêu cầu, tách khỏi banner trang trí
+       để banner có thể chuyển xuống cuối trang mà không ảnh hưởng đến việc truy cập nhanh 4 dịch vụ. -->
+  <div class="section" style="padding-bottom:0;">
+    <div class="quick-nav-card">
+      <div class="quick-nav-title">Chọn nhanh dịch vụ di động</div>
+      <div class="hero-pills">
+        <button class="hero-pill" data-target="goi-cuoc"><span class="pill-ico">📱</span>Gói cước di động</button>
+        <button class="hero-pill" data-target="sim-so"><span class="pill-ico">💳</span>Dịch vụ SIM số</button>
+        <button class="hero-pill" data-target="gtgt"><span class="pill-ico">🎁</span>Dịch vụ GTGT</button>
+        <button class="hero-pill" data-target="quoc-te"><span class="pill-ico">🌐</span>Dịch vụ quốc tế</button>
       </div>
+      <div class="hero-pill-note" id="hero-pill-note" style="display:none;font-size:12px;color:var(--text-muted);margin-top:10px;"></div>
     </div>
   </div>
 
@@ -1122,6 +1120,30 @@
     </div>
 
     <div class="selection-summary" id="sim-summary"></div>
+  </div>
+
+  <!-- Banner giới thiệu — theo yêu cầu, chuyển xuống cuối trang; 4 nút chọn nhanh vẫn giữ nguyên ở đầu trang -->
+  <div class="hero">
+    <div class="hero-card hero-mobile">
+      <div class="hero-inner hero-split">
+        <div class="hero-content hero-text">
+          <h1>Dịch vụ di động</h1>
+          <p class="hero-subtitle">Kết nối không giới hạn, theo cách của bạn.</p>
+        </div>
+        <div class="hero-media" aria-hidden="true">
+          <svg viewBox="0 0 260 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="130" cy="112" r="100" fill="#fff" fill-opacity=".08"/>
+            <path d="M130 196C82 176 40 142 40 100 40 70 62 48 90 48c22 0 38 13 40 30 2-17 18-30 40-30 28 0 50 22 50 52 0 42-42 76-90 96Z" fill="#fff" fill-opacity=".14"/>
+            <rect x="88" y="58" width="52" height="94" rx="12" fill="#fff" fill-opacity=".95"/>
+            <rect x="98" y="72" width="32" height="56" rx="4" fill="var(--viettel-red)" fill-opacity=".25"/>
+            <circle cx="114" cy="140" r="5" fill="var(--viettel-red)"/>
+            <rect x="150" y="86" width="40" height="68" rx="10" fill="#fff" fill-opacity=".82"/>
+            <rect x="158" y="96" width="24" height="40" rx="3" fill="var(--viettel-red)" fill-opacity=".2"/>
+            <circle cx="170" cy="146" r="4" fill="var(--viettel-red)"/>
+          </svg>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 

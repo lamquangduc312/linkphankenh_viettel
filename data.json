@@ -1,0 +1,1343 @@
+{
+  "meta": {
+    "nguon": [
+      "https://viettel.vn/vx/internet-truyenhinh/",
+      "https://viettel.vn/vx/internet-truyenhinh/toan-trinh/",
+      "https://viettel.vn/vx/internet-truyenhinh/combo",
+      "https://viettel.vn/vx/di-dong/sim-so/",
+      "https://viettel.vn/vx/di-dong/goi-data-1/",
+      "https://viettel.vn/vx/di-dong/goi-data-1/ (tab Gói roaming)",
+      "https://viettel.vn/vx/di-dong/goi-data-1/ (tab Gói cước HOT, Miễn phí MXH, Siêu ưu đãi thoại/data)"
+    ],
+    "ngayThuThap": "2026-07-02",
+    "ghiChu": "Dữ liệu được tổng hợp thủ công từ ảnh chụp màn hình các trang gói cước Viettel do người dùng cung cấp, dùng để dựng trang demo nội bộ."
+  },
+  "goiInternet": [
+    {
+      "ma": "NETVT01_T",
+      "nhom": "Gói Internet",
+      "tocDo": "300 Mbps",
+      "moTa": "01 thiết bị Wifi 6 đời mới",
+      "khuVuc": "",
+      "chuKy": "",
+      "gia": 195000,
+      "donVi": "đ/tháng"
+    },
+    {
+      "ma": "NETVT2_T",
+      "nhom": "Gói Internet",
+      "tocDo": "Từ 500 Mbps đến 1Gbps",
+      "moTa": "",
+      "khuVuc": "Áp dụng tại 32 Tỉnh và ngoại thành HNI, HCM",
+      "chuKy": "Đóng theo chu kỳ 1 tháng/6 tháng/13 tháng",
+      "gia": 240000,
+      "donVi": "đ/tháng"
+    },
+    {
+      "ma": "MESHVT1_T",
+      "nhom": "Gói Internet",
+      "tocDo": "300 Mbps",
+      "moTa": "",
+      "khuVuc": "Áp dụng tại 32 Tỉnh và ngoại thành HNI, HCM",
+      "chuKy": "",
+      "gia": 210000,
+      "donVi": "đ/tháng"
+    },
+    {
+      "ma": "MESHVT2_T",
+      "nhom": "Gói Internet",
+      "tocDo": "Từ 500Mbps đến 1Gbps",
+      "moTa": "",
+      "khuVuc": "Áp dụng tại 32 Tỉnh và ngoại thành HNI, HCM",
+      "chuKy": "Đóng theo chu kỳ 1 tháng/6 tháng/13 tháng",
+      "gia": 245000,
+      "donVi": "đ/tháng"
+    },
+    {
+      "ma": "MESHVT3_T",
+      "nhom": "Mesh Wifi tốc độ cao",
+      "tocDo": "Từ 500 Mbps đến 1Gbps",
+      "moTa": "",
+      "khuVuc": "KH tại 32 Tỉnh và ngoại thành HNI, HCM",
+      "chuKy": "Đóng theo chu kỳ 1 tháng/6 tháng/13 tháng",
+      "gia": 299000,
+      "donVi": "đ/tháng"
+    },
+    {
+      "ma": "MESHVT1_H",
+      "nhom": "Mesh Wifi tốc độ cao",
+      "tocDo": "300 Mbps",
+      "moTa": "",
+      "khuVuc": "KH tại Nội thành HNI, HCM",
+      "chuKy": "Đóng theo chu kỳ 1 tháng/6 tháng/13 tháng",
+      "gia": 255000,
+      "donVi": "đ/tháng"
+    },
+    {
+      "ma": "MESHVT2_H",
+      "nhom": "Mesh Wifi tốc độ cao",
+      "tocDo": "Từ 500 Mbps đến 1Gbps",
+      "moTa": "",
+      "khuVuc": "KH tại Nội thành HNI, HCM",
+      "chuKy": "Đóng theo chu kỳ 1 tháng/6 tháng/13 tháng",
+      "gia": 289000,
+      "donVi": "đ/tháng"
+    },
+    {
+      "ma": "MESHVT3_H",
+      "nhom": "Mesh Wifi tốc độ cao",
+      "tocDo": "Từ 500 Mbps đến 1Gbps",
+      "moTa": "",
+      "khuVuc": "KH tại Nội thành HNI, HCM",
+      "chuKy": "Đóng theo chu kỳ 1 tháng/6 tháng/13 tháng",
+      "gia": 359000,
+      "donVi": "đ/tháng"
+    },
+    {
+      "ma": "NETVT01_H",
+      "nhom": "Wifi 6 tốc độ cao",
+      "tocDo": "300 Mbps",
+      "moTa": "",
+      "khuVuc": "KH tại Nội thành HNI, HCM",
+      "chuKy": "Đóng theo chu kỳ 1 tháng/6 tháng/13 tháng",
+      "gia": 235000,
+      "donVi": "đ/tháng"
+    },
+    {
+      "ma": "NETVT2_H",
+      "nhom": "Wifi 6 tốc độ cao",
+      "tocDo": "Từ 500 Mbps đến 1Gbps",
+      "moTa": "",
+      "khuVuc": "KH tại Nội thành HNI, HCM",
+      "chuKy": "Đóng theo chu kỳ 1 tháng/6 tháng/13 tháng",
+      "gia": 265000,
+      "donVi": "đ/tháng"
+    }
+  ],
+  "goiCombo": [
+    {
+      "ma": "NETVT2T_GIAITRIBOX",
+      "nhom": "Combo Internet - TV360",
+      "tocDo": "Từ 500Mbps đến 1Gbps",
+      "thietBi": "Modem Wifi 6 + Đầu thu Set-top-box TV360",
+      "khuVuc": "Khách hàng tại 32 Tỉnh và ngoại thành HNI, HCM",
+      "chuKy": "Đóng cước theo chu kỳ 1/6/13 tháng",
+      "gia": 280000,
+      "donVi": "đ/tháng"
+    },
+    {
+      "ma": "MESHVT1T_GIAITRI",
+      "nhom": "Combo Internet - TV360",
+      "tocDo": "300Mbps",
+      "thietBi": "01 Modem Wifi 6 + 01 Mesh Wifi + Truyền hình trên Smart TV",
+      "khuVuc": "KH tại 32 Tỉnh và ngoại thành HNI, HCM",
+      "chuKy": "Đóng cước theo chu kỳ 1/6/13 tháng",
+      "gia": 230000,
+      "donVi": "đ/tháng"
+    },
+    {
+      "ma": "MESHVT1H_CAM1",
+      "nhom": "Combo Internet - Camera",
+      "tocDo": "300Mbps + 7 ngày lưu trữ",
+      "thietBi": "Modem Wifi 6 + Camera",
+      "khuVuc": "KH tại Nội thành HNI, HCM",
+      "chuKy": "Đóng theo chu kỳ 1 tháng/6 tháng/13 tháng",
+      "gia": 275000,
+      "donVi": "đ/tháng"
+    },
+    {
+      "ma": "MESHVT2H_CAM1",
+      "nhom": "Combo Internet - Camera",
+      "tocDo": "500Mbps đến 1 Gbps + 1 ngày lưu trữ (24h)",
+      "thietBi": "Modem Wifi 6 + Camera",
+      "khuVuc": "Áp dụng tại Nội thành HNI, HCM",
+      "chuKy": "Đóng cước theo chu kỳ 1/6/13 tháng",
+      "gia": 309000,
+      "donVi": "đ/tháng"
+    },
+    {
+      "ma": "MESHVT3H_CAM1",
+      "nhom": "Combo Internet - Camera",
+      "tocDo": "500Mbps đến 1 Gbps + 1 ngày lưu trữ (24h)",
+      "thietBi": "Modem Wifi 6 + Camera",
+      "khuVuc": "Áp dụng tại Nội thành HNI, HCM",
+      "chuKy": "Đóng cước theo chu kỳ 1/6/13 tháng",
+      "gia": 379000,
+      "donVi": "đ/tháng"
+    }
+  ],
+  "simSo": {
+    "loaiThueBao": [
+      "Trả trước",
+      "Trả sau"
+    ],
+    "macDinh": "Trả sau",
+    "chuKyGoiChinh": "1 chu kỳ 30 ngày",
+    "danhSach": [
+      {
+        "stt": 1,
+        "so": "0332 519 399",
+        "gia": 60000,
+        "thoiGian": "12 tháng"
+      },
+      {
+        "stt": 2,
+        "so": "0399 401 984",
+        "gia": 60000,
+        "thoiGian": "12 tháng"
+      },
+      {
+        "stt": 3,
+        "so": "0375 085 579",
+        "gia": 60000,
+        "thoiGian": "12 tháng"
+      },
+      {
+        "stt": 4,
+        "so": "0374 336 488",
+        "gia": 60000,
+        "thoiGian": "12 tháng"
+      },
+      {
+        "stt": 5,
+        "so": "0962 449 624",
+        "gia": 60000,
+        "thoiGian": "12 tháng"
+      },
+      {
+        "stt": 6,
+        "so": "0384 820 399",
+        "gia": 60000,
+        "thoiGian": "12 tháng"
+      },
+      {
+        "stt": 7,
+        "so": "0335 812 512",
+        "gia": 60000,
+        "thoiGian": "12 tháng"
+      },
+      {
+        "stt": 8,
+        "so": "0336 052 286",
+        "gia": 60000,
+        "thoiGian": "12 tháng"
+      },
+      {
+        "stt": 9,
+        "so": "0354 282 819",
+        "gia": 60000,
+        "thoiGian": "12 tháng"
+      },
+      {
+        "stt": 10,
+        "so": "0367 204 320",
+        "gia": 60000,
+        "thoiGian": "12 tháng"
+      }
+    ]
+  },
+  "goiData": [
+    {
+      "ma": "5G70",
+      "nhom": "7 ngày",
+      "data": "56GB (8GB/ngày)",
+      "thoai": "",
+      "tienIch": "",
+      "gia": 70000,
+      "giaGoc": null
+    },
+    {
+      "ma": "5G150",
+      "nhom": "30 ngày",
+      "data": "6GB/ngày tại Việt Nam, 1GB Roaming",
+      "thoai": "",
+      "tienIch": "TV360, MCA",
+      "gia": 135000,
+      "giaGoc": 150000
+    },
+    {
+      "ma": "5G150N",
+      "nhom": "30 ngày",
+      "data": "8GB/ngày, 1GB Roaming",
+      "thoai": "",
+      "tienIch": "TV360",
+      "gia": 135000,
+      "giaGoc": 150000
+    },
+    {
+      "ma": "5G160B",
+      "nhom": "30 ngày",
+      "data": "4GB/ngày",
+      "thoai": "100 phút ngoại mạng, 10p/cuộc nội mạng",
+      "tienIch": "TV360, MCA",
+      "gia": 144000,
+      "giaGoc": 160000
+    },
+    {
+      "ma": "5G180B",
+      "nhom": "30 ngày",
+      "data": "6GB/ngày, 1GB Roaming",
+      "thoai": "100 phút ngoại mạng, 10p/cuộc nội mạng",
+      "tienIch": "TV360, MCA",
+      "gia": 162000,
+      "giaGoc": 180000
+    },
+    {
+      "ma": "5G230B",
+      "nhom": "30 ngày",
+      "data": "8GB/ngày tại Việt Nam, 1GB Roaming",
+      "thoai": "150 phút ngoại mạng, 20p/cuộc nội mạng",
+      "tienIch": "TV360, MCA",
+      "gia": 207000,
+      "giaGoc": 230000
+    },
+    {
+      "ma": "5G280B",
+      "nhom": "30 ngày",
+      "data": "10GB/ngày",
+      "thoai": "200 phút ngoại mạng, 20p/cuộc nội mạng",
+      "tienIch": "TV360, MCA",
+      "gia": 252000,
+      "giaGoc": 280000
+    },
+    {
+      "ma": "5G330B",
+      "nhom": "30 ngày",
+      "data": "12GB/ngày",
+      "thoai": "300 phút ngoại mạng, 20p/cuộc nội mạng",
+      "tienIch": "TV360, MCA",
+      "gia": 297000,
+      "giaGoc": 330000
+    },
+    {
+      "ma": "5G380B",
+      "nhom": "30 ngày",
+      "data": "15GB/ngày",
+      "thoai": "300 phút ngoại mạng, 20p/cuộc nội mạng",
+      "tienIch": "TV360, MCA",
+      "gia": 342000,
+      "giaGoc": 380000
+    },
+    {
+      "ma": "5G480B",
+      "nhom": "30 ngày",
+      "data": "20GB/ngày",
+      "thoai": "300 phút ngoại mạng, 20p/cuộc nội mạng",
+      "tienIch": "TV360, MYBOX",
+      "gia": 432000,
+      "giaGoc": 480000
+    },
+    {
+      "ma": "3T5G150",
+      "nhom": "90 ngày",
+      "data": "6GB/ngày tại Việt Nam, 3GB Roaming",
+      "thoai": "",
+      "tienIch": "TV360, MCA",
+      "gia": 405000,
+      "giaGoc": 450000
+    },
+    {
+      "ma": "3T5G150N",
+      "nhom": "90 ngày",
+      "data": "8GB/ngày, 1GB Roaming",
+      "thoai": "",
+      "tienIch": "TV360, MCA",
+      "gia": 405000,
+      "giaGoc": 450000
+    },
+    {
+      "ma": "3T5G160B",
+      "nhom": "90 ngày",
+      "data": "4GB/ngày",
+      "thoai": "Mỗi 30 ngày có 300 phút ngoại mạng, 10p/cuộc nội mạng",
+      "tienIch": "TV360, MCA",
+      "gia": 432000,
+      "giaGoc": 480000
+    },
+    {
+      "ma": "3T5G180B",
+      "nhom": "90 ngày",
+      "data": "6GB/ngày, 1GB Roaming",
+      "thoai": "Mỗi 30 ngày có 300 phút ngoại mạng, 10p/cuộc nội mạng",
+      "tienIch": "TV360, MCA",
+      "gia": 486000,
+      "giaGoc": 540000
+    },
+    {
+      "ma": "3T5G230B",
+      "nhom": "90 ngày",
+      "data": "8GB/ngày tại Việt Nam, 3GB Roaming",
+      "thoai": "Mỗi 30 ngày có 150 phút ngoại mạng, 20p/cuộc nội mạng",
+      "tienIch": "TV360, MCA",
+      "gia": 621000,
+      "giaGoc": 690000
+    },
+    {
+      "ma": "3T5G280B",
+      "nhom": "90 ngày",
+      "data": "900GB (10GB/ngày)",
+      "thoai": "Mỗi chu kỳ 30 ngày có 200 phút ngoại mạng, 20p/cuộc nội mạng",
+      "tienIch": "TV360, MCA",
+      "gia": 756000,
+      "giaGoc": 840000
+    },
+    {
+      "ma": "3T5G330B",
+      "nhom": "90 ngày",
+      "data": "1.080GB (12GB/ngày)",
+      "thoai": "Mỗi 30 ngày có 300 phút ngoại mạng, 20p/cuộc nội mạng",
+      "tienIch": "TV360, MCA",
+      "gia": 891000,
+      "giaGoc": 990000
+    },
+    {
+      "ma": "3T5G380B",
+      "nhom": "90 ngày",
+      "data": "1.350GB (15GB/ngày)",
+      "thoai": "Mỗi 30 ngày có 300 phút ngoại mạng, 20p/cuộc nội mạng",
+      "tienIch": "TV360, MCA",
+      "gia": 1026000,
+      "giaGoc": 1140000
+    },
+    {
+      "ma": "3T5G480B",
+      "nhom": "90 ngày",
+      "data": "20GB/ngày",
+      "thoai": "900 phút ngoại mạng, 20p/cuộc nội mạng",
+      "tienIch": "TV360",
+      "gia": 1296000,
+      "giaGoc": 1440000
+    },
+    {
+      "ma": "6T5G150",
+      "nhom": "180 ngày",
+      "data": "6GB/ngày tại Việt Nam, 6GB Roaming",
+      "thoai": "",
+      "tienIch": "TV360, MCA",
+      "gia": 810000,
+      "giaGoc": 900000
+    },
+    {
+      "ma": "6T5G150N",
+      "nhom": "180 ngày",
+      "data": "8GB/ngày, 1GB Roaming",
+      "thoai": "",
+      "tienIch": "TV360, MCA",
+      "gia": 810000,
+      "giaGoc": 900000
+    },
+    {
+      "ma": "6T5G160B",
+      "nhom": "180 ngày",
+      "data": "4GB/ngày",
+      "thoai": "600 phút ngoại mạng, 10p/cuộc nội mạng",
+      "tienIch": "TV360, MCA",
+      "gia": 864000,
+      "giaGoc": 960000
+    },
+    {
+      "ma": "6T5G180B",
+      "nhom": "180 ngày",
+      "data": "6GB/ngày, 1GB Roaming",
+      "thoai": "600 phút ngoại mạng, 10p/cuộc nội mạng",
+      "tienIch": "TV360, MCA",
+      "gia": 972000,
+      "giaGoc": 1080000
+    },
+    {
+      "ma": "6T5G230B",
+      "nhom": "180 ngày",
+      "data": "8GB/ngày tại Việt Nam, 6GB Roaming",
+      "thoai": "900 phút ngoại mạng, 20p/cuộc nội mạng",
+      "tienIch": "TV360, MCA",
+      "gia": 1242000,
+      "giaGoc": 1380000
+    },
+    {
+      "ma": "6T5G280B",
+      "nhom": "180 ngày",
+      "data": "10GB/ngày",
+      "thoai": "1.200 phút ngoại mạng, 20p/cuộc nội mạng",
+      "tienIch": "TV360, MCA",
+      "gia": 1512000,
+      "giaGoc": 1600000
+    },
+    {
+      "ma": "6T5G480B",
+      "nhom": "180 ngày",
+      "data": "20GB/ngày",
+      "thoai": "1.800 phút ngoại mạng, 20p/cuộc nội mạng",
+      "tienIch": "TV360",
+      "gia": 2592000,
+      "giaGoc": 2800000
+    },
+    {
+      "ma": "12T5G150",
+      "nhom": "360 ngày",
+      "data": "6GB/ngày tại Việt Nam, 12GB Roaming",
+      "thoai": "",
+      "tienIch": "TV360, MCA",
+      "gia": 1620000,
+      "giaGoc": 1800000
+    },
+    {
+      "ma": "12T5G150N",
+      "nhom": "360 ngày",
+      "data": "8GB/ngày, 1GB Roaming",
+      "thoai": "",
+      "tienIch": "TV360, MCA",
+      "gia": 1620000,
+      "giaGoc": 1800000
+    },
+    {
+      "ma": "12T5G160B",
+      "nhom": "360 ngày",
+      "data": "4GB/ngày",
+      "thoai": "1.200 phút ngoại mạng, 10p/cuộc nội mạng",
+      "tienIch": "TV360, MCA",
+      "gia": 1728000,
+      "giaGoc": 1920000
+    },
+    {
+      "ma": "12T5G230B",
+      "nhom": "360 ngày",
+      "data": "8GB/ngày tại Việt Nam, 12GB Roaming",
+      "thoai": "1.800 phút ngoại mạng, 20p/cuộc nội mạng",
+      "tienIch": "TV360, MCA",
+      "gia": 2484000,
+      "giaGoc": 2760000
+    },
+    {
+      "ma": "12T5G280B",
+      "nhom": "360 ngày",
+      "data": "10GB/ngày",
+      "thoai": "2.400 phút ngoại mạng, 20p/cuộc nội mạng",
+      "tienIch": "TV360, MCA",
+      "gia": 3024000,
+      "giaGoc": 3360000
+    },
+    {
+      "ma": "12T5G330B",
+      "nhom": "360 ngày",
+      "data": "12GB/ngày",
+      "thoai": "3.600 phút ngoại mạng, 20p/cuộc nội mạng",
+      "tienIch": "TV360, MCA",
+      "gia": 3564000,
+      "giaGoc": 3960000
+    },
+    {
+      "ma": "12T5G380B",
+      "nhom": "360 ngày",
+      "data": "15GB/ngày",
+      "thoai": "3.600 phút ngoại mạng, 20p/cuộc nội mạng",
+      "tienIch": "TV360, MCA",
+      "gia": 4104000,
+      "giaGoc": 4560000
+    },
+    {
+      "ma": "12T5G480B",
+      "nhom": "360 ngày",
+      "data": "20GB/ngày",
+      "thoai": "3.600 phút ngoại mạng, 20p/cuộc nội mạng",
+      "tienIch": "TV360, MYBOX",
+      "gia": 5184000,
+      "giaGoc": 5760000
+    }
+  ],
+  "goiRoaming": [
+    {
+      "ma": "IRU1",
+      "nhom": "Ngày",
+      "thoiHan": "24 giờ",
+      "uuDai": "1GB tốc độ cao",
+      "phamVi": "Campuchia, Lào",
+      "gia": 25000,
+      "giaGoc": null
+    },
+    {
+      "ma": "DRU1",
+      "nhom": "Ngày",
+      "thoiHan": "24 giờ",
+      "uuDai": "1GB tốc độ cao",
+      "phamVi": "90 Quốc gia",
+      "gia": 50000,
+      "giaGoc": null
+    },
+    {
+      "ma": "IRU3",
+      "nhom": "Ngày",
+      "thoiHan": "3 ngày",
+      "uuDai": "3GB (1GB tốc độ cao/ngày)",
+      "phamVi": "Campuchia, Lào",
+      "gia": 75000,
+      "giaGoc": null
+    },
+    {
+      "ma": "TQ5",
+      "nhom": "Ngày",
+      "thoiHan": "120 giờ",
+      "uuDai": "2GB",
+      "phamVi": "Trung Quốc",
+      "gia": 99000,
+      "giaGoc": null
+    },
+    {
+      "ma": "THAI5",
+      "nhom": "Ngày",
+      "thoiHan": "120 giờ",
+      "uuDai": "4GB",
+      "phamVi": "Thái Lan",
+      "gia": 99000,
+      "giaGoc": null
+    },
+    {
+      "ma": "HQ5",
+      "nhom": "Ngày",
+      "thoiHan": "120 giờ",
+      "uuDai": "8GB, 20 phút thoại 4G/5G",
+      "phamVi": "Hàn Quốc",
+      "gia": 99000,
+      "giaGoc": null
+    },
+    {
+      "ma": "UAE5",
+      "nhom": "Ngày",
+      "thoiHan": "120 giờ",
+      "uuDai": "5GB",
+      "phamVi": "UAE",
+      "gia": 99000,
+      "giaGoc": null
+    },
+    {
+      "ma": "ASEAN5",
+      "nhom": "Ngày",
+      "thoiHan": "120 giờ",
+      "uuDai": "2GB",
+      "phamVi": "9 Quốc gia",
+      "gia": 100000,
+      "giaGoc": null
+    },
+    {
+      "ma": "DR3",
+      "nhom": "Ngày",
+      "thoiHan": "72 giờ",
+      "uuDai": "1GB",
+      "phamVi": "171 Quốc gia",
+      "gia": 130000,
+      "giaGoc": null
+    },
+    {
+      "ma": "IR15",
+      "nhom": "Tuần",
+      "thoiHan": "15 ngày",
+      "uuDai": "2GB",
+      "phamVi": "Campuchia, Lào",
+      "gia": 99000,
+      "giaGoc": null
+    },
+    {
+      "ma": "IRU7",
+      "nhom": "Tuần",
+      "thoiHan": "7 ngày",
+      "uuDai": "7GB (1GB tốc độ cao/ngày)",
+      "phamVi": "Campuchia, Lào",
+      "gia": 175000,
+      "giaGoc": null
+    },
+    {
+      "ma": "CR15",
+      "nhom": "Tuần",
+      "thoiHan": "360 giờ",
+      "uuDai": "3GB, 10 SMS, 30 phút thoại",
+      "phamVi": "Campuchia, Lào",
+      "gia": 199000,
+      "giaGoc": null
+    },
+    {
+      "ma": "HQ10",
+      "nhom": "Tuần",
+      "thoiHan": "240 giờ",
+      "uuDai": "20GB, 30 phút thoại 4G/5G",
+      "phamVi": "Hàn Quốc",
+      "gia": 200000,
+      "giaGoc": null
+    },
+    {
+      "ma": "THAI10",
+      "nhom": "Tuần",
+      "thoiHan": "240 giờ",
+      "uuDai": "10GB",
+      "phamVi": "Thái Lan",
+      "gia": 200000,
+      "giaGoc": null
+    },
+    {
+      "ma": "MALAY10",
+      "nhom": "Tuần",
+      "thoiHan": "240 giờ",
+      "uuDai": "16GB",
+      "phamVi": "Malaysia",
+      "gia": 200000,
+      "giaGoc": null
+    },
+    {
+      "ma": "SING10",
+      "nhom": "Tuần",
+      "thoiHan": "240 giờ",
+      "uuDai": "12GB",
+      "phamVi": "Singapore",
+      "gia": 200000,
+      "giaGoc": null
+    },
+    {
+      "ma": "HK10",
+      "nhom": "Tuần",
+      "thoiHan": "240 giờ",
+      "uuDai": "16GB",
+      "phamVi": "Hồng Kông",
+      "gia": 200000,
+      "giaGoc": null
+    },
+    {
+      "ma": "CR200",
+      "nhom": "Tuần",
+      "thoiHan": "168 giờ",
+      "uuDai": "400MB, 10 SMS, 20 phút thoại",
+      "phamVi": "35 Quốc gia",
+      "gia": 200000,
+      "giaGoc": null
+    },
+    {
+      "ma": "TQ10",
+      "nhom": "Tuần",
+      "thoiHan": "240 giờ",
+      "uuDai": "6GB",
+      "phamVi": "Trung Quốc",
+      "gia": 250000,
+      "giaGoc": null
+    },
+    {
+      "ma": "NHAT15",
+      "nhom": "Tuần",
+      "thoiHan": "360 giờ",
+      "uuDai": "6GB",
+      "phamVi": "Nhật Bản",
+      "gia": 250000,
+      "giaGoc": null
+    },
+    {
+      "ma": "DL10",
+      "nhom": "Tuần",
+      "thoiHan": "240 giờ",
+      "uuDai": "10GB",
+      "phamVi": "Đài Loan",
+      "gia": 250000,
+      "giaGoc": null
+    },
+    {
+      "ma": "UC10",
+      "nhom": "Tuần",
+      "thoiHan": "240 giờ",
+      "uuDai": "8GB",
+      "phamVi": "Úc",
+      "gia": 250000,
+      "giaGoc": null
+    },
+    {
+      "ma": "UAE10",
+      "nhom": "Tuần",
+      "thoiHan": "240 giờ",
+      "uuDai": "15GB",
+      "phamVi": "UAE",
+      "gia": 250000,
+      "giaGoc": null
+    },
+    {
+      "ma": "ASEAN15",
+      "nhom": "Tuần",
+      "thoiHan": "360 giờ",
+      "uuDai": "5GB",
+      "phamVi": "9 Quốc gia",
+      "gia": 250000,
+      "giaGoc": null
+    },
+    {
+      "ma": "DR7",
+      "nhom": "Tuần",
+      "thoiHan": "168 giờ",
+      "uuDai": "2GB",
+      "phamVi": "171 Quốc gia",
+      "gia": 250000,
+      "giaGoc": null
+    },
+    {
+      "ma": "DRU7",
+      "nhom": "Tuần",
+      "thoiHan": "7 ngày",
+      "uuDai": "7GB (1GB tốc độ cao/ngày)",
+      "phamVi": "90 Quốc gia",
+      "gia": 350000,
+      "giaGoc": null
+    },
+    {
+      "ma": "USA15",
+      "nhom": "Tuần",
+      "thoiHan": "360 giờ",
+      "uuDai": "25GB",
+      "phamVi": "Mỹ",
+      "gia": 350000,
+      "giaGoc": null
+    },
+    {
+      "ma": "NGA15",
+      "nhom": "Tuần",
+      "thoiHan": "360 giờ",
+      "uuDai": "6GB",
+      "phamVi": "Nga",
+      "gia": 350000,
+      "giaGoc": null
+    },
+    {
+      "ma": "REU15",
+      "nhom": "Tuần",
+      "thoiHan": "360 giờ",
+      "uuDai": "5GB",
+      "phamVi": "42 Quốc gia",
+      "gia": 400000,
+      "giaGoc": null
+    },
+    {
+      "ma": "CR500",
+      "nhom": "Tuần",
+      "thoiHan": "240 giờ",
+      "uuDai": "1.2GB, 20 SMS, 50 phút thoại",
+      "phamVi": "35 Quốc gia",
+      "gia": 500000,
+      "giaGoc": null
+    },
+    {
+      "ma": "DR15",
+      "nhom": "Tuần",
+      "thoiHan": "360 giờ",
+      "uuDai": "5GB",
+      "phamVi": "171 Quốc gia",
+      "gia": 550000,
+      "giaGoc": null
+    },
+    {
+      "ma": "DRE20",
+      "nhom": "Tháng",
+      "thoiHan": "30 ngày",
+      "uuDai": "50MB",
+      "phamVi": "171 Quốc gia",
+      "gia": 18000,
+      "giaGoc": 20000
+    },
+    {
+      "ma": "DRE50",
+      "nhom": "Tháng",
+      "thoiHan": "30 ngày",
+      "uuDai": "200MB",
+      "phamVi": "171 Quốc gia",
+      "gia": 45000,
+      "giaGoc": 50000
+    },
+    {
+      "ma": "DRE100",
+      "nhom": "Tháng",
+      "thoiHan": "30 ngày",
+      "uuDai": "500MB",
+      "phamVi": "171 Quốc gia",
+      "gia": 90000,
+      "giaGoc": 100000
+    },
+    {
+      "ma": "CR30",
+      "nhom": "Tháng",
+      "thoiHan": "720 giờ",
+      "uuDai": "5GB, 50 SMS, 100 phút thoại",
+      "phamVi": "Campuchia, Lào",
+      "gia": 450000,
+      "giaGoc": null
+    },
+    {
+      "ma": "REU30",
+      "nhom": "Tháng",
+      "thoiHan": "720 giờ",
+      "uuDai": "12GB",
+      "phamVi": "42 Quốc gia",
+      "gia": 800000,
+      "giaGoc": null
+    },
+    {
+      "ma": "DR30",
+      "nhom": "Tháng",
+      "thoiHan": "720 giờ",
+      "uuDai": "10GB",
+      "phamVi": "171 Quốc gia",
+      "gia": 1100000,
+      "giaGoc": null
+    }
+  ],
+  "goiHot": [
+    {
+      "ma": "ST7K",
+      "nhom": "1 ngày",
+      "thoiHan": "1 ngày",
+      "data": "1GB",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 7000,
+      "giaGoc": null
+    },
+    {
+      "ma": "5G10",
+      "nhom": "1 ngày",
+      "thoiHan": "1 ngày",
+      "data": "6GB",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 10000,
+      "giaGoc": null
+    },
+    {
+      "ma": "5GVS12",
+      "nhom": "1 ngày",
+      "thoiHan": "1 ngày",
+      "data": "6GB",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "",
+      "tienIch": "TV360",
+      "moTa": "",
+      "gia": 12000,
+      "giaGoc": null
+    }
+  ],
+  "goiMXH": [
+    {
+      "ma": "FB5K",
+      "nhom": "1 ngày",
+      "thoiHan": "1 ngày",
+      "data": "15GB Meta",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "FACEBOOK, INSTAGRAM",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 5000,
+      "giaGoc": null
+    },
+    {
+      "ma": "YT5K",
+      "nhom": "1 ngày",
+      "thoiHan": "1 ngày",
+      "data": "15GB Youtube",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "YOUTUBE",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 5000,
+      "giaGoc": null
+    },
+    {
+      "ma": "T5K",
+      "nhom": "1 ngày",
+      "thoiHan": "1 ngày",
+      "data": "15GB Tiktok",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "TIKTOK",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 5000,
+      "giaGoc": null
+    },
+    {
+      "ma": "YT15K",
+      "nhom": "7 ngày",
+      "thoiHan": "7 ngày",
+      "data": "25GB Youtube",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "YOUTUBE",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 15000,
+      "giaGoc": null
+    },
+    {
+      "ma": "T15KN",
+      "nhom": "7 ngày",
+      "thoiHan": "7 ngày",
+      "data": "25GB TikTok",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "TIKTOK",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 15000,
+      "giaGoc": null
+    },
+    {
+      "ma": "FB15K",
+      "nhom": "7 ngày",
+      "thoiHan": "7 ngày",
+      "data": "25GB Meta",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "FACEBOOK, INSTAGRAM",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 15000,
+      "giaGoc": null
+    },
+    {
+      "ma": "YT50K",
+      "nhom": "30 ngày",
+      "thoiHan": "30 ngày",
+      "data": "50GB Youtube",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "YOUTUBE",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 50000,
+      "giaGoc": null
+    },
+    {
+      "ma": "T50K",
+      "nhom": "30 ngày",
+      "thoiHan": "30 ngày",
+      "data": "50GB TikTok",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "TIKTOK",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 50000,
+      "giaGoc": null
+    },
+    {
+      "ma": "FB50K",
+      "nhom": "30 ngày",
+      "thoiHan": "30 ngày",
+      "data": "50GB Meta",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "FACEBOOK, INSTAGRAM",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 50000,
+      "giaGoc": null
+    },
+    {
+      "ma": "3FB50K",
+      "nhom": "90 ngày",
+      "thoiHan": "90 ngày",
+      "data": "150GB Meta",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "FACEBOOK, INSTAGRAM",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 150000,
+      "giaGoc": null
+    },
+    {
+      "ma": "6FB50K",
+      "nhom": "180 ngày",
+      "thoiHan": "180 ngày",
+      "data": "300GB Meta",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "FACEBOOK, INSTAGRAM",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 300000,
+      "giaGoc": null
+    },
+    {
+      "ma": "12FB50K",
+      "nhom": "360 ngày",
+      "thoiHan": "360 ngày",
+      "data": "600GB Meta",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "FACEBOOK, INSTAGRAM",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 600000,
+      "giaGoc": null
+    }
+  ],
+  "goiSieuUuDai": [
+    {
+      "ma": "TV7K",
+      "nhom": "1 ngày",
+      "thoiHan": "1 ngày",
+      "data": "1GB",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "",
+      "tienIch": "TV360",
+      "moTa": "",
+      "gia": 7000,
+      "giaGoc": null
+    },
+    {
+      "ma": "ST7K",
+      "nhom": "1 ngày",
+      "thoiHan": "1 ngày",
+      "data": "1GB",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 7000,
+      "giaGoc": null
+    },
+    {
+      "ma": "1N",
+      "nhom": "1 ngày",
+      "thoiHan": "1 ngày",
+      "data": "5GB",
+      "thoai": "5 phút ngoại mạng, 10 phút/cuộc nội mạng",
+      "sms": "Miễn phí nội mạng",
+      "uuDai": "",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 10000,
+      "giaGoc": null
+    },
+    {
+      "ma": "ST15K",
+      "nhom": "3 ngày",
+      "thoiHan": "3 ngày",
+      "data": "3GB",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 15000,
+      "giaGoc": null
+    },
+    {
+      "ma": "3N",
+      "nhom": "3 ngày",
+      "thoiHan": "3 ngày",
+      "data": "5GB/ngày",
+      "thoai": "15 phút ngoại mạng, 10 phút/cuộc nội mạng",
+      "sms": "Miễn phí nội mạng",
+      "uuDai": "",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 30000,
+      "giaGoc": null
+    },
+    {
+      "ma": "5G30",
+      "nhom": "3 ngày",
+      "thoiHan": "3 ngày",
+      "data": "21GB (7GB/ngày)",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 30000,
+      "giaGoc": null
+    },
+    {
+      "ma": "V30X",
+      "nhom": "7 ngày",
+      "thoiHan": "7 ngày",
+      "data": "500MB/ngày",
+      "thoai": "10 phút/cuộc nội mạng",
+      "sms": "",
+      "uuDai": "",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 30000,
+      "giaGoc": null
+    },
+    {
+      "ma": "ST30K",
+      "nhom": "7 ngày",
+      "thoiHan": "7 ngày",
+      "data": "",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "",
+      "tienIch": "",
+      "moTa": "7GB tốc độ cao sử dụng trong 7 ngày (Gia hạn tự động).",
+      "gia": 30000,
+      "giaGoc": null
+    },
+    {
+      "ma": "7N",
+      "nhom": "7 ngày",
+      "thoiHan": "7 ngày",
+      "data": "5GB/ngày",
+      "thoai": "35 phút ngoại mạng, 10 phút/cuộc nội mạng",
+      "sms": "Miễn phí nội mạng",
+      "uuDai": "",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 70000,
+      "giaGoc": null
+    },
+    {
+      "ma": "V25B",
+      "nhom": "15 ngày",
+      "thoiHan": "15 ngày",
+      "data": "2GB",
+      "thoai": "10 phút/cuộc nội mạng",
+      "sms": "",
+      "uuDai": "",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 25000,
+      "giaGoc": null
+    },
+    {
+      "ma": "V35B",
+      "nhom": "15 ngày",
+      "thoiHan": "15 ngày",
+      "data": "500MB/ngày",
+      "thoai": "10 phút/cuộc nội mạng",
+      "sms": "",
+      "uuDai": "",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 35000,
+      "giaGoc": null
+    },
+    {
+      "ma": "SD90",
+      "nhom": "30 ngày",
+      "thoiHan": "30 ngày",
+      "data": "1,5GB/ngày",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 90000,
+      "giaGoc": null
+    },
+    {
+      "ma": "V120B",
+      "nhom": "30 ngày",
+      "thoiHan": "30 ngày",
+      "data": "1,5GB/ngày",
+      "thoai": "50 phút ngoại mạng, 10 phút/cuộc nội mạng",
+      "sms": "",
+      "uuDai": "",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 120000,
+      "giaGoc": null
+    },
+    {
+      "ma": "TV120C",
+      "nhom": "30 ngày",
+      "thoiHan": "30 ngày",
+      "data": "1,5GB/ngày",
+      "thoai": "50 phút ngoại mạng, 10 phút/cuộc nội mạng",
+      "sms": "",
+      "uuDai": "",
+      "tienIch": "TV360",
+      "moTa": "",
+      "gia": 120000,
+      "giaGoc": null
+    },
+    {
+      "ma": "3SD90",
+      "nhom": "90 ngày",
+      "thoiHan": "90 ngày",
+      "data": "1,5GB/ngày",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 270000,
+      "giaGoc": null
+    },
+    {
+      "ma": "6SD90",
+      "nhom": "180 ngày",
+      "thoiHan": "180 ngày",
+      "data": "1,5GB/ngày",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 540000,
+      "giaGoc": null
+    },
+    {
+      "ma": "12SD90",
+      "nhom": "360 ngày",
+      "thoiHan": "360 ngày",
+      "data": "1,5GB/ngày",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 1080000,
+      "giaGoc": null
+    },
+    {
+      "ma": "FT5",
+      "nhom": "khac",
+      "thoiHan": "",
+      "data": "",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "",
+      "tienIch": "",
+      "moTa": "Miễn phí 15 phút/cuộc gọi nội mạng",
+      "gia": 5000,
+      "giaGoc": null
+    },
+    {
+      "ma": "MI7D",
+      "nhom": "khac",
+      "thoiHan": "đến 24h ngày đăng ký",
+      "data": "",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "",
+      "tienIch": "",
+      "moTa": "700MB Data tốc độ cao sử dụng đến 24h00 ngày đăng ký",
+      "gia": 7000,
+      "giaGoc": null
+    },
+    {
+      "ma": "ST10K",
+      "nhom": "khac",
+      "thoiHan": "",
+      "data": "2GB",
+      "thoai": "",
+      "sms": "",
+      "uuDai": "",
+      "tienIch": "",
+      "moTa": "",
+      "gia": 10000,
+      "giaGoc": null
+    }
+  ]
+}

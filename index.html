@@ -193,6 +193,72 @@
   .staff-tab-panel{display:none;}
   .staff-tab-panel.active{display:block;}
 
+  /* ---------- Tab "Khách hàng tiềm năng" (NVKD + CTV) — nhận diện/đối chiếu khách truy cập qua
+     link phân kênh. Dùng lại đúng bảng .sim-table + .status-badge sẵn có, chỉ thêm màu badge phân loại
+     riêng (lead-badge-*) vì đây là 1 tập giá trị khác (không phải trạng thái đơn hàng). ---------- */
+  .lead-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:700;white-space:nowrap;}
+  .lead-badge-cao{background:#FDECEA;color:#C4002A;}
+  .lead-badge-moi{background:#FFF3E0;color:#B8860B;}
+  .lead-badge-hienhuu{background:#E7F0FB;color:#1c5cab;}
+  .lead-badge-tru{background:#F0F0F2;color:#9C9CA3;}
+  .lead-badge-unknown{background:#F0F0F2;color:#6B7280;}
+  .lead-actions{display:flex;gap:6px;flex-wrap:wrap;}
+  .lead-actions button{
+    border:1px solid var(--border);background:#fff;border-radius:6px;padding:4px 8px;font-size:11.5px;
+    font-weight:600;cursor:pointer;color:var(--text-dark);white-space:nowrap;
+  }
+  .lead-actions button:hover{background:var(--bg);}
+  .lead-actions button.lead-btn-call{color:#1E7A45;border-color:#B7DBC0;}
+  .lead-actions button.lead-btn-zalo{color:#1c5cab;border-color:#BBD3EE;}
+  .lead-empty-note{
+    background:#F7F7F9;border:1px dashed var(--border);color:var(--text-muted);font-size:13px;
+    border-radius:8px;padding:16px;text-align:center;
+  }
+
+  /* ---------- Tab "Tài liệu Marketing" (NVKD + CTV) — kho tài liệu giới thiệu sản phẩm,
+     content chia sẻ MXH và hình ảnh do các phòng ban quản lý sản phẩm (Di động/Cố định) đăng tải,
+     để NVKD/CTV tải về sử dụng. ---------- */
+  .doc-filter-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0 16px;}
+  .doc-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px;margin-top:6px;}
+  .doc-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px;}
+  .doc-card-top{display:flex;align-items:center;gap:10px;}
+  .doc-card-icon{font-size:24px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:var(--bg);border-radius:9px;flex-shrink:0;}
+  .doc-card-title{font-weight:700;font-size:14px;line-height:1.3;}
+  .doc-badge-row{display:flex;gap:6px;flex-wrap:wrap;}
+  .doc-badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:700;white-space:nowrap;}
+  .doc-badge-gioithieu{background:#E7F0FB;color:#1c5cab;}
+  .doc-badge-content{background:#FFF3E0;color:#B8860B;}
+  .doc-badge-hinhanh{background:#E9F7EF;color:#1E7A45;}
+  .doc-badge-dv{background:#F0F0F2;color:#6B7280;}
+  .doc-card-desc{font-size:12.5px;color:var(--text-dark);line-height:1.45;min-height:34px;}
+  .doc-card-meta{font-size:11px;color:var(--text-muted);}
+  .doc-card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:4px;padding-top:8px;border-top:1px solid var(--border);}
+  .doc-download-btn{background:var(--viettel-red);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:700;font-size:12.5px;cursor:pointer;text-decoration:none;display:inline-block;}
+  .doc-download-btn:hover{opacity:.9;}
+
+  /* ---------- Banner "thu thập SĐT" nhẹ (progressive) — chỉ hiện cạnh Huy hiệu tin cậy, sau khi khách
+     đã xem chi tiết gói từ đủ số lần ngưỡng, KHÔNG chặn thao tác, khách có thể bỏ qua bất kỳ lúc nào. ---------- */
+  .visitor-phone-prompt{
+    position:fixed;left:18px;z-index:149;background:#fff;border:1px solid var(--border);
+    border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:14px 16px;max-width:344px;
+    display:none;
+  }
+  .visitor-phone-prompt.show{display:block;}
+  .visitor-phone-prompt-text{font-size:12.5px;color:var(--text-dark);margin-bottom:8px;line-height:1.45;}
+  .visitor-phone-prompt-row{display:flex;gap:8px;}
+  .visitor-phone-prompt-row input{
+    flex:1;min-width:0;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;
+  }
+  .visitor-phone-prompt-row button{
+    background:var(--viettel-red);color:#fff;border:none;border-radius:8px;padding:9px 14px;
+    font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;
+  }
+  .visitor-phone-prompt-note{font-size:10.5px;color:var(--text-muted);margin-top:6px;line-height:1.4;}
+  .visitor-phone-prompt-close{
+    position:absolute;top:6px;right:9px;background:none;border:none;font-size:15px;
+    color:var(--text-muted);cursor:pointer;line-height:1;
+  }
+
   .card-grid{
     display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px;
   }
@@ -689,6 +755,24 @@
     }
     .data-cat-tabs::-webkit-scrollbar{ display: none; }
     .data-cat-tab{ flex-shrink: 0; white-space: nowrap; }
+
+    /* 10. Bộ lọc kỳ trên tab Dashboard (Tháng này / Tháng trước / 3 tháng / 12 tháng) — cùng kiểu
+       cuộn ngang 1 dòng như các thanh tab khác, tránh xuống dòng dồn cục trên màn hình hẹp. */
+    .staff-range-tabs{
+      flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; padding-bottom: 4px;
+    }
+    .staff-range-tabs::-webkit-scrollbar{ display: none; }
+    .staff-range-btn{ flex-shrink: 0; white-space: nowrap; }
+
+    /* 11. Bộ lọc trạng thái trên "Danh sách đơn hàng chi tiết" (Tất cả / Đang thực hiện / Đang triển
+       khai / Hoàn thành / Đã hủy) — cuộn ngang 1 dòng thay vì xuống dòng, đảm bảo mượt trên di động. */
+    .order-status-filters{
+      flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; padding-bottom: 4px;
+    }
+    .order-status-filters::-webkit-scrollbar{ display: none; }
+    .order-filter-btn{ flex-shrink: 0; white-space: nowrap; }
   }
 </style>
 </head>
@@ -798,7 +882,19 @@
     <div id="ref-badge-countdown" style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px;font-style:italic;"></div>
   </div>
 </div>
-  
+
+<!-- Banner "để lại SĐT" (progressive, KHÔNG bắt buộc) — chỉ hiện cho khách vào qua link giới thiệu, sau khi
+     đã xem chi tiết gói đủ số lần ngưỡng và hệ thống chưa xác định được SĐT bằng cách nào khác. Neo ngay phía
+     trên Huy hiệu tin cậy (cùng cột trái) để khách liên tưởng đây là 1 bước hỗ trợ thêm, không phải yêu cầu bắt buộc. -->
+<div class="visitor-phone-prompt" id="visitor-phone-prompt" style="bottom:180px;">
+  <button class="visitor-phone-prompt-close" id="visitor-phone-prompt-close" aria-label="Đóng">&times;</button>
+  <div class="visitor-phone-prompt-text" id="visitor-phone-prompt-text"></div>
+  <div class="visitor-phone-prompt-row">
+    <input type="tel" id="visitor-phone-prompt-input" placeholder="Số điện thoại của bạn" maxlength="10">
+    <button id="visitor-phone-prompt-submit">Gửi</button>
+  </div>
+  <div class="visitor-phone-prompt-note">Chỉ dùng để NVKD/CTV phụ trách liên hệ tư vấn, không dùng cho mục đích khác.</div>
+</div>
 
 <!-- ================= MODAL: ĐĂNG NHẬP THEO SỐ ĐIỆN THOẠI ================= -->
 <div class="login-overlay" id="login-overlay">
@@ -1240,6 +1336,8 @@
       <div class="staff-main-tabs" id="staff-main-tabs">
         <button class="staff-main-tab-btn active" data-staff-tab="dashboard">Dashboard</button>
         <button class="staff-main-tab-btn" data-staff-tab="ctv">Quản lý cộng tác viên</button>
+        <button class="staff-main-tab-btn" data-staff-tab="leads">🎯 Khách hàng tiềm năng</button>
+        <button class="staff-main-tab-btn" data-staff-tab="tailieu">📁 Tài liệu Marketing</button>
         <button class="staff-main-tab-btn" data-staff-tab="account">Tài khoản của tôi</button>
       </div>
 
@@ -1343,6 +1441,54 @@
         <div class="ctv-grid" id="ctv-grid"></div>
       </div>
 
+      <!-- Tab "Khách hàng tiềm năng": khách truy cập qua link phân kênh (của NVKD hoặc bất kỳ CTV nào),
+           đối chiếu với đơn hàng + lịch sử truy cập, loại trừ SĐT nội bộ (NVKD/CTV), phân loại + khuyến nghị. -->
+      <div class="staff-tab-panel" id="staff-tab-leads">
+        <p style="font-size:12.5px;color:var(--text-muted);margin:-4px 0 16px;">
+          Danh sách khách hàng đã truy cập qua link phân kênh của bạn hoặc của các CTV trực thuộc — đã tự động loại trừ số điện thoại nội bộ (NVKD/CTV).
+        </p>
+        <div style="overflow-x:auto;">
+          <table class="sim-table">
+            <thead>
+              <tr>
+                <th>Số điện thoại</th><th>Nguồn giới thiệu</th><th>Lần ghé gần nhất</th><th>Số lần ghé</th>
+                <th>Dịch vụ đã xem</th><th>Phân loại</th><th>Khuyến nghị</th><th>Ghi chú</th><th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="staff-leads-table-body"></tbody>
+          </table>
+        </div>
+        <div class="lead-empty-note" id="staff-leads-empty" style="display:none;margin-top:12px;">
+          Chưa có khách hàng nào truy cập qua link phân kênh trong phiên làm việc này.
+        </div>
+      </div>
+
+      <!-- Tab "Tài liệu Marketing": kho tài liệu do các phòng ban quản lý sản phẩm (Di động/Cố định)
+           đăng tải — tài liệu giới thiệu SP, content chia sẻ MXH (FB/Zalo/YouTube/TikTok), hình ảnh SP —
+           để NVKD/CTV tải về sử dụng khi bán hàng/làm nội dung. -->
+      <div class="staff-tab-panel" id="staff-tab-tailieu">
+        <p style="font-size:12.5px;color:var(--text-muted);margin:-4px 0 16px;">
+          Tài liệu do phòng ban quản lý sản phẩm Di động/Cố định đăng tải. Tải về để sử dụng khi tư vấn khách hàng hoặc đăng nội dung lên mạng xã hội.
+        </p>
+        <div class="doc-filter-row">
+          <select class="order-person-filter" id="staff-doc-filter-dichvu">
+            <option value="all">Tất cả dịch vụ</option>
+            <option value="Di động">Di động</option>
+            <option value="Cố định">Cố định</option>
+          </select>
+          <select class="order-person-filter" id="staff-doc-filter-loai">
+            <option value="all">Tất cả loại nội dung</option>
+            <option value="Tài liệu giới thiệu SP">Tài liệu giới thiệu SP</option>
+            <option value="Content MXH">Content MXH</option>
+            <option value="Hình ảnh SP">Hình ảnh SP</option>
+          </select>
+        </div>
+        <div class="doc-card-grid" id="staff-doc-grid"></div>
+        <div class="lead-empty-note" id="staff-doc-empty" style="display:none;margin-top:12px;">
+          Không có tài liệu nào khớp với bộ lọc đã chọn.
+        </div>
+      </div>
+
       <div class="staff-tab-panel" id="staff-tab-account">
         <div class="staff-profile-bar">
           <div style="display:flex;align-items:center;gap:14px;">
@@ -1387,6 +1533,8 @@
       <!-- CTV Tabs -->
       <div class="staff-nav" style="margin-bottom:20px;border-bottom:1px solid var(--border);padding:0;">
         <span class="staff-nav-link tab-btn active" data-tab="ctv-tab-sales" style="padding-bottom:10px;margin-right:20px;cursor:pointer;font-weight:600;">Kết quả bán hàng</span>
+        <span class="staff-nav-link tab-btn" data-tab="ctv-tab-leads" style="padding-bottom:10px;margin-right:20px;cursor:pointer;font-weight:600;">🎯 Khách hàng tiềm năng</span>
+        <span class="staff-nav-link tab-btn" data-tab="ctv-tab-tailieu" style="padding-bottom:10px;margin-right:20px;cursor:pointer;font-weight:600;">📁 Tài liệu Marketing</span>
         <span class="staff-nav-link tab-btn" data-tab="ctv-tab-account" style="padding-bottom:10px;cursor:pointer;font-weight:600;">Tài khoản của bạn</span>
       </div>
 
@@ -1440,6 +1588,52 @@
           </table>
         </div>
         <div class="order-table-note" id="ctv-orders-table-note"></div>
+      </div>
+
+      <!-- Tab "Khách hàng tiềm năng" của riêng CTV này — chỉ hiện lead phát sinh từ đúng link giới thiệu
+           của CTV đang đăng nhập (không thấy lead của NVKD hay CTV khác). -->
+      <div class="tab-panel" id="ctv-tab-leads">
+        <p style="font-size:12.5px;color:var(--text-muted);margin:-4px 0 16px;">
+          Danh sách khách hàng đã truy cập qua liên kết giới thiệu của riêng bạn.
+        </p>
+        <div style="overflow-x:auto;">
+          <table class="sim-table">
+            <thead>
+              <tr>
+                <th>Số điện thoại</th><th>Lần ghé gần nhất</th><th>Số lần ghé</th>
+                <th>Dịch vụ đã xem</th><th>Phân loại</th><th>Khuyến nghị</th><th>Ghi chú</th><th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="ctv-leads-table-body"></tbody>
+          </table>
+        </div>
+        <div class="lead-empty-note" id="ctv-leads-empty" style="display:none;margin-top:12px;">
+          Chưa có khách hàng nào truy cập qua liên kết giới thiệu của bạn.
+        </div>
+      </div>
+
+      <!-- Tab "Tài liệu Marketing" của CTV — cùng kho tài liệu với NVKD. -->
+      <div class="tab-panel" id="ctv-tab-tailieu">
+        <p style="font-size:12.5px;color:var(--text-muted);margin:-4px 0 16px;">
+          Tài liệu do phòng ban quản lý sản phẩm Di động/Cố định đăng tải. Tải về để sử dụng khi tư vấn khách hàng hoặc đăng nội dung lên mạng xã hội.
+        </p>
+        <div class="doc-filter-row">
+          <select class="order-person-filter" id="ctv-doc-filter-dichvu">
+            <option value="all">Tất cả dịch vụ</option>
+            <option value="Di động">Di động</option>
+            <option value="Cố định">Cố định</option>
+          </select>
+          <select class="order-person-filter" id="ctv-doc-filter-loai">
+            <option value="all">Tất cả loại nội dung</option>
+            <option value="Tài liệu giới thiệu SP">Tài liệu giới thiệu SP</option>
+            <option value="Content MXH">Content MXH</option>
+            <option value="Hình ảnh SP">Hình ảnh SP</option>
+          </select>
+        </div>
+        <div class="doc-card-grid" id="ctv-doc-grid"></div>
+        <div class="lead-empty-note" id="ctv-doc-empty" style="display:none;margin-top:12px;">
+          Không có tài liệu nào khớp với bộ lọc đã chọn.
+        </div>
       </div>
 
       <!-- Tab 2: Tài khoản của bạn -->
@@ -4701,6 +4895,10 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
 
   function setLoggedIn(phone){
     loggedInPhone = phone;
+    // BỔ SUNG: đưa SĐT khách hàng thường vừa đăng nhập ra window để khối script "Khách hàng tiềm năng"
+    // (script #3) tận dụng luôn làm nguồn thu thập SĐT mạnh nhất — khách đã tự đăng nhập thì không cần
+    // hỏi lại qua banner nhẹ nữa (xem detectLoggedInCustomerPhone() ở khối script Kênh NVKD/CTV).
+    window.currentCustomerPhone = phone;
     loginBtn.outerHTML = `
       <button class="user-chip" id="btn-open-login">
         <span class="avatar">${phone.slice(-2)}</span>${phone}
@@ -4711,6 +4909,7 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
 
   function setLoggedOut(){
     loggedInPhone = null;
+    window.currentCustomerPhone = null;
     const chip = document.getElementById('btn-open-login');
     if(chip){
       chip.outerHTML = `<button class="login-btn" id="btn-open-login">Đăng nhập</button>`;
@@ -5842,6 +6041,12 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
     window.activeReferral = referrer;
     renderTrustBadge(referrer);
 
+    // BỔ SUNG: ghi nhận lượt truy cập của khách vào "Visitor Log" (mô phỏng — xem tài liệu thiết kế
+    // "Khách hàng tiềm năng"), làm cơ sở cho tab "🎯 Khách hàng tiềm năng" của NVKD/CTV. Thử lấy SĐT ngay
+    // nếu đã có nguồn đáng tin cậy (khách đã đăng nhập / nhận diện ngầm qua mạng); nếu chưa có thì ghi
+    // nhận lượt ghé trước, sẽ xin SĐT nhẹ nhàng sau nếu khách thể hiện đủ quan tâm (xem trackVisitorPackageView).
+    recordVisit(referrer);
+
     // Link phân kênh theo dịch vụ (?DV=<mã dịch vụ>, xem SERVICE_CATALOG) — đưa thẳng khách hàng
     // tới đúng trang dịch vụ tương ứng nếu dịch vụ đó có trang minh hoạ trong bản demo.
     const dv = params.get('DV');
@@ -5962,6 +6167,11 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
   //         serviceLabel/canLapDat: dùng khi ghi nhận đơn hàng nếu khách đăng ký qua giới thiệu (xem recordReferredOrder),
   //         onRegister: callback khi bấm "Đăng ký ngay" trong modal (dùng lại đúng luồng xác nhận đăng ký ở trang gốc) }
   function openPackageDetailModal(pkg, opts = {}){
+    // BỔ SUNG: nếu khách đang xem qua link giới thiệu (?NV=...), mỗi lần mở "Chi tiết gói cước" được tính
+    // là 1 tín hiệu quan tâm — dùng cho bước 2 của cơ chế thu thập SĐT "progressive" (xem tài liệu thiết kế
+    // "Khách hàng tiềm năng"). Không ảnh hưởng gì tới luồng hiển thị modal hiện có nếu không phải khách qua giới thiệu.
+    if(window.activeReferral) trackVisitorPackageView(pkg);
+
     const specs = pkgDetailSpecs(pkg);
     const giamPercent = pkg.giaGoc ? Math.round((1 - pkg.gia / pkg.giaGoc) * 100) : 0;
 
@@ -6672,6 +6882,7 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
     renderStaffOverview();
     renderCtvGrid();
     renderStaffChannelGrid();
+    renderStaffLeads();
   }
   function setStaffLoggedOut(){
     staffIsLoggedIn = false;
@@ -6817,6 +7028,7 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
     document.querySelectorAll('#ctv-range-tabs .staff-range-btn').forEach(b => b.classList.toggle('active', b.dataset.range === 'thang-nay'));
     renderCtvSelfOverview();
     renderCtvQuickLinks();
+    renderCtvLeads();
   }
   function setCtvLoggedOut(){
     loggedInCtv = null;
@@ -6934,6 +7146,661 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
     loginStaff: (phone) => setStaffLoggedIn(phone),
     loginCtv: (phone) => handleCtvLogin(phone),
   };
+
+  /* ============================================================================
+     TÍNH NĂNG: NHẬN DIỆN & ĐỐI CHIẾU "KHÁCH HÀNG TIỀM NĂNG" TỪ LINK PHÂN KÊNH
+     (xem tài liệu thiết kế "DEV-Thiet-Ke-Ky-Thuat-Khach-Hang-Tiem-Nang.doc" cùng thư mục)
+     Bản demo này KHÔNG có backend thật — dùng localStorage của trình duyệt để MÔ PHỎNG đúng luồng
+     nghiệp vụ (ở môi trường thật sẽ là Google Sheet "VisitorLog" ghi/đọc qua Apps Script). Các dòng
+     đánh dấu "TODO (Dev)" là nơi cần nối API/Apps Script thật khi triển khai chính thức.
+  ============================================================================ */
+  // v2: nâng cấp bộ dữ liệu demo (45 lượt ghé -> 43 khách sau khi gộp trùng SĐT, có kèm lịch sử ghi
+  // chú) cho khớp với sheet "VisitorLog" trong Google Sheet DucLQ_Data_LPK. Đổi tên key để các trình
+  // duyệt đã lỡ lưu bộ dữ liệu demo cũ (v1, chỉ 3 lead mẫu) tự động được cấp lại dữ liệu mới, không cần
+  // xoá localStorage thủ công.
+  const VISITOR_LOG_KEY = 'tammi_visitor_log_v2';
+  const VISITOR_ENGAGEMENT_THRESHOLD = 2; // số lượt xem "Chi tiết gói cước" trước khi hiện form nhẹ xin SĐT
+  const visitorPackageViewCount = {}; // đếm theo phiên trình duyệt (reset khi tải lại trang)
+
+  function loadVisitorLog(){
+    try { return JSON.parse(localStorage.getItem(VISITOR_LOG_KEY)) || []; }
+    catch(e){ return []; }
+  }
+  function saveVisitorLog(list){
+    try { localStorage.setItem(VISITOR_LOG_KEY, JSON.stringify(list)); }
+    catch(e){ /* bỏ qua nếu trình duyệt chặn localStorage (vd. chế độ duyệt web riêng tư) */ }
+  }
+
+  // SĐT cần LOẠI TRỪ khỏi danh sách "khách hàng tiềm năng" — chính NVKD đang đăng nhập + toàn bộ CTV
+  // trực thuộc, để NVKD/CTV tự bấm xem trước link của mình không bị tính nhầm thành 1 lead thật.
+  function excludedPhoneSet(){
+    const set = new Set(ctvList.map(c => c.sdt));
+    if(STAFF_DEMO.sdt) set.add(STAFF_DEMO.sdt);
+    return set;
+  }
+
+  // ID phiên khách ẩn danh khi chưa biết SĐT — lưu ở sessionStorage nên chỉ tồn tại trong 1 tab trình
+  // duyệt, KHÔNG dùng để định danh lâu dài (khác hẳn SĐT thật một khi đã thu thập được).
+  function getVisitorSessionId(){
+    let id = sessionStorage.getItem('tammi_visitor_session_id');
+    if(!id){
+      id = 'vs-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+      sessionStorage.setItem('tammi_visitor_session_id', id);
+    }
+    return id;
+  }
+
+  // TODO (Dev): ở môi trường thật, thay hàm này bằng lời gọi API "network enabler" nội bộ Viettel để đọc
+  // SĐT do hạ tầng mạng chèn sẵn vào header HTTP khi khách đang dùng DATA DI ĐỘNG của Viettel (không hoạt
+  // động qua Wifi/mạng khác). Trình duyệt không có quyền đọc tầng mạng nên bản demo luôn trả về null.
+  function detectCarrierPhoneSilently(){
+    return null;
+  }
+
+  // Nguồn SĐT đáng tin cậy nhất hiện có, đúng thứ tự ưu tiên trong tài liệu thiết kế: (1) khách đã tự
+  // đăng nhập ở trang này, (2) nhận diện ngầm qua mạng viễn thông.
+  function bestKnownCustomerPhone(){
+    if(window.currentCustomerPhone) return { sdt: window.currentCustomerPhone, nguon: 'khach-da-dang-nhap' };
+    const carrier = detectCarrierPhoneSilently();
+    if(carrier) return { sdt: carrier, nguon: 'ngam' };
+    return null;
+  }
+
+  function maskPhone(sdt){
+    if(!sdt) return '';
+    const s = String(sdt);
+    return s.length >= 6 ? s.slice(0, 3) + '***' + s.slice(-3) : s;
+  }
+
+  // Tìm/khởi tạo bản ghi visitor cho đúng người giới thiệu hiện tại — gộp theo SĐT nếu đã biết, nếu
+  // chưa biết thì gộp theo visitorId (phiên trình duyệt) để không đếm trùng khi khách xem nhiều gói/nhiều lần.
+  function findOrCreateVisitorEntry(referrer){
+    const list = loadVisitorLog();
+    const sessionId = getVisitorSessionId();
+    const known = bestKnownCustomerPhone();
+
+    let entry = null;
+    if(known && known.sdt){
+      entry = list.find(v => v.sdt === known.sdt && v.nguoiGioiThieuCode === referrer.code);
+    }
+    if(!entry){
+      entry = list.find(v => v.visitorId === sessionId && v.nguoiGioiThieuCode === referrer.code);
+    }
+    if(!entry){
+      entry = {
+        visitorId: sessionId,
+        sdt: null,
+        nguoiGioiThieuCode: referrer.code,
+        loaiNguoiGioiThieu: referrer.type,
+        lanDauISO: new Date().toISOString(),
+        lanCuoiISO: new Date().toISOString(),
+        soLanGhe: 0,
+        dichVuDaXem: [],
+        nguonThuThapSdt: 'chua-co',
+        loaiTru: false,
+        trangThaiXuLy: 'chua-lien-he',
+      };
+      list.push(entry);
+    }
+    return { list, entry };
+  }
+
+  // Gán SĐT (đã biết hoặc mới thu thập) vào 1 bản ghi visitor + áp dụng ngay bước loại trừ NVKD/CTV.
+  function applyPhoneToEntry(entry, sdt, nguon){
+    entry.sdt = sdt;
+    entry.nguonThuThapSdt = nguon;
+    entry.loaiTru = excludedPhoneSet().has(sdt);
+  }
+
+  // Ghi nhận 1 lượt truy cập qua link phân kênh — gọi từ initReferralFromUrl() mỗi khi tải trang có ?NV=...
+  function recordVisit(referrer){
+    const { list, entry } = findOrCreateVisitorEntry(referrer);
+    entry.soLanGhe += 1;
+    entry.lanCuoiISO = new Date().toISOString();
+    if(!entry.sdt){
+      const known = bestKnownCustomerPhone();
+      if(known && known.sdt) applyPhoneToEntry(entry, known.sdt, known.nguon);
+    }
+    saveVisitorLog(list);
+  }
+
+  // Ghi nhận 1 lượt xem "Chi tiết gói cước" — dùng để tính ngưỡng hiện form nhẹ xin SĐT (bước 2 của cơ
+  // chế thu thập "progressive"). Chỉ có ý nghĩa khi khách đang vào qua link giới thiệu (activeReferral).
+  function trackVisitorPackageView(pkg){
+    const referrer = window.activeReferral;
+    if(!referrer) return;
+    const { list, entry } = findOrCreateVisitorEntry(referrer);
+    if(pkg && pkg.ma && !entry.dichVuDaXem.includes(pkg.ma)) entry.dichVuDaXem.push(pkg.ma);
+    saveVisitorLog(list);
+
+    const sessionId = getVisitorSessionId();
+    visitorPackageViewCount[sessionId] = (visitorPackageViewCount[sessionId] || 0) + 1;
+
+    // Đã có SĐT (đăng nhập/nhận diện ngầm), hoặc khách đã từng bấm đóng banner trước đó -> không hỏi lại.
+    if(entry.sdt || entry.nguonThuThapSdt === 'tu-choi') return;
+    if(visitorPackageViewCount[sessionId] >= VISITOR_ENGAGEMENT_THRESHOLD){
+      showVisitorPhonePrompt(referrer);
+    }
+  }
+
+  // Hiện banner nhẹ xin SĐT — neo phía trên Huy hiệu tin cậy, KHÔNG chặn bất kỳ thao tác nào của khách.
+  function showVisitorPhonePrompt(referrer){
+    const box = document.getElementById('visitor-phone-prompt');
+    if(!box || box.classList.contains('show')) return;
+    document.getElementById('visitor-phone-prompt-text').textContent =
+      `Bạn có muốn ${referrer.hoTen} liên hệ tư vấn thêm không? Để lại số điện thoại để được gọi lại nhanh hơn (không bắt buộc).`;
+    box.classList.add('show');
+  }
+  function hideVisitorPhonePrompt(){
+    document.getElementById('visitor-phone-prompt')?.classList.remove('show');
+  }
+  document.getElementById('visitor-phone-prompt-close')?.addEventListener('click', () => {
+    // Khách chủ động từ chối — đánh dấu lại để không hỏi thêm lần nào nữa trong phiên này.
+    const referrer = window.activeReferral;
+    if(referrer){
+      const { list, entry } = findOrCreateVisitorEntry(referrer);
+      entry.nguonThuThapSdt = 'tu-choi';
+      saveVisitorLog(list);
+    }
+    hideVisitorPhonePrompt();
+  });
+  document.getElementById('visitor-phone-prompt-submit')?.addEventListener('click', () => {
+    const referrer = window.activeReferral;
+    if(!referrer) return;
+    const input = document.getElementById('visitor-phone-prompt-input');
+    const sdt = (input.value || '').replace(/\s+/g, '');
+    if(!PHONE_REGEX.test(sdt)){
+      input.style.borderColor = 'var(--viettel-red)';
+      return;
+    }
+    input.style.borderColor = '';
+    const { list, entry } = findOrCreateVisitorEntry(referrer);
+    applyPhoneToEntry(entry, sdt, 'chu-dong');
+    saveVisitorLog(list);
+    input.value = '';
+    hideVisitorPhonePrompt();
+  });
+
+  // ---------- Đối chiếu & phân loại ----------
+  // Tra 1 SĐT có từng xuất hiện trong đơn hàng hay không — tái dùng đúng collectAllOrdersForRange() đã có
+  // sẵn cho dashboard (gộp cả NVKD + mọi CTV, 12 tháng gần nhất) thay vì viết lại logic sinh dữ liệu đơn hàng.
+  function phoneHasOrderHistory(sdt){
+    if(!sdt) return false;
+    return collectAllOrdersForRange('12-thang').some(o => o.sdtKhachHang === sdt);
+  }
+
+  function classifyVisitor(entry){
+    if(entry.loaiTru) return 'loai-tru';
+    if(!entry.sdt) return 'chua-xac-dinh';
+    if(phoneHasOrderHistory(entry.sdt)) return 'khach-hang-hien-huu';
+    if(entry.soLanGhe >= 2) return 'tiem-nang-cao';
+    return 'tiem-nang-moi';
+  }
+
+  const LEAD_META = {
+    'tiem-nang-cao':       { label:'Tiềm năng cao',       cls:'lead-badge-cao',
+      khuyenNghi: e => `Đã xem ${e.soLanGhe} lần, chưa đăng ký — nên gọi/Zalo tư vấn trong 24h.` },
+    'tiem-nang-moi':       { label:'Tiềm năng mới',       cls:'lead-badge-moi',
+      khuyenNghi: () => `Khách mới ghé lần đầu — nên liên hệ trong 3 ngày.` },
+    'khach-hang-hien-huu': { label:'Khách hàng hiện hữu', cls:'lead-badge-hienhuu',
+      khuyenNghi: () => `Đã là khách hàng — có thể chăm sóc/gia hạn/giới thiệu gói mới.` },
+    'chua-xac-dinh':       { label:'Chưa xác định SĐT',   cls:'lead-badge-unknown',
+      khuyenNghi: () => `Chưa thu thập được số liên hệ.` },
+    'loai-tru':            { label:'Loại trừ (nội bộ)',   cls:'lead-badge-tru',
+      khuyenNghi: () => `Số điện thoại nội bộ (NVKD/CTV) — không tính là khách hàng.` },
+  };
+  function leadBadgeHtml(kind){
+    const meta = LEAD_META[kind];
+    return `<span class="lead-badge ${meta.cls}">${escapeHtml(meta.label)}</span>`;
+  }
+
+  // Hiện ghi chú MỚI NHẤT của NVKD/CTV về khách này, kèm gợi ý số lượng ghi chú lịch sử còn lại (hover
+  // vào để xem đầy đủ qua thuộc tính title) — để lần ghé/log tiếp theo vẫn nắm được bối cảnh đã trao đổi.
+  function ghiChuCellHtml(entry){
+    const notes = entry.ghiChu || [];
+    if(!notes.length) return '<span style="color:var(--text-muted);">—</span>';
+    const sorted = [...notes].sort((a, b) => new Date(a.ngay) - new Date(b.ngay));
+    const latest = sorted[sorted.length - 1];
+    const historyTitle = sorted.map(n => `${formatVNDate(n.ngay)} - ${n.tacGia}: ${n.noiDung}`).join('\n');
+    const moreTag = sorted.length > 1
+      ? ` <span style="color:var(--text-muted);font-size:10.5px;white-space:nowrap;">(+${sorted.length - 1} lịch sử)</span>`
+      : '';
+    return `<span title="${escapeHtml(historyTitle)}"><b>${escapeHtml(latest.tacGia)}:</b> ${escapeHtml(latest.noiDung)}</span>${moreTag}`;
+  }
+
+  // ---------- Hành động nhanh (Gọi / Zalo / Đánh dấu đã liên hệ / Bỏ qua) ----------
+  function updateLeadStatus(visitorId, nguoiGioiThieuCode, trangThai){
+    const list = loadVisitorLog();
+    const entry = list.find(v => v.visitorId === visitorId && v.nguoiGioiThieuCode === nguoiGioiThieuCode);
+    if(entry){
+      entry.trangThaiXuLy = trangThai;
+      saveVisitorLog(list);
+    }
+  }
+
+  // Dựng 1 dòng <tr> cho bảng lead — dùng chung cho cả 2 tab NVKD/CTV. showSource=true (bản NVKD): hiện
+  // thêm cột "Nguồn giới thiệu" để phân biệt lead của chính mình hay của CTV nào. Số bị "loại trừ" ẩn hẳn
+  // khỏi bảng (không chỉ gắn badge) đúng theo yêu cầu ban đầu.
+  function leadRowHtml(entry, showSource){
+    const kind = classifyVisitor(entry);
+    if(kind === 'loai-tru') return '';
+    const meta = LEAD_META[kind];
+    const actionable = kind !== 'chua-xac-dinh';
+    const sourceLabel = entry.loaiNguoiGioiThieu === 'staff'
+      ? `${STAFF_DEMO.hoTen} (NVKD)`
+      : (ctvList.find(c => c.sdt === entry.nguoiGioiThieuCode)?.hoTen || 'CTV') + ' (CTV)';
+    const phoneCell = entry.sdt ? maskPhone(entry.sdt) : '<i style="color:var(--text-muted);">Ẩn danh</i>';
+    const svcCell = entry.dichVuDaXem.length
+      ? entry.dichVuDaXem.map(escapeHtml).join(', ')
+      : '<span style="color:var(--text-muted);">—</span>';
+    const doneNote = entry.trangThaiXuLy === 'da-lien-he'
+      ? '<div style="font-size:11px;color:#1E7A45;margin-top:3px;">✔ Đã liên hệ</div>'
+      : entry.trangThaiXuLy === 'bo-qua'
+        ? '<div style="font-size:11px;color:var(--text-muted);margin-top:3px;">Đã bỏ qua</div>'
+        : '';
+    return `
+      <tr data-lead-visitor="${escapeHtml(entry.visitorId)}" data-lead-code="${escapeHtml(entry.nguoiGioiThieuCode)}">
+        <td>${phoneCell}</td>
+        ${showSource ? `<td>${escapeHtml(sourceLabel)}</td>` : ''}
+        <td>${formatVNDate(entry.lanCuoiISO.slice(0,10))}</td>
+        <td>${entry.soLanGhe}</td>
+        <td>${svcCell}</td>
+        <td>${leadBadgeHtml(kind)}</td>
+        <td style="font-size:12.5px;color:var(--text-muted);max-width:220px;">${escapeHtml(meta.khuyenNghi(entry))}${doneNote}</td>
+        <td style="font-size:12.5px;max-width:240px;">${ghiChuCellHtml(entry)}</td>
+        <td>
+          <div class="lead-actions">
+            ${actionable ? `<button class="lead-btn-call" data-lead-call="${escapeHtml(entry.sdt)}">📞 Gọi</button>` : ''}
+            ${actionable ? `<button class="lead-btn-zalo" data-lead-zalo="${escapeHtml(entry.sdt)}">💬 Zalo</button>` : ''}
+            ${actionable && entry.trangThaiXuLy !== 'da-lien-he' ? `<button data-lead-done>✔ Đã liên hệ</button>` : ''}
+            ${actionable && entry.trangThaiXuLy !== 'bo-qua' ? `<button data-lead-skip>Bỏ qua</button>` : ''}
+          </div>
+        </td>
+      </tr>`;
+  }
+
+  function bindLeadRowActions(container, onChange){
+    container.querySelectorAll('[data-lead-call]').forEach(btn => {
+      btn.addEventListener('click', () => { location.href = 'tel:' + btn.dataset.leadCall; });
+    });
+    container.querySelectorAll('[data-lead-zalo]').forEach(btn => {
+      btn.addEventListener('click', () => { window.open(zaloChatLink(btn.dataset.leadZalo), '_blank'); });
+    });
+    container.querySelectorAll('[data-lead-done]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tr = btn.closest('tr');
+        updateLeadStatus(tr.dataset.leadVisitor, tr.dataset.leadCode, 'da-lien-he');
+        onChange();
+      });
+    });
+    container.querySelectorAll('[data-lead-skip]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tr = btn.closest('tr');
+        updateLeadStatus(tr.dataset.leadVisitor, tr.dataset.leadCode, 'bo-qua');
+        onChange();
+      });
+    });
+  }
+
+  // ---------- Render tab NVKD: xem TẤT CẢ lead (chính mình + mọi CTV trực thuộc) ----------
+  function renderStaffLeads(){
+    const tbody = document.getElementById('staff-leads-table-body');
+    const emptyNote = document.getElementById('staff-leads-empty');
+    if(!tbody) return;
+    const list = loadVisitorLog();
+    const rows = list
+      .filter(e => e.nguoiGioiThieuCode === staffChannelNvCode() || ctvList.some(c => c.sdt === e.nguoiGioiThieuCode))
+      .sort((a, b) => new Date(b.lanCuoiISO) - new Date(a.lanCuoiISO))
+      .map(e => leadRowHtml(e, true))
+      .join('');
+    tbody.innerHTML = rows;
+    if(emptyNote) emptyNote.style.display = rows ? 'none' : 'block';
+    bindLeadRowActions(tbody, renderStaffLeads);
+  }
+
+  // ---------- Render tab CTV: CHỈ xem lead phát sinh từ đúng link của chính CTV này ----------
+  function renderCtvLeads(){
+    const tbody = document.getElementById('ctv-leads-table-body');
+    const emptyNote = document.getElementById('ctv-leads-empty');
+    if(!tbody || !loggedInCtv) return;
+    const list = loadVisitorLog();
+    const rows = list
+      .filter(e => e.nguoiGioiThieuCode === loggedInCtv.sdt)
+      .sort((a, b) => new Date(b.lanCuoiISO) - new Date(a.lanCuoiISO))
+      .map(e => leadRowHtml(e, false))
+      .join('');
+    tbody.innerHTML = rows;
+    if(emptyNote) emptyNote.style.display = rows ? 'none' : 'block';
+    bindLeadRowActions(tbody, renderCtvLeads);
+  }
+
+  // Làm mới bảng lead mỗi khi bấm đúng tab tương ứng (dữ liệu có thể vừa đổi do NVKD/CTV tự xem trước
+  // link của mình ở tab khác) — cộng thêm vào đúng handler chuyển tab sẵn có, không thay thế.
+  document.querySelector('#staff-main-tabs [data-staff-tab="leads"]')?.addEventListener('click', renderStaffLeads);
+  document.querySelector('#ctv-dashboard [data-tab="ctv-tab-leads"]')?.addEventListener('click', renderCtvLeads);
+
+  // Gieo sẵn dữ liệu lead minh hoạ (chỉ khi Visitor Log còn trống — vd. lần đầu mở demo trên trình
+  // duyệt này) để tab "Khách hàng tiềm năng" có dữ liệu xem thử ngay cho CẢ NVKD lẫn từng CTV (đặc biệt
+  // CTV Hoàng Tuấn Kiệt), không cần đợi có khách thật truy cập qua link. Bộ dữ liệu này khớp 1-1 với
+  // sheet "VisitorLog" trong Google Sheet DucLQ_Data_LPK (45 lượt ghé, gộp còn 43 khách sau khi hợp
+  // nhất 2 cặp khách quay lại), kèm lịch sử ghi chú (mảng `ghiChu`) để lần ghé/log tiếp theo vẫn hiển
+  // thị lại được các ghi chú trước đó — đúng yêu cầu "nắm được bối cảnh của khách hàng".
+  function seedDemoVisitorLogIfEmpty(){
+    if(loadVisitorLog().length > 0) return;
+    const iso = d => d + 'T00:00:00.000Z';
+    const ctvKiet = ctvList.find(c => c.sdt === '0989858785') || { sdt:'0989858785', hoTen:'Hoàng Tuấn Kiệt' };
+    const ctvLanHuong = ctvList.find(c => c.sdt === '0912000111') || { sdt:'0912000111', hoTen:'Trần Thị Lan Hương' };
+    const ctvHoangNam = ctvList.find(c => c.sdt === '0987000222') || { sdt:'0987000222', hoTen:'Lê Hoàng Nam' };
+    const ctvNgocThao = ctvList.find(c => c.sdt === '0977000333') || { sdt:'0977000333', hoTen:'Phạm Ngọc Thảo' };
+    const nvCode = staffChannelNvCode();
+    const gc = (ngay, tacGia, noiDung) => ({ ngay, tacGia, noiDung });
+
+    const entries = [
+      // ----- Gốc (vl-0001 .. vl-0010) -----
+      { visitorId:'vl-0001', sdt:'0938201122', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-18'), lanCuoiISO:iso('2026-07-22'), soLanGhe:3,
+        dichVuDaXem:['FTTH (Internet cáp quang)','Combo Internet + Truyền hình'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-22','NVKD - Lê Văn Linh','Đã nhắn Zalo giới thiệu gói FTTH, khách hẹn xem lại cuối tuần.') ] },
+      { visitorId:'vl-0002', sdt:'0912000111', nguoiGioiThieuCode:ctvLanHuong.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-20'), lanCuoiISO:iso('2026-07-20'), soLanGhe:1,
+        dichVuDaXem:['Mua gói Data'], nguonThuThapSdt:'chu-dong', loaiTru:true, trangThaiXuLy:'bo-qua',
+        ghiChu:[ gc('2026-07-20','CTV - Trần Thị Lan Hương','Tự kiểm tra link cá nhân trước khi gửi khách.') ] },
+      { visitorId:'vl-0003', sdt:'0977445566', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-15'), lanCuoiISO:iso('2026-07-21'), soLanGhe:4,
+        dichVuDaXem:['Mua gói Data','FTTH (Internet cáp quang)'],
+        nguonThuThapSdt:'khach-da-dang-nhap', loaiTru:false, trangThaiXuLy:'da-lien-he',
+        ghiChu:[ gc('2026-07-21','NVKD - Lê Văn Linh','Khách cũ, đã dùng gói Data - gợi ý nâng cấp FTTH, khách đồng ý cân nhắc.') ],
+        _hienHuu:'nvkd' },
+      { visitorId:'vl-0004', sdt:null, nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-22'), lanCuoiISO:iso('2026-07-22'), soLanGhe:1, dichVuDaXem:['FTTH (Internet cáp quang)'],
+        nguonThuThapSdt:'chua-co', loaiTru:false, trangThaiXuLy:'chua-lien-he', ghiChu:[] },
+      { visitorId:'vl-0005', sdt:'0955889900', nguoiGioiThieuCode:ctvHoangNam.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-19'), lanCuoiISO:iso('2026-07-22'), soLanGhe:2,
+        dichVuDaXem:['Combo Internet + Truyền hình','Camera'], nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-22','CTV - Lê Hoàng Nam','Đã gọi 2 lần, khách còn phân vân giữa Combo và FTTH.') ] },
+      { visitorId:'vl-0006', sdt:'0966009911', nguoiGioiThieuCode:ctvNgocThao.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-21'), lanCuoiISO:iso('2026-07-21'), soLanGhe:1, dichVuDaXem:['Mua gói Data'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-21','CTV - Phạm Ngọc Thảo','Mới nhắn hỏi giá, chưa phản hồi thêm.') ] },
+      { visitorId:'vl-0007', sdt:'0933112233', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-10'), lanCuoiISO:iso('2026-07-24'), soLanGhe:5,
+        dichVuDaXem:['Mua sim/số','FTTH (Internet cáp quang)'],
+        nguonThuThapSdt:'khach-da-dang-nhap', loaiTru:false, trangThaiXuLy:'da-lien-he',
+        ghiChu:[ gc('2026-07-24','NVKD - Lê Văn Linh','Khách quen, đã mua sim/số và FTTH - chăm sóc định kỳ.') ],
+        _hienHuu:'nvkd' },
+      { visitorId:'vl-0008', sdt:'0944118822', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-23'), lanCuoiISO:iso('2026-07-23'), soLanGhe:1, dichVuDaXem:['Camera'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-23','CTV - Hoàng Tuấn Kiệt','Khách hỏi về Camera, đã gửi thêm thông tin giá.') ] },
+      { visitorId:'vl-0009', sdt:'0909000123', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-24'), lanCuoiISO:iso('2026-07-24'), soLanGhe:1, dichVuDaXem:['FTTH (Internet cáp quang)'],
+        nguonThuThapSdt:'khach-da-dang-nhap', loaiTru:true, trangThaiXuLy:'bo-qua',
+        ghiChu:[ gc('2026-07-24','NVKD - Lê Văn Linh','Tự bấm thử link cá nhân để kiểm tra giao diện.') ] },
+      { visitorId:'vl-0010', sdt:'0922556677', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-17'), lanCuoiISO:iso('2026-07-23'), soLanGhe:3,
+        dichVuDaXem:['Truyền hình','Camera','Combo Internet + Truyền hình'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'da-lien-he',
+        ghiChu:[ gc('2026-07-23','NVKD - Lê Văn Linh','Đã gặp trực tiếp tư vấn, khách hẹn quyết định trong tuần.') ] },
+
+      // ----- 20 lead mới của NVKD (vl-0011 .. vl-0030) -----
+      { visitorId:'vl-0011', sdt:'0911223344', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-05'), lanCuoiISO:iso('2026-07-05'), soLanGhe:1, dichVuDaXem:['FTTH (Internet cáp quang)'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-05','NVKD - Lê Văn Linh','Khách mới ghé xem gói FTTH, chưa liên hệ.') ] },
+      { visitorId:'vl-0012', sdt:'0922113355', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-06'), lanCuoiISO:iso('2026-07-06'), soLanGhe:1, dichVuDaXem:['Combo Internet + Truyền hình'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-06','NVKD - Lê Văn Linh','Xem combo, chưa để lại phản hồi.') ] },
+      { visitorId:'vl-0013', sdt:'0933224466', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-07'), lanCuoiISO:iso('2026-07-07'), soLanGhe:1, dichVuDaXem:['Mua sim/số'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-07','NVKD - Lê Văn Linh','Quan tâm đổi số đẹp, sẽ theo dõi thêm.') ] },
+      { visitorId:'vl-0014', sdt:'0944335577', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-08'), lanCuoiISO:iso('2026-07-08'), soLanGhe:1, dichVuDaXem:['Camera'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-08','NVKD - Lê Văn Linh','Xem gói camera an ninh, chưa liên hệ.') ] },
+      { visitorId:'vl-0015', sdt:'0955446688', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-09'), lanCuoiISO:iso('2026-07-09'), soLanGhe:1, dichVuDaXem:['Mua gói Data'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-09','NVKD - Lê Văn Linh','Hỏi giá gói Data 5G, chưa phản hồi thêm.') ] },
+      { visitorId:'vl-0016', sdt:'0966557799', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-10'), lanCuoiISO:iso('2026-07-10'), soLanGhe:1, dichVuDaXem:['Truyền hình'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-10','NVKD - Lê Văn Linh','Quan tâm gói truyền hình, chưa liên hệ.') ] },
+      { visitorId:'vl-0017', sdt:'0977668811', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-11'), lanCuoiISO:iso('2026-07-11'), soLanGhe:1, dichVuDaXem:['FTTH (Internet cáp quang)'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-11','NVKD - Lê Văn Linh','Ghé xem FTTH tốc độ cao, chưa liên hệ.') ] },
+      { visitorId:'vl-0018', sdt:'0988779922', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-12'), lanCuoiISO:iso('2026-07-12'), soLanGhe:1, dichVuDaXem:['Đổi eSIM'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-12','NVKD - Lê Văn Linh','Hỏi thủ tục đổi eSIM, chưa liên hệ.') ] },
+      { visitorId:'vl-0019', sdt:'0912233445', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-13'), lanCuoiISO:iso('2026-07-13'), soLanGhe:1, dichVuDaXem:['Combo Internet + Truyền hình'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-13','NVKD - Lê Văn Linh','Xem combo giải trí, chưa liên hệ.') ] },
+      { visitorId:'vl-0020', sdt:'0923344556', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-14'), lanCuoiISO:iso('2026-07-14'), soLanGhe:1, dichVuDaXem:['Mua sim/số'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-14','NVKD - Lê Văn Linh','Quan tâm sim trả trước, chưa liên hệ.') ] },
+      { visitorId:'vl-0021', sdt:'0934455667', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-12'), lanCuoiISO:iso('2026-07-16'), soLanGhe:2,
+        dichVuDaXem:['FTTH (Internet cáp quang)','Camera'], nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-16','NVKD - Lê Văn Linh','Ghé lại lần 2 xem thêm Camera, cần gọi tư vấn gấp.') ] },
+      { visitorId:'vl-0022', sdt:'0945566778', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-10'), lanCuoiISO:iso('2026-07-17'), soLanGhe:2,
+        dichVuDaXem:['Combo Internet + Truyền hình'], nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'da-lien-he',
+        ghiChu:[ gc('2026-07-17','NVKD - Lê Văn Linh','Đã gọi tư vấn, khách hẹn quyết định cuối tuần.') ] },
+      { visitorId:'vl-0023', sdt:'0956677889', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-11'), lanCuoiISO:iso('2026-07-18'), soLanGhe:2,
+        dichVuDaXem:['Mua gói Data'], nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-18','NVKD - Lê Văn Linh','Ghé xem lần 2, nên chủ động gọi trước 25/07.') ] },
+      { visitorId:'vl-0024', sdt:'0967788990', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-13'), lanCuoiISO:iso('2026-07-19'), soLanGhe:2,
+        dichVuDaXem:['Truyền hình','FTTH (Internet cáp quang)'], nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'da-lien-he',
+        ghiChu:[ gc('2026-07-19','NVKD - Lê Văn Linh','Đã nhắn Zalo, khách đang so sánh giá đối thủ.') ] },
+      // vl-0025 + vl-0026 gộp: khách Lâm Thị Kim quay lại lần 2 — minh hoạ trực tiếp yêu cầu
+      // "hiển thị lại các ghi chú lịch sử" (2 ghi chú, 2 mốc thời gian, cùng 1 SĐT).
+      { visitorId:'vl-0025', sdt:'0978899001', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-15'), lanCuoiISO:iso('2026-07-21'), soLanGhe:2,
+        dichVuDaXem:['Mua gói Data','FTTH (Internet cáp quang)'], nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'da-lien-he',
+        ghiChu:[
+          gc('2026-07-15','NVKD - Lê Văn Linh','Lâm Thị Kim mới ghé xem gói Data, chưa liên hệ.'),
+          gc('2026-07-21','NVKD - Lê Văn Linh','Gọi lại lần 2, Lâm Thị Kim đã đồng ý dùng thử FTTH, hẹn lắp đặt tuần sau.'),
+        ] },
+      { visitorId:'vl-0027', sdt:'0988556677', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-20'), lanCuoiISO:iso('2026-07-22'), soLanGhe:2,
+        dichVuDaXem:['Combo Internet + Truyền hình'], nguonThuThapSdt:'khach-da-dang-nhap', loaiTru:false, trangThaiXuLy:'da-lien-he',
+        ghiChu:[ gc('2026-07-22','NVKD - Lê Văn Linh','Khách cũ (Lê Văn Cường) - gợi ý nâng cấp combo, khách đồng ý xem xét.') ],
+        _hienHuu:'nvkd' },
+      { visitorId:'vl-0028', sdt:'0966223344', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-19'), lanCuoiISO:iso('2026-07-23'), soLanGhe:2,
+        dichVuDaXem:['Mua sim/số'], nguonThuThapSdt:'khach-da-dang-nhap', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-23','NVKD - Lê Văn Linh','Khách cũ (Phạm Thị Hoa) quay lại xem thêm sim số đẹp.') ],
+        _hienHuu:'nvkd' },
+      { visitorId:'vl-0029', sdt:'0987000222', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-24'), lanCuoiISO:iso('2026-07-24'), soLanGhe:1, dichVuDaXem:['FTTH (Internet cáp quang)'],
+        nguonThuThapSdt:'khach-da-dang-nhap', loaiTru:true, trangThaiXuLy:'bo-qua',
+        ghiChu:[ gc('2026-07-24','NVKD - Lê Văn Linh','Trùng SĐT CTV Lê Hoàng Nam - tự xem trước link, không tính lead.') ] },
+      { visitorId:'vl-0030', sdt:null, nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-24'), lanCuoiISO:iso('2026-07-24'), soLanGhe:1, dichVuDaXem:['Camera'],
+        nguonThuThapSdt:'chua-co', loaiTru:false, trangThaiXuLy:'chua-lien-he', ghiChu:[] },
+
+      // ----- 15 lead mới của CTV Hoàng Tuấn Kiệt (vl-0031 .. vl-0045) -----
+      { visitorId:'vl-0031', sdt:'0913344556', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-05'), lanCuoiISO:iso('2026-07-05'), soLanGhe:1, dichVuDaXem:['Mua gói Data'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-05','CTV - Hoàng Tuấn Kiệt','Khách mới hỏi gói Data, chưa liên hệ.') ] },
+      { visitorId:'vl-0032', sdt:'0924455667', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-06'), lanCuoiISO:iso('2026-07-06'), soLanGhe:1, dichVuDaXem:['FTTH (Internet cáp quang)'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-06','CTV - Hoàng Tuấn Kiệt','Xem FTTH, chưa phản hồi thêm.') ] },
+      { visitorId:'vl-0033', sdt:'0935566778', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-07'), lanCuoiISO:iso('2026-07-07'), soLanGhe:1, dichVuDaXem:['Camera'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-07','CTV - Hoàng Tuấn Kiệt','Hỏi camera an ninh, chưa liên hệ.') ] },
+      { visitorId:'vl-0034', sdt:'0946677889', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-08'), lanCuoiISO:iso('2026-07-08'), soLanGhe:1, dichVuDaXem:['Combo Internet + Truyền hình'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-08','CTV - Hoàng Tuấn Kiệt','Xem combo, chưa liên hệ.') ] },
+      { visitorId:'vl-0035', sdt:'0957788990', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-09'), lanCuoiISO:iso('2026-07-09'), soLanGhe:1, dichVuDaXem:['Mua sim/số'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-09','CTV - Hoàng Tuấn Kiệt','Hỏi sim số đẹp, chưa liên hệ.') ] },
+      { visitorId:'vl-0036', sdt:'0968899001', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-10'), lanCuoiISO:iso('2026-07-10'), soLanGhe:1, dichVuDaXem:['Đổi eSIM'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-10','CTV - Hoàng Tuấn Kiệt','Hỏi thủ tục eSIM, chưa liên hệ.') ] },
+      { visitorId:'vl-0037', sdt:'0979900112', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-11'), lanCuoiISO:iso('2026-07-11'), soLanGhe:1, dichVuDaXem:['Truyền hình'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-11','CTV - Hoàng Tuấn Kiệt','Xem gói truyền hình, chưa liên hệ.') ] },
+      { visitorId:'vl-0038', sdt:'0914455226', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-10'), lanCuoiISO:iso('2026-07-18'), soLanGhe:2,
+        dichVuDaXem:['FTTH (Internet cáp quang)','Camera'], nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'da-lien-he',
+        ghiChu:[ gc('2026-07-18','CTV - Hoàng Tuấn Kiệt','Đã gọi, khách quan tâm combo FTTH+Camera.') ] },
+      { visitorId:'vl-0039', sdt:'0925566337', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-11'), lanCuoiISO:iso('2026-07-19'), soLanGhe:2,
+        dichVuDaXem:['Mua gói Data'], nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-19','CTV - Hoàng Tuấn Kiệt','Ghé lần 2, cần chủ động liên hệ sớm.') ] },
+      { visitorId:'vl-0040', sdt:'0936677448', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-12'), lanCuoiISO:iso('2026-07-20'), soLanGhe:2,
+        dichVuDaXem:['Combo Internet + Truyền hình'], nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'da-lien-he',
+        ghiChu:[ gc('2026-07-20','CTV - Hoàng Tuấn Kiệt','Đã nhắn Zalo, khách hẹn quyết định trong tuần.') ] },
+      // vl-0041 + vl-0042 gộp: khách Võ Thị Diễm quay lại lần 2 — minh hoạ thứ hai cho lịch sử ghi chú.
+      { visitorId:'vl-0041', sdt:'0947788556', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-14'), lanCuoiISO:iso('2026-07-22'), soLanGhe:2,
+        dichVuDaXem:['Mua gói Data','FTTH (Internet cáp quang)'], nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'da-lien-he',
+        ghiChu:[
+          gc('2026-07-14','CTV - Hoàng Tuấn Kiệt','Võ Thị Diễm mới ghé xem gói Data, chưa liên hệ.'),
+          gc('2026-07-22','CTV - Hoàng Tuấn Kiệt','Gọi lại, Võ Thị Diễm đang cân nhắc giá, hẹn phản hồi tuần sau.'),
+        ] },
+      { visitorId:'vl-0043', sdt:'0912334455', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-21'), lanCuoiISO:iso('2026-07-23'), soLanGhe:2,
+        dichVuDaXem:['Truyền hình'], nguonThuThapSdt:'khach-da-dang-nhap', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-23','CTV - Hoàng Tuấn Kiệt','Khách cũ (Hoàng Văn Đức) ghé xem thêm gói truyền hình.') ],
+        _hienHuu:'kiet' },
+      { visitorId:'vl-0044', sdt:'0989858785', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-24'), lanCuoiISO:iso('2026-07-24'), soLanGhe:1, dichVuDaXem:['FTTH (Internet cáp quang)'],
+        nguonThuThapSdt:'khach-da-dang-nhap', loaiTru:true, trangThaiXuLy:'bo-qua',
+        ghiChu:[ gc('2026-07-24','CTV - Hoàng Tuấn Kiệt','Tự bấm thử link cá nhân, không tính lead.') ] },
+      { visitorId:'vl-0045', sdt:null, nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-24'), lanCuoiISO:iso('2026-07-24'), soLanGhe:1, dichVuDaXem:['Camera'],
+        nguonThuThapSdt:'chua-co', loaiTru:false, trangThaiXuLy:'chua-lien-he', ghiChu:[] },
+    ];
+
+    // Với các lead được thiết kế để minh hoạ phân loại "Khách hàng hiện hữu" (_hienHuu), gán SĐT THẬT
+    // lấy từ chính dữ liệu đơn hàng đang chạy (collectAllOrdersForRange) thay vì SĐT tự đặt cố định —
+    // để classifyVisitor() (dựa trên phoneHasOrderHistory) luôn nhận diện đúng, không lệ thuộc số liệu
+    // đơn hàng ngẫu nhiên theo seed hiện tại. Nếu không tìm đủ SĐT thật (trường hợp hiếm), giữ nguyên
+    // SĐT mẫu — lead vẫn hiển thị bình thường, chỉ khác nhãn phân loại.
+    try {
+      const allOrders = collectAllOrdersForRange('12-thang');
+      const nvkdPhones = [...new Set(allOrders.filter(o => !o.sdtCTV).map(o => o.sdtKhachHang))];
+      const kietPhones = [...new Set(allOrders.filter(o => o.sdtCTV === ctvKiet.sdt).map(o => o.sdtKhachHang))];
+      let nvkdIdx = 0, kietIdx = 0;
+      entries.forEach(e => {
+        if(e._hienHuu === 'nvkd' && nvkdPhones[nvkdIdx]) e.sdt = nvkdPhones[nvkdIdx++];
+        else if(e._hienHuu === 'kiet' && kietPhones[kietIdx]) e.sdt = kietPhones[kietIdx++];
+        delete e._hienHuu;
+      });
+    } catch(e) { /* nếu chưa sẵn sàng dữ liệu đơn hàng, giữ nguyên SĐT mẫu đã gán ở trên */ }
+
+    saveVisitorLog(entries);
+  }
+  seedDemoVisitorLogIfEmpty();
+
+  // ---------- Tab "Tài liệu Marketing" (NVKD + CTV) ----------
+  // Dữ liệu demo mô phỏng đúng cấu trúc sheet "TaiLieuMarketing" trong Google Sheet DucLQ_Data_LPK
+  // (do các phòng ban quản lý sản phẩm Di động/Cố định đăng tải, NVKD/CTV chỉ xem + tải về).
+  const TAI_LIEU_MARKETING = [
+    { ma:'TL001', ten:'Giới thiệu Gói cước Data 5G', dichVu:'Di động', loaiNoiDung:'Tài liệu giới thiệu SP', nenTang:'',
+      moTa:'Tài liệu giới thiệu chi tiết gói Data 5G: thông tin gói, giá cước, ưu đãi, FAQ.', dinhDang:'DOC',
+      ngayDang:'2026-07-01', phongBan:'Phòng QLSP Di động',
+      link:'https://drive.google.com/file/d/1JO8N2zV_MlAl17LFGur_nkxwCXcpfKVA/view?usp=drivesdk' },
+    { ma:'TL002', ten:'Giới thiệu Combo Internet + Truyền hình', dichVu:'Cố định', loaiNoiDung:'Tài liệu giới thiệu SP', nenTang:'',
+      moTa:'Tài liệu giới thiệu combo FTTH + Truyền hình: thông số, giá cước, kịch bản tư vấn.', dinhDang:'DOC',
+      ngayDang:'2026-07-02', phongBan:'Phòng QLSP Cố định',
+      link:'https://drive.google.com/file/d/1Z0sOljH02kD5OqkWWA1lWzZZU2IurInA/view?usp=drivesdk' },
+    { ma:'TL003', ten:'Content Facebook - Khuyến mãi Data 5G', dichVu:'Di động', loaiNoiDung:'Content MXH', nenTang:'Facebook',
+      moTa:'Bài đăng Facebook giới thiệu ưu đãi tặng 1 tháng Data 5G.', dinhDang:'TXT',
+      ngayDang:'2026-07-03', phongBan:'Phòng QLSP Di động',
+      link:'https://drive.google.com/file/d/1d3kK1vCFYrMmRU3E8EMVIS6IMgaYgE2_/view?usp=drivesdk' },
+    { ma:'TL004', ten:'Kịch bản TikTok - Data 5G', dichVu:'Di động', loaiNoiDung:'Content MXH', nenTang:'TikTok',
+      moTa:'Kịch bản video ngắn 15-20 giây quảng bá gói Data 5G.', dinhDang:'TXT',
+      ngayDang:'2026-07-04', phongBan:'Phòng QLSP Di động',
+      link:'https://drive.google.com/file/d/1NsMb456RTr2uwqMweRSVGJjU7Z4j665G/view?usp=drivesdk' },
+    { ma:'TL005', ten:'Content Zalo - Ưu đãi Combo FTTH', dichVu:'Cố định', loaiNoiDung:'Content MXH', nenTang:'Zalo',
+      moTa:'Bài chia sẻ Zalo giới thiệu ưu đãi lắp đặt miễn phí Combo FTTH.', dinhDang:'TXT',
+      ngayDang:'2026-07-05', phongBan:'Phòng QLSP Cố định',
+      link:'https://drive.google.com/file/d/17EcyNt2Rnts6m69OAdDmodytVScZ7Jwc/view?usp=drivesdk' },
+    { ma:'TL006', ten:'Kịch bản YouTube - Combo FTTH', dichVu:'Cố định', loaiNoiDung:'Content MXH', nenTang:'YouTube',
+      moTa:'Kịch bản video 60 giây giới thiệu Combo Internet + Truyền hình.', dinhDang:'TXT',
+      ngayDang:'2026-07-06', phongBan:'Phòng QLSP Cố định',
+      link:'https://drive.google.com/file/d/1ZUsEi1Xn9IGQnyRSG6QWNPOrPnsr0wxJ/view?usp=drivesdk' },
+    { ma:'TL007', ten:'Banner Data 5G 1080x1080', dichVu:'Di động', loaiNoiDung:'Hình ảnh SP', nenTang:'',
+      moTa:'Ảnh banner vuông dùng cho Facebook/Zalo/Instagram quảng bá gói Data 5G.', dinhDang:'SVG',
+      ngayDang:'2026-07-07', phongBan:'Phòng QLSP Di động',
+      link:'https://drive.google.com/file/d/1lIcdDZuLrXWLd-rFpmj-I0N9AeWUiV11/view?usp=drivesdk' },
+    { ma:'TL008', ten:'Banner Combo Internet + Truyền hình 1080x1080', dichVu:'Cố định', loaiNoiDung:'Hình ảnh SP', nenTang:'',
+      moTa:'Ảnh banner vuông quảng bá Combo Internet + Truyền hình.', dinhDang:'SVG',
+      ngayDang:'2026-07-08', phongBan:'Phòng QLSP Cố định',
+      link:'https://drive.google.com/file/d/1c9Pw2i-Ln9opELrRCRsGcJD9zJc4oQp0/view?usp=drivesdk' },
+  ];
+
+  const DOC_LOAI_META = {
+    'Tài liệu giới thiệu SP': { cls:'doc-badge-gioithieu', icon:'📄' },
+    'Content MXH':            { cls:'doc-badge-content',   icon:'📱' },
+    'Hình ảnh SP':            { cls:'doc-badge-hinhanh',   icon:'🖼️' },
+  };
+
+  function docCardHtml(doc){
+    const meta = DOC_LOAI_META[doc.loaiNoiDung] || { cls:'doc-badge-dv', icon:'📁' };
+    const nenTangBadge = doc.nenTang ? `<span class="doc-badge doc-badge-dv">${escapeHtml(doc.nenTang)}</span>` : '';
+    return `
+      <div class="doc-card" data-ma="${doc.ma}">
+        <div class="doc-card-top">
+          <div class="doc-card-icon">${meta.icon}</div>
+          <div class="doc-card-title">${escapeHtml(doc.ten)}</div>
+        </div>
+        <div class="doc-badge-row">
+          <span class="doc-badge ${meta.cls}">${escapeHtml(doc.loaiNoiDung)}</span>
+          <span class="doc-badge doc-badge-dv">${escapeHtml(doc.dichVu)}</span>
+          ${nenTangBadge}
+        </div>
+        <div class="doc-card-desc">${escapeHtml(doc.moTa)}</div>
+        <div class="doc-card-meta">Định dạng: ${escapeHtml(doc.dinhDang)} · Đăng ngày ${formatVNDate ? formatVNDate(doc.ngayDang) : doc.ngayDang} · ${escapeHtml(doc.phongBan)}</div>
+        <div class="doc-card-footer">
+          <a class="doc-download-btn" href="${doc.link}" target="_blank" rel="noopener">⭳ Tải về</a>
+        </div>
+      </div>`;
+  }
+
+  // Render lưới tài liệu theo 2 bộ lọc (Dịch vụ + Loại nội dung) — dùng chung cho cả NVKD lẫn CTV
+  // vì kho tài liệu là chung, không phân biệt theo người xem.
+  function renderDocGrid(gridId, emptyId, filterDichVuId, filterLoaiId){
+    const grid = document.getElementById(gridId);
+    const emptyNote = document.getElementById(emptyId);
+    if(!grid) return;
+    const dichVu = document.getElementById(filterDichVuId)?.value || 'all';
+    const loai = document.getElementById(filterLoaiId)?.value || 'all';
+    const filtered = TAI_LIEU_MARKETING.filter(d => {
+      return (dichVu === 'all' || d.dichVu === dichVu) && (loai === 'all' || d.loaiNoiDung === loai);
+    });
+    grid.innerHTML = filtered.map(docCardHtml).join('');
+    if(emptyNote) emptyNote.style.display = filtered.length ? 'none' : 'block';
+  }
+
+  function renderStaffDocs(){ renderDocGrid('staff-doc-grid', 'staff-doc-empty', 'staff-doc-filter-dichvu', 'staff-doc-filter-loai'); }
+  function renderCtvDocs(){ renderDocGrid('ctv-doc-grid', 'ctv-doc-empty', 'ctv-doc-filter-dichvu', 'ctv-doc-filter-loai'); }
+
+  document.querySelector('#staff-main-tabs [data-staff-tab="tailieu"]')?.addEventListener('click', renderStaffDocs);
+  document.querySelector('#ctv-dashboard [data-tab="ctv-tab-tailieu"]')?.addEventListener('click', renderCtvDocs);
+  document.getElementById('staff-doc-filter-dichvu')?.addEventListener('change', renderStaffDocs);
+  document.getElementById('staff-doc-filter-loai')?.addEventListener('change', renderStaffDocs);
+  document.getElementById('ctv-doc-filter-dichvu')?.addEventListener('change', renderCtvDocs);
+  document.getElementById('ctv-doc-filter-loai')?.addEventListener('change', renderCtvDocs);
 
   // "Phiên giới thiệu" đang hoạt động (đọc được từ URL ?NV=... khi khách hàng bấm link chia sẻ) — null nghĩa
   // là khách vào trang bình thường, không qua giới thiệu. showInternetSummary()/showDataSummary() đọc biến

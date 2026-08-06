@@ -124,7 +124,7 @@
       <a class="btn-primary" id="doc-preview-download-btn" href="#" target="_blank" rel="noopener" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding:9px 18px; white-space:nowrap; flex-shrink:0;">⭳ Tải về</a>
     </div>
     <div style="flex:1; background:#f0f2f5; border-radius:8px; overflow:hidden; position:relative;">
-      <iframe id="doc-preview-iframe" style="width:100%; height:100%; border:none;" src=""></iframe>
+      <div id="doc-preview-content" style="width:100%; height:100%; overflow-y:auto; padding:20px; background:#fff; box-sizing:border-box;"></div>
     </div>
   </div>
 </div>

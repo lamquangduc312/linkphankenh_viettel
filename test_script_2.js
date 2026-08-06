@@ -54,6 +54,215 @@
     return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg" style="background:#fff;border-radius:6px;">${rects}</svg>`;
   }
 
+  /* ================= HÀM TIỆN ÍCH DÙNG CHUNG (helpers) =================
+     FIX LỖI: các hàm bên dưới (escapeHtml, formatVND, formatCompact, formatVNDate,
+     initialsOf, referralLink, positionTooltip, statusBadgeHtml, orderRowHtml,
+     renderTrendChart) được gọi ở rất nhiều nơi trong khối script Kênh NVKD/CTV
+     (dashboard, bảng đơn hàng, thẻ CTV, biểu đồ...) nhưng lại CHƯA từng được khai báo
+     trong file gốc. Do đó ngay khi đăng nhập NVKD/CTV thành công và các hàm render...()
+     được gọi, trình duyệt gặp lỗi "X is not defined" và dừng thực thi giữa chừng
+     -> toàn bộ dashboard hiện ra trống trơn (không có số liệu/bảng biểu) dù đăng
+     nhập OTP đã thành công. Bổ sung đầy đủ các hàm còn thiếu ở đây để khắc phục. */
+
+  // Escape ký tự đặc biệt HTML để chống lỗi hiển thị/XSS khi chèn tên KH, NVKD, CTV... vào innerHTML
+  function escapeHtml(str){
+    return String(str ?? '').replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  // Định dạng tiền VNĐ đầy đủ, có dấu phân cách nghìn — dùng cho số liệu doanh số, giá trị đơn hàng
+  function formatVND(n){
+    return (Number(n) || 0).toLocaleString('vi-VN') + 'đ';
+  }
+
+  // Định dạng rút gọn (vd. 1,2tr / 850k) — dùng cho nhãn trên biểu đồ, nơi không đủ chỗ hiển thị số đầy đủ
+  function formatCompact(n){
+    n = Number(n) || 0;
+    const abs = Math.abs(n);
+    if(abs >= 1e9) return (n / 1e9).toFixed(1).replace(/\.0$/, '').replace('.', ',') + ' tỷ';
+    if(abs >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, '').replace('.', ',') + ' tr';
+    if(abs >= 1e3) return Math.round(n / 1e3) + 'k';
+    return String(Math.round(n));
+  }
+
+  // Chuyển ngày ISO "YYYY-MM-DD" sang định dạng Việt Nam "dd/mm/yyyy" dùng trong bảng/CSV
+  function formatVNDate(isoStr){
+    if(!isoStr) return '';
+    const parts = String(isoStr).split('-');
+    if(parts.length !== 3) return String(isoStr);
+    const [y, m, d] = parts;
+    return `${d}/${m}/${y}`;
+  }
+
+  // Chữ cái đầu tên (tối đa 2 ký tự) dùng làm avatar mặc định khi NVKD/CTV chưa có ảnh đại diện
+  function initialsOf(name){
+    const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if(parts.length === 0) return '?';
+    const first = parts[0][0] || '';
+    const last = parts.length > 1 ? (parts[parts.length - 1][0] || '') : '';
+    return (first + last).toUpperCase();
+  }
+
+  // Dựng link giới thiệu/phân kênh theo mã định danh NVKD hoặc SĐT của CTV
+  function referralLink(code){
+    return 'https://viettel.vn/vx/gioithieu?NV=' + encodeURIComponent(code);
+  }
+
+  // Dựng link mở cửa sổ chat Zalo tới đúng SĐT của NVKD/CTV — Zalo nhận dạng số điện thoại theo
+  // định dạng quốc tế không có dấu "+" (vd. 0989866666 -> 84989866666), theo đúng chuẩn "zalo.me/<sđt>".
+  function zaloChatLink(phone){
+    const digits = String(phone || '').replace(/\D/g, '');
+    const intlPhone = digits.replace(/^0/, '84');
+    return 'https://zalo.me/' + intlPhone;
+  }
+
+  // Định vị tooltip theo vị trí con trỏ, tương đối với phần tử cha có position (vd. .chart-card)
+  function positionTooltip(tooltip, container, e){
+    const parent = tooltip.offsetParent || container || document.body;
+    const rect = parent.getBoundingClientRect();
+    let x = e.clientX - rect.left + 14;
+    let y = e.clientY - rect.top - 12;
+    const maxX = rect.width - (tooltip.offsetWidth || 0) - 8;
+    if(maxX > 0 && x > maxX) x = maxX;
+    if(x < 0) x = 0;
+    if(y < 0) y = 0;
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = y + 'px';
+  }
+
+  // Ánh xạ trạng thái đơn hàng -> class màu badge (dùng chung style .status-badge sẵn có trong CSS)
+  function statusBadgeHtml(trangThai){
+    const map = {
+      'Hoàn thành': 'status-hoan-thanh',
+      'Đang thực hiện': 'status-dang-thuc-hien',
+      'Đang triển khai': 'status-dang-trien-khai',
+      'Đã hủy': 'status-da-huy'
+    };
+    const cls = map[trangThai] || 'status-dang-thuc-hien';
+    return `<span class="status-badge ${cls}">${escapeHtml(trangThai)}</span>`;
+  }
+
+  // Dựng 1 dòng <tr> cho bảng đơn hàng. isFullView=true (dashboard NVKD): hiện cả cột NVKD + CTV (10 cột).
+  // isFullView=false (dashboard CTV tự xem): chỉ hiện 1 cột "NVKD phụ trách" (9 cột) — đúng số cột với
+  // header bảng tương ứng trong HTML (#orders-table vs #ctv-orders-table).
+  function orderRowHtml(o, isFullView){
+    const identityCells = isFullView
+      ? `<td>${escapeHtml(o.tenNVKD || '-')}</td><td>${o.tenCTV ? escapeHtml(o.tenCTV) : '-'}</td>`
+      : `<td>${escapeHtml(o.tenNVKD || '-')}</td>`;
+    return `
+      <tr>
+        <td>${escapeHtml(o.maDonHang)}</td>
+        <td>${formatVNDate(o.ngay)}</td>
+        <td>${escapeHtml(o.loaiDichVu)}</td>
+        <td>${o.tenGoiCuoc ? escapeHtml(o.tenGoiCuoc) : ''}</td>
+        <td>${escapeHtml(o.hoTenKhachHang)}</td>
+        <td>${escapeHtml(o.sdtKhachHang)}</td>
+        ${identityCells}
+        <td>${o.tenNVKyThuat ? escapeHtml(o.tenNVKyThuat) : '-'}</td>
+        <td>${statusBadgeHtml(o.trangThai)}</td>
+        <td>${formatVND(o.giaTri)}</td>
+      </tr>`;
+  }
+
+  // Biểu đồ đường xu hướng doanh số nhiều chuỗi (vd. "Bạn" vs "Toàn đội CTV") theo 12 tháng gần nhất.
+  // series: [{ key, name, color, data:[12 số] }]. Dựng bằng SVG thuần + có tooltip/đường dóng khi rê chuột,
+  // dùng chung style .chart-legend/.chart-tooltip/.chart-crosshair-line/.chart-grid/.chart-axis-label/.chart-end-label sẵn có trong CSS.
+  function renderTrendChart(containerId, series){
+    const container = document.getElementById(containerId);
+    if(!container) return;
+    if(!series || series.length === 0 || series.every(s => !s.data || s.data.length === 0)){
+      container.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:20px 0;">Không có dữ liệu để hiển thị.</div>';
+      return;
+    }
+
+    const W = 560, H = 220;
+    const padL = 36, padR = 34, padT = 10, padB = 24;
+    const plotW = W - padL - padR;
+    const plotH = H - padT - padB;
+    const n = MONTHS_12.length;
+    const stepX = n > 1 ? plotW / (n - 1) : 0;
+    const maxVal = Math.max(1, ...series.flatMap(s => s.data));
+
+    const xAt = (i) => padL + i * stepX;
+    const yAt = (v) => padT + plotH - (v / maxVal) * plotH;
+
+    let gridLines = '';
+    const gridSteps = 4;
+    for(let g = 0; g <= gridSteps; g++){
+      const v = maxVal * g / gridSteps;
+      const y = yAt(v);
+      gridLines += `<line class="chart-grid" x1="${padL}" y1="${y.toFixed(1)}" x2="${(W - padR).toFixed(1)}" y2="${y.toFixed(1)}"/>`;
+      gridLines += `<text class="chart-axis-label" x="2" y="${(y - 3).toFixed(1)}">${formatCompact(v)}</text>`;
+    }
+
+    let xLabels = '';
+    MONTHS_12.forEach((d, i) => {
+      if(n > 6 && i % 2 !== 0 && i !== n - 1) return;
+      xLabels += `<text class="chart-axis-label" x="${xAt(i).toFixed(1)}" y="${H - 6}" text-anchor="middle">Th${d.getMonth() + 1}</text>`;
+    });
+
+    let paths = '', pointsSvg = '', endLabels = '';
+    series.forEach(s => {
+      const dAttr = s.data.map((v, i) => `${i === 0 ? 'M' : 'L'}${xAt(i).toFixed(1)},${yAt(v).toFixed(1)}`).join(' ');
+      paths += `<path d="${dAttr}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+      s.data.forEach((v, i) => {
+        pointsSvg += `<circle cx="${xAt(i).toFixed(1)}" cy="${yAt(v).toFixed(1)}" r="3" fill="${s.color}"/>`;
+      });
+      const lastV = s.data[s.data.length - 1];
+      endLabels += `<text class="chart-end-label" x="${(W - padR + 4).toFixed(1)}" y="${yAt(lastV).toFixed(1)}" fill="${s.color}">${formatCompact(lastV)}</text>`;
+    });
+
+    const legendHtml = `<div class="chart-legend">${series.map(s => `
+      <div class="chart-legend-item"><span class="chart-legend-swatch" style="background:${s.color};"></span>${escapeHtml(s.name)}</div>
+    `).join('')}</div>`;
+
+    container.innerHTML = `
+      ${legendHtml}
+      <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;overflow:visible;display:block;">
+        ${gridLines}
+        ${paths}
+        ${pointsSvg}
+        ${xLabels}
+        ${endLabels}
+        <line class="chart-crosshair-line" id="${containerId}-crosshair" x1="0" y1="${padT}" x2="0" y2="${(padT + plotH).toFixed(1)}" style="opacity:0;"></line>
+        <rect x="${padL}" y="${padT}" width="${plotW}" height="${plotH}" fill="transparent" id="${containerId}-hitarea" style="cursor:crosshair;"></rect>
+      </svg>
+      <div class="chart-tooltip" id="${containerId}-tooltip"></div>
+    `;
+
+    const svg = container.querySelector('svg');
+    const hitArea = document.getElementById(containerId + '-hitarea');
+    const crosshair = document.getElementById(containerId + '-crosshair');
+    const tooltip = document.getElementById(containerId + '-tooltip');
+
+    function idxFromEvent(e){
+      const pt = svg.createSVGPoint();
+      pt.x = e.clientX; pt.y = e.clientY;
+      const loc = pt.matrixTransform(svg.getScreenCTM().inverse());
+      const idx = Math.round((loc.x - padL) / (stepX || 1));
+      return Math.max(0, Math.min(n - 1, idx));
+    }
+
+    hitArea.addEventListener('pointermove', (e) => {
+      const idx = idxFromEvent(e);
+      const x = xAt(idx);
+      crosshair.setAttribute('x1', x.toFixed(1));
+      crosshair.setAttribute('x2', x.toFixed(1));
+      crosshair.style.opacity = 1;
+      const monthLabel = `Tháng ${MONTHS_12[idx].getMonth() + 1}/${MONTHS_12[idx].getFullYear()}`;
+      tooltip.innerHTML = `<div class="ttl-name">${monthLabel}</div>` + series.map(s => `
+        <div><span class="ttl-name">${escapeHtml(s.name)}: </span><span class="ttl-val" style="color:${s.color};">${formatVND(s.data[idx])}</span></div>
+      `).join('');
+      tooltip.classList.add('show');
+      positionTooltip(tooltip, container, e);
+    });
+    hitArea.addEventListener('pointerleave', () => {
+      crosshair.style.opacity = 0;
+      tooltip.classList.remove('show');
+    });
+  }
+
   /* ---------- Dữ liệu demo: hồ sơ NVKD + danh sách CTV trực thuộc ---------- */
   const STAFF_DEMO = {
     hoTen: 'Lê Văn Linh',
@@ -64,16 +273,45 @@
     sdt: '0909000123', // số điện thoại liên hệ hiển thị cho khách hàng ở khối "Được giới thiệu bởi" (nút Gọi điện/Nhắn Zalo)
     rating: 5,
     reviews: 156,
-    avatar: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnMiIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGRkYwRjIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRkZENkRCIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjEwMCIgZmlsbD0idXJsKCNiZzIpIi8+CiAgPHBhdGggZD0iTTM4IDE4NSBDMzggMTQwLCA2OCAxMzIsIDEwMCAxMzIgQzEzMiAxMzIsIDE2MiAxNDAsIDE2MiAxODUgWiIgZmlsbD0iI0VFMDAzMyIvPgogIDxwYXRoIGQ9Ik03MiAxMzIgTDk1IDE1MiBMMTAwIDEzNiBMMTA1IDE1MiBMMTI4IDEzMiBaIiBmaWxsPSIjRkZGRkZGIi8+CiAgPHBhdGggZD0iTTk2IDEzOCBMMTAwIDE2MiBMMTA0IDEzOCBaIiBmaWxsPSIjQ0MwMDJEIi8+CiAgPHJlY3QgeD0iOTAiIHk9IjExMiIgd2lkdGg9IjIwIiBoZWlnaHQ9IjI0IiBmaWxsPSIjRkZDQzgwIiByeD0iNCIvPgogIDxjaXJjbGUgY3g9IjEwMCIgY3k9Ijg4IiByPSIzNSIgZmlsbD0iI0ZGRTBCMiIvPgogIDxwYXRoIGQ9Ik02MiA4MiBDNjAgNDgsIDE0MCA0OCwgMTM4IDgyIEMxMzAgNjAsIDcwIDYwLCA2MiA4MiBaIiBmaWxsPSIjMUExQTFBIi8+CiAgPGNpcmNsZSBjeD0iODUiIGN5PSI4NiIgcj0iMy41IiBmaWxsPSIjMUExQTFBIi8+CiAgPGNpcmNsZSBjeD0iMTE1IiBjeT0iODYiIHI9IjMuNSIgZmlsbD0iIzFBMUExQSIvPgogIDxwYXRoIGQ9Ik04NiAxMDQgUTEwMCAxMTcgMTE0IDEwNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRDg0MzE1IiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4=", // 📷 trong tab "Tài khoản của tôi", chỉ lưu tạm trong bộ nhớ trình duyệt
+    // Dùng ảnh thật có sẵn trong cùng thư mục với index.html (avatar_collab_1.png — nam, đúng giới tính
+    // với "Lê Văn Linh") thay vì icon minh hoạ SVG cũ. Vẫn có thể đổi ảnh khác qua nút 📷 trong tab
+    // "Tài khoản của tôi" — ảnh tải lên sẽ ghi đè bằng data URL, chỉ lưu tạm trong bộ nhớ trình duyệt.
+    avatar: "avatar_collab_1.png",
   };
 
-  // Danh sách kênh phân phối theo từng dịch vụ — dùng chung 1 liên kết/mã QR định danh theo NVKD
-  // (xem staffChannelNvCode), chỉ khác nhau ở trang dịch vụ mà nút "Xem trang dịch vụ" điều hướng tới.
-  const NVKD_CHANNELS = [
-    { key:'internet', label:'Internet / Truyền hình', icon:'🌐', page:'page-internet' },
-    { key:'di-dong',  label:'Di động / Sim số',        icon:'📱', page:'page-sim' },
-    { key:'data-5g',  label:'Gói cước Data/5G',        icon:'📶', page:'page-data' },
+  // ---------- Danh mục dịch vụ NVKD/CTV phụ trách (dùng cho dashboard + link phân kênh) ----------
+  // 4 nhóm nghiệp vụ theo đúng yêu cầu: Dịch vụ cố định, Dịch vụ di động, Lan tỏa, Chăm sóc khách hàng.
+  // Mỗi nhóm có màu riêng, dùng đồng bộ cho biểu đồ "Loại dịch vụ" và lưới link phân kênh.
+  const SERVICE_GROUPS = [
+    { key:'co-dinh',   label:'Dịch vụ cố định',        icon:'🏠', color:'#EE0033' },
+    { key:'di-dong',   label:'Dịch vụ di động',        icon:'📱', color:'#2a78d6' },
+    { key:'lan-toa',   label:'Lan tỏa',                icon:'📲', color:'#F5A623' },
+    { key:'cham-soc',  label:'Chăm sóc khách hàng',    icon:'🧾', color:'#3AAE58' },
   ];
+
+  // Danh mục 12 dịch vụ cụ thể NVKD/CTV giới thiệu/xử lý cho khách hàng.
+  // - page: trang demo tương ứng để nút "Xem trang dịch vụ" điều hướng tới (null = dịch vụ chưa có trang minh hoạ riêng).
+  // - laDangKyMoi: true nếu hoàn thành đơn được tính là "thuê bao mới" (đăng ký mới thật sự,
+  //   khác với các thao tác trên thuê bao đã có sẵn như đổi eSIM/chuyển đầu số/chăm sóc...).
+  // - giaTriRange: khoảng giá trị đơn hàng demo (0-0 = dịch vụ không phát sinh doanh thu trực tiếp).
+  const SERVICE_CATALOG = [
+    { key:'ftth',               name:'FTTH (Internet cáp quang)',      group:'co-dinh',  icon:'🌐', page:'page-internet', laDangKyMoi:true,  giaTriRange:[150000, 450000] },
+    { key:'combo',              name:'Combo Internet + Truyền hình',   group:'co-dinh',  icon:'📦', page:'page-internet', laDangKyMoi:true,  giaTriRange:[210000, 550000] },
+    { key:'truyen-hinh',        name:'Truyền hình',                    group:'co-dinh',  icon:'📺', page:'page-internet', laDangKyMoi:true,  giaTriRange:[90000, 250000] },
+    { key:'camera',             name:'Camera',                         group:'co-dinh',  icon:'📷', page:'page-internet', laDangKyMoi:true,  giaTriRange:[100000, 300000] },
+    { key:'mua-sim-so',         name:'Mua sim/số',                     group:'di-dong',  icon:'📱', page:'page-sim',      laDangKyMoi:true,  giaTriRange:[50000, 500000] },
+    { key:'doi-esim',           name:'Đổi eSIM',                       group:'di-dong',  icon:'🔄', page:'page-sim',      laDangKyMoi:false, giaTriRange:[25000, 25000] },
+    { key:'mua-goi-data',       name:'Mua gói Data',                   group:'di-dong',  icon:'📶', page:'page-data',     laDangKyMoi:false, giaTriRange:[70000, 230000] },
+    { key:'chuyen-tra-sau',     name:'Chuyển sang trả sau',            group:'di-dong',  icon:'💳', page:'page-sim',      laDangKyMoi:false, giaTriRange:[0, 0] },
+    { key:'chuyen-tra-truoc',   name:'Chuyển sang trả trước',          group:'di-dong',  icon:'💰', page:'page-sim',      laDangKyMoi:false, giaTriRange:[0, 0] },
+    { key:'dang-ky-thong-tin',  name:'Đăng ký thông tin thuê bao',     group:'di-dong',  icon:'🪪', page:'page-sim',      laDangKyMoi:false, giaTriRange:[0, 0] },
+    { key:'lan-toa-app',        name:'Lan tỏa cài đặt App',            group:'lan-toa',  icon:'📲', page:null,            laDangKyMoi:false, giaTriRange:[10000, 30000] },
+    { key:'cham-soc-thu-cuoc',  name:'Chăm sóc thu cước',              group:'cham-soc', icon:'🧾', page:null,            laDangKyMoi:false, giaTriRange:[0, 0] },
+  ];
+  function serviceGroupOf(key){
+    const svc = SERVICE_CATALOG.find(s => s.key === key);
+    return svc ? SERVICE_GROUPS.find(g => g.key === svc.group) : null;
+  }
 
   // Mã định danh kênh giới thiệu của NVKD, đúng theo cấu trúc nghiệp vụ thật:
   // CNKD (cố định) + mã viết tắt địa bàn (tỉnh/thành) + email nội bộ (không gồm đuôi @...).
@@ -83,7 +321,8 @@
   }
 
   /* ---------- MOCKUP DỮ LIỆU ĐĂNG KÝ MỚI THEO CTV VÀ NVKD ---------- */
-  const NOW = new Date();
+  // Giả lập thời điểm hiện tại là cuối tháng 8/2026 để biểu đồ demo hiển thị đầy đủ số liệu tháng 8
+  const NOW = new Date('2026-08-31T23:59:59');
   const MONTHS_12 = Array.from({length: 12}).map((_, i) => new Date(NOW.getFullYear(), NOW.getMonth() - 11 + i, 1));
 
   function monthKey(d) {
@@ -113,10 +352,41 @@
     return MONTHS_12.slice(0, 12);
   }
 
+  // FIX lỗi thiếu thông tin: trước đây cột "Khách hàng" hiển thị placeholder "Khách hàng 132"
+  // (chỉ ghép chữ + số ngẫu nhiên). Đổi sang sinh HỌ TÊN THẬT kiểu Việt Nam bằng random có seed
+  // (dựa trên h — mã hash của mỗi đơn) để mỗi đơn hàng luôn ra cùng 1 tên cố định, không đổi
+  // qua các lần render lại (giữ tính nhất quán như các trường dữ liệu demo khác trong file).
+  const CUST_HO_POOL = ['Nguyễn','Trần','Lê','Phạm','Hoàng','Huỳnh','Phan','Vũ','Võ','Đặng','Bùi','Đỗ','Hồ','Ngô','Dương','Lý'];
+  const CUST_TEN_NAM_POOL = ['Văn Bình','Văn Cường','Văn Dũng','Văn Hải','Văn Hùng','Văn Khánh','Văn Long','Văn Minh','Văn Nam','Văn Sơn','Văn Thắng','Văn Tuấn','Văn Việt','Đức Anh','Quốc Huy'];
+  const CUST_TEN_NU_POOL = ['Thị Lan','Thị Hương','Thị Thảo','Thị Ngọc','Thị Nga','Thị Trang','Thị Vân','Thị Yến','Thị Thủy','Thu Hà','Mai Anh','Ngọc Linh','Phương Anh','Kim Ngân','Bảo Trân'];
+
+  function randomCustomerName(h) {
+    const ho = CUST_HO_POOL[Math.floor(randomSeeded(h + 6) * CUST_HO_POOL.length)];
+    const tenPool = randomSeeded(h + 7) < 0.5 ? CUST_TEN_NAM_POOL : CUST_TEN_NU_POOL;
+    const ten = tenPool[Math.floor(randomSeeded(h + 8) * tenPool.length)];
+    return ho + ' ' + ten;
+  }
+
+  // Bổ sung các gói cước demo cho từng dịch vụ
+  const MOCK_PLANS = {
+    'ftth': ['(Gói SUN1T)', '(Gói SUN2T)', '(Gói SUN3T)', '(Gói STAR1T)', '(Gói STAR2T)', '(Gói STAR3T)', '(Gói FAST2)'],
+    'combo': ['(Gói SUN1T + TV360)', '(Gói STAR1T + TV360)', '(Gói SUN2T + TV360)'],
+    'truyen-hinh': ['(Gói TV360 Basic)', '(Gói TV360 Standard)'],
+    'mua-goi-data': ['(Gói ST15K)', '(Gói ST30K)', '(Gói V90C)', '(Gói SD135)', '(Gói MXH120)']
+  };
+
   function collectOrders(personKey, rangeKey, createdDate) {
     const wanted = new Set(monthsForRange(rangeKey).map(monthKey));
     const createdYm = createdDate ? monthKey(createdDate) : null;
     let orders = [];
+
+    // FIX lỗi thiếu thông tin: trước đây cột CTV hiển thị cứng chuỗi "Cộng tác viên" thay vì tên
+    // thật. Tra đúng CTV theo id nằm trong personKey (dạng "ctv:<id>") để lấy họ tên/SĐT thật.
+    let ctvInfo = null;
+    if (personKey.startsWith('ctv:')) {
+      const ctvId = personKey.slice('ctv:'.length);
+      ctvInfo = ctvList.find(c => c.id === ctvId) || null;
+    }
 
     // Support for when rangeKey is literally 'YYYY-MM'
     if (rangeKey.match(/^\d{4}-\d{2}$/)) {
@@ -141,20 +411,45 @@
         const r = randomSeeded(h);
         
         if (r < 0.25) {
-          const val = Math.floor(randomSeeded(h + 1) * 20 + 5) * 100000;
+          // Chọn 1 trong 12 dịch vụ (SERVICE_CATALOG) theo random có seed, rồi sinh giá trị đơn hàng
+          // đúng trong khoảng giaTriRange riêng của dịch vụ đó (dịch vụ chăm sóc/hành chính có range [0,0]
+          // -> không phát sinh doanh thu, chỉ tính là 1 đơn đã xử lý).
+          const svc = SERVICE_CATALOG[Math.floor(randomSeeded(h + 5) * SERVICE_CATALOG.length)];
+          const [minV, maxV] = svc.giaTriRange;
+          const val = maxV > minV
+            ? minV + Math.round(randomSeeded(h + 1) * (maxV - minV) / 10000) * 10000
+            : minV;
+
+          // Sinh đủ 4 trạng thái (khớp với các nút lọc trạng thái sẵn có trên UI), theo tỉ trọng
+          // gần với thực tế: phần lớn đã hoàn thành/đang xử lý, một phần nhỏ bị huỷ.
+          const rStatus = randomSeeded(h + 2);
+          const trangThai = rStatus < 0.45 ? 'Hoàn thành'
+            : rStatus < 0.68 ? 'Đang thực hiện'
+            : rStatus < 0.88 ? 'Đang triển khai'
+            : 'Đã hủy';
+
+          // Bổ sung tên gói cước (nếu có)
+          let tenGoiCuoc = null;
+          if (MOCK_PLANS[svc.key]) {
+            const planPool = MOCK_PLANS[svc.key];
+            tenGoiCuoc = planPool[Math.floor(randomSeeded(h + 9) * planPool.length)];
+          }
+
           orders.push({
             id: 'OD-' + h,
             maDonHang: 'OD' + h.toString().padStart(8, '0').slice(-8),
             ngay: mStr,
             ngaySort: d.getTime(),
             giaTri: val,
-            trangThai: randomSeeded(h + 2) > 0.7 ? 'Đang thực hiện' : 'Hoàn thành',
-            loaiDichVu: randomSeeded(h + 3) > 0.5 ? 'Internet' : 'Di động',
-            hoTenKhachHang: 'Khách hàng ' + (h % 1000),
+            trangThai,
+            dichVuKey: svc.key,
+            loaiDichVu: svc.name,
+            tenGoiCuoc: tenGoiCuoc,
+            hoTenKhachHang: randomCustomerName(h),
             sdtKhachHang: '09' + String(h % 100000000).padStart(8, '0'),
             tenNVKD: STAFF_DEMO.hoTen,
-            tenCTV: personKey.startsWith('ctv:') ? 'Cộng tác viên' : null,
-            sdtCTV: personKey.startsWith('ctv:') ? '09...' : null,
+            tenCTV: ctvInfo ? ctvInfo.hoTen : null,
+            sdtCTV: ctvInfo ? ctvInfo.sdt : null,
             tenNVKyThuat: randomSeeded(h + 4) > 0.5 ? 'Nguyễn Kỹ Thuật' : null
           });
         }
@@ -171,7 +466,11 @@
     orders.forEach(o => {
       if (o.trangThai === 'Hoàn thành') {
         doanhSo += o.giaTri;
-        thueBaoMoi++;
+        // Chỉ tính "thuê bao mới" cho các dịch vụ thực sự phát sinh thuê bao/khách hàng mới
+        // (vd. FTTH, Combo, mua sim/số...) — không tính các thao tác trên thuê bao có sẵn
+        // (đổi eSIM, chuyển đầu số...) hay các hoạt động lan tỏa/chăm sóc không phải đăng ký mới.
+        const svc = SERVICE_CATALOG.find(s => s.key === o.dichVuKey);
+        if (svc && svc.laDangKyMoi) thueBaoMoi++;
       }
     });
     return { doanhSo, thueBaoMoi, tongDonHang: orders.length };
@@ -202,22 +501,55 @@
     'thang-nay':'Tháng này', 'thang-truoc':'Tháng trước', '3-thang':'3 tháng gần nhất', '12-thang':'12 tháng gần nhất'
   };
 
-    const VIETTEL_AVATARS = [
-    "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnMSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGRkYwRjIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRkVFMkU2Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjEwMCIgZmlsbD0idXJsKCNiZzEpIi8+CiAgPHBhdGggZD0iTTUwIDkwIEM0NSAxNDUsIDE1NSAxNDUsIDE1MCA5MCBaIiBmaWxsPSIjMjYzMjM4Ii8+CiAgPHBhdGggZD0iTTQwIDE4NSBDNDAgMTQwLCA3MCAxMzIsIDEwMCAxMzIgQzEzMCAxMzIsIDE2MCAxNDAsIDE2MCAxODUgWiIgZmlsbD0iI0VFMDAzMyIvPgogIDxwYXRoIGQ9Ik04NSAxMzIgTDEwMCAxNTUgTDExNSAxMzIgWiIgZmlsbD0iI0ZGRkZGRiIvPgogIDxwYXRoIGQ9Ik05MiAxMzIgTDEwMCAxNDggTDEwOCAxMzIgWiIgZmlsbD0iI0NDMDAyRCIvPgogIDxyZWN0IHg9IjkwIiB5PSIxMTIiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyNCIgZmlsbD0iI0ZGQ0M4MCIgcng9IjQiLz4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSI4OCIgcj0iMzQiIGZpbGw9IiNGRkUwQjIiLz4KICA8cGF0aCBkPSJNNjMgODUgQzYzIDUwLCAxMzcgNTAsIDEzNyA4NSBDMTI1IDY1LCA3NSA2NSwgNjMgODUgWiIgZmlsbD0iIzI2MzIzOCIvPgogIDxwYXRoIGQ9Ik02NSA4NSBDNjMgMTA1LCA3MiAxMjUsIDcyIDEyNSBDNzIgMTAwLCA3MCA4NSwgNjUgODUgWiIgZmlsbD0iIzI2MzIzOCIvPgogIDxwYXRoIGQ9Ik0xMzUgODUgQzEzNyAxMDUsIDEyOCAxMjUsIDEyOCAxMjUgQzEyOCAxMDAsIDEzMCA4NSwgMTM1IDg1IFoiIGZpbGw9IiMyNjMyMzgiLz4KICA8Y2lyY2xlIGN4PSI4NiIgY3k9Ijg2IiByPSIzLjUiIGZpbGw9IiMyNjMyMzgiLz4KICA8Y2lyY2xlIGN4PSIxMTQiIGN5PSI4NiIgcj0iMy41IiBmaWxsPSIjMjYzMjM4Ii8+CiAgPHBhdGggZD0iTTg3IDEwNCBRMTAwIDExNiAxMTMgMTA0IiBmaWxsPSJub25lIiBzdHJva2U9IiNFNjUxMDAiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjwvc3ZnPg==",
-    "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnMiIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGRkYwRjIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRkZENkRCIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjEwMCIgZmlsbD0idXJsKCNiZzIpIi8+CiAgPHBhdGggZD0iTTM4IDE4NSBDMzggMTQwLCA2OCAxMzIsIDEwMCAxMzIgQzEzMiAxMzIsIDE2MiAxNDAsIDE2MiAxODUgWiIgZmlsbD0iI0VFMDAzMyIvPgogIDxwYXRoIGQ9Ik03MiAxMzIgTDk1IDE1MiBMMTAwIDEzNiBMMTA1IDE1MiBMMTI4IDEzMiBaIiBmaWxsPSIjRkZGRkZGIi8+CiAgPHBhdGggZD0iTTk2IDEzOCBMMTAwIDE2MiBMMTA0IDEzOCBaIiBmaWxsPSIjQ0MwMDJEIi8+CiAgPHJlY3QgeD0iOTAiIHk9IjExMiIgd2lkdGg9IjIwIiBoZWlnaHQ9IjI0IiBmaWxsPSIjRkZDQzgwIiByeD0iNCIvPgogIDxjaXJjbGUgY3g9IjEwMCIgY3k9Ijg4IiByPSIzNSIgZmlsbD0iI0ZGRTBCMiIvPgogIDxwYXRoIGQ9Ik02MiA4MiBDNjAgNDgsIDE0MCA0OCwgMTM4IDgyIEMxMzAgNjAsIDcwIDYwLCA2MiA4MiBaIiBmaWxsPSIjMUExQTFBIi8+CiAgPGNpcmNsZSBjeD0iODUiIGN5PSI4NiIgcj0iMy41IiBmaWxsPSIjMUExQTFBIi8+CiAgPGNpcmNsZSBjeD0iMTE1IiBjeT0iODYiIHI9IjMuNSIgZmlsbD0iIzFBMUExQSIvPgogIDxwYXRoIGQ9Ik04NiAxMDQgUTEwMCAxMTcgMTE0IDEwNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRDg0MzE1IiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4=",
-    "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnMyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGRkVCRUYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRkZDQ0QzIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjEwMCIgZmlsbD0idXJsKCNiZzMpIi8+CiAgPHBhdGggZD0iTTQ1IDk1IEM0MCAxNTAsIDE2MCAxNTAsIDE1NSA5NSBaIiBmaWxsPSIjNEExNDhDIi8+CiAgPHBhdGggZD0iTTQyIDE4NSBDNDIgMTQwLCA3MiAxMzMsIDEwMCAxMzMgQzEyOCAxMzMsIDE1OCAxNDAsIDE1OCAxODUgWiIgZmlsbD0iI0VFMDAzMyIvPgogIDxwYXRoIGQ9Ik04OCAxMzMgTDEwMCAxNTQgTDExMiAxMzMgWiIgZmlsbD0iI0ZGRkZGRiIvPgogIDxyZWN0IHg9IjkxIiB5PSIxMTQiIHdpZHRoPSIxOCIgaGVpZ2h0PSIyMiIgZmlsbD0iI0ZGRTBCMiIgcng9IjQiLz4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSI4OCIgcj0iMzMiIGZpbGw9IiNGRkUwQjIiLz4KICA8cGF0aCBkPSJNNjQgODIgQzY0IDQ4LCAxMzYgNDgsIDEzNiA4MiBDMTI0IDY0LCA3NiA2NCwgNjQgODIgWiIgZmlsbD0iIzRBMTQ4QyIvPgogIDxjaXJjbGUgY3g9Ijg2IiBjeT0iODYiIHI9IjMuNSIgZmlsbD0iIzIxMjEyMSIvPgogIDxjaXJjbGUgY3g9IjExNCIgY3k9Ijg2IiByPSIzLjUiIGZpbGw9IiMyMTIxMjEiLz4KICA8cGF0aCBkPSJNODcgMTAzIFExMDAgMTE1IDExMyAxMDMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0U2NTEwMCIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+",
-    "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnNCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGRkYwRjIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRkZENkRCIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjEwMCIgZmlsbD0idXJsKCNiZzQpIi8+CiAgPHBhdGggZD0iTTM4IDE4NSBDMzggMTQwLCA2OCAxMzIsIDEwMCAxMzIgQzEzMiAxMzIsIDE2MiAxNDAsIDE2MiAxODUgWiIgZmlsbD0iI0VFMDAzMyIvPgogIDxwYXRoIGQ9Ik04NSAxMzIgTDEwMCAxNTUgTDExNSAxMzIgWiIgZmlsbD0iI0ZGRkZGRiIvPgogIDxwYXRoIGQ9Ik05NiAxNDAgTDEwNCAxNDAgTDEwMiAxNjggTDk4IDE2OCBaIiBmaWxsPSIjQ0MwMDJEIi8+CiAgPHJlY3QgeD0iOTAiIHk9IjExMiIgd2lkdGg9IjIwIiBoZWlnaHQ9IjI0IiBmaWxsPSIjRkZDQzgwIiByeD0iNCIvPgogIDxjaXJjbGUgY3g9IjEwMCIgY3k9Ijg4IiByPSIzNSIgZmlsbD0iI0ZGRTBCMiIvPgogIDxwYXRoIGQ9Ik02MiA4MiBDNjAgNDgsIDE0MCA0OCwgMTM4IDgyIEMxMzAgNjAsIDcwIDYwLCA2MiA4MiBaIiBmaWxsPSIjMDA0RDQwIi8+CiAgPGNpcmNsZSBjeD0iODQiIGN5PSI4NiIgcj0iMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzI2MzIzOCIgc3Ryb2tlLXdpZHRoPSIzIi8+CiAgPGNpcmNsZSBjeD0iMTE2IiBjeT0iODYiIHI9IjEwIiBmaWxsPSJub25lIiBzdHJva2U9IiMyNjMyMzgiIHN0cm9rZS13aWR0aD0iMyIvPgogIDxsaW5lIHgxPSI5NCIgeTE9Ijg2IiB4Mj0iMTA2IiB5Mj0iODYiIHN0cm9rZT0iIzI2MzIzOCIgc3Ryb2tlLXdpZHRoPSIzIi8+CiAgPHBhdGggZD0iTTg3IDEwNSBRMTAwIDExNyAxMTMgMTA1IiBmaWxsPSJub25lIiBzdHJva2U9IiNFNjUxMDAiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjwvc3ZnPg==",
-    "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnNSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGRkYwRjIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRkZDQ0QzIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjEwMCIgZmlsbD0idXJsKCNiZzUpIi8+CiAgPHBhdGggZD0iTTEzMCA4NSBDMTYwIDgwLCAxNjUgMTIwLCAxNDAgMTQwIEMxNDUgMTE1LCAxNDAgOTUsIDEzMCA4NSBaIiBmaWxsPSIjM0UyNzIzIi8+CiAgPHBhdGggZD0iTTQyIDE4NSBDNDIgMTQwLCA3MiAxMzMsIDEwMCAxMzMgQzEyOCAxMzMsIDE1OCAxNDAsIDE1OCAxODUgWiIgZmlsbD0iI0VFMDAzMyIvPgogIDxwYXRoIGQ9Ik04OCAxMzMgTDEwMCAxNTQgTDExMiAxMzMgWiIgZmlsbD0iI0ZGRkZGRiIvPgogIDxyZWN0IHg9IjkxIiB5PSIxMTQiIHdpZHRoPSIxOCIgaGVpZ2h0PSIyMiIgZmlsbD0iI0ZGRTBCMiIgcng9IjQiLz4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSI4OCIgcj0iMzMiIGZpbGw9IiNGRkUwQjIiLz4KICA8cGF0aCBkPSJNNjQgODIgQzY0IDQ4LCAxMzYgNDgsIDEzNiA4MiBDMTI0IDY0LCA3NiA2NCwgNjQgODIgWiIgZmlsbD0iIzNFMjcyMyIvPgogIDxjaXJjbGUgY3g9Ijg2IiBjeT0iODYiIHI9IjMuNSIgZmlsbD0iIzIxMjEyMSIvPgogIDxjaXJjbGUgY3g9IjExNCIgY3k9Ijg2IiByPSIzLjUiIGZpbGw9IiMyMTIxMjEiLz4KICA8cGF0aCBkPSJNODcgMTAzIFExMDAgMTE1IDExMyAxMDMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0U2NTEwMCIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+",
-    "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnNiIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGRkYwRjIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRkZENkRCIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjEwMCIgZmlsbD0idXJsKCNiZzYpIi8+CiAgPHBhdGggZD0iTTM4IDE4NSBDMzggMTQwLCA2OCAxMzIsIDEwMCAxMzIgQzEzMiAxMzIsIDE2MiAxNDAsIDE2MiAxODUgWiIgZmlsbD0iI0VFMDAzMyIvPgogIDxwYXRoIGQ9Ik03MiAxMzIgTDk1IDE1MiBMMTAwIDEzNiBMMTA1IDE1MiBMMTI4IDEzMiBaIiBmaWxsPSIjRkZGRkZGIi8+CiAgPHBhdGggZD0iTTk2IDEzOCBMMTAwIDE2MiBMMTA0IDEzOCBaIiBmaWxsPSIjQ0MwMDJEIi8+CiAgPHJlY3QgeD0iOTAiIHk9IjExMiIgd2lkdGg9IjIwIiBoZWlnaHQ9IjI0IiBmaWxsPSIjRkZDQzgwIiByeD0iNCIvPgogIDxjaXJjbGUgY3g9IjEwMCIgY3k9Ijg4IiByPSIzNSIgZmlsbD0iI0ZGRTBCMiIvPgogIDxwYXRoIGQ9Ik02MiA4MiBDNjAgNDgsIDE0MCA0OCwgMTM4IDgyIEMxMzAgNjAsIDcwIDYwLCA2MiA4MiBaIiBmaWxsPSIjMjEyMTIxIi8+CiAgPGNpcmNsZSBjeD0iODUiIGN5PSI4NiIgcj0iMy41IiBmaWxsPSIjMjEyMTIxIi8+CiAgPGNpcmNsZSBjeD0iMTE1IiBjeT0iODYiIHI9IjMuNSIgZmlsbD0iIzIxMjEyMSIvPgogIDxwYXRoIGQ9Ik04NiAxMDQgUTEwMCAxMTcgMTE0IDEwNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRDg0MzE1IiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4="
+  // BỔ SUNG: dùng ảnh thật có sẵn trong thư mục (thay cho 6 icon SVG minh hoạ cũ). Kiểm tra thực tế
+  // cho thấy avatar_collab_4.png, avatar_collab_5.png, avatar_collab_6.png trong thư mục BỊ LỖI —
+  // nội dung file thực chất là văn bản SVG (icon cũ) nhưng bị đặt sai đuôi .png, nên trình duyệt sẽ
+  // không hiển thị được (ảnh vỡ). Vì vậy chỉ dùng 4 ảnh thật hợp lệ: avatar.png, avatar_collab_1.png,
+  // avatar_collab_2.png, avatar_collab_3.png. CTV nào không có ảnh thật phù hợp thì để avatar:null để
+  // tự động hiện chữ cái đầu tên (initialsOf) — giống cách các nơi khác trong app đã xử lý khi thiếu ảnh.
+  const VIETTEL_AVATARS = [
+    "avatar.png",
+    "avatar_collab_2.png",
+    "avatar_collab_3.png",
   ];
 
+  // BỔ SUNG: mỗi CTV có địa chỉ hoạt động riêng (diaChi) trong cùng địa bàn của NVKD phụ trách
+  // (Quận 1, TP.HCM) — hiện trong huy hiệu "Được giới thiệu bởi" giống NVKD.
   let ctvList = [
-    { id:'ctv-001', hoTen:'Trần Thị Lan Hương', sdt:'0912000111', ngayTaoISO:'2024-05-12', avatar: VIETTEL_AVATARS[0], trangThai:'active' },
-    { id:'ctv-002', hoTen:'Lê Hoàng Nam',       sdt:'0987000222', ngayTaoISO:'2024-08-02', avatar: VIETTEL_AVATARS[1], trangThai:'active' },
-    { id:'ctv-003', hoTen:'Phạm Ngọc Thảo',     sdt:'0977000333', ngayTaoISO:'2025-01-20', avatar: VIETTEL_AVATARS[2], trangThai:'active' },
-    { id:'ctv-004', hoTen:'Đinh Văn Khóa',      sdt:'0988000444', ngayTaoISO:'2024-11-11', avatar: VIETTEL_AVATARS[3], trangThai:'locked' },
-    { id:'ctv-005', hoTen:'Hoàng Tuấn Kiệt',    sdt:'0989858785', ngayTaoISO:'2025-05-05', avatar: VIETTEL_AVATARS[4], trangThai:'active' },
+    { id:'ctv-001', hoTen:'Trần Thị Lan Hương', sdt:'0912000111', ngayTaoISO:'2024-05-12', avatar: 'avatar.png', trangThai:'active', diaChi:'Phường Bến Nghé, Quận 1, TP.HCM' },
+    { id:'ctv-002', hoTen:'Lê Hoàng Nam',       sdt:'0987000222', ngayTaoISO:'2024-08-02', avatar: null, trangThai:'active', diaChi:'Phường Đa Kao, Quận 1, TP.HCM' },
+    { id:'ctv-003', hoTen:'Phạm Ngọc Thảo',     sdt:'0977000333', ngayTaoISO:'2025-01-20', avatar: 'avatar_collab_2.png', trangThai:'active', diaChi:'Phường Nguyễn Thái Bình, Quận 1, TP.HCM' },
+    { id:'ctv-004', hoTen:'Đinh Văn Khóa',      sdt:'0988000444', ngayTaoISO:'2024-11-11', avatar: null, trangThai:'locked', diaChi:'Phường Cầu Kho, Quận 1, TP.HCM' },
+    { id:'ctv-005', hoTen:'Hoàng Tuấn Kiệt',    sdt:'0989858785', ngayTaoISO:'2025-05-05', avatar: null, trangThai:'active', diaChi:'Phường Cô Giang, Quận 1, TP.HCM' },
   ];
+
+  // Danh sách 4 trạng thái đơn hàng, dùng màu đồng bộ với .status-badge sẵn có trong CSS.
+  const ORDER_STATUS_LIST = [
+    { key:'Hoàn thành',       color:'#0ca30c' },
+    { key:'Đang thực hiện',   color:'#1c5cab' },
+    { key:'Đang triển khai',  color:'#B8860B' },
+    { key:'Đã hủy',           color:'#d03b3b' },
+  ];
+
+  /* ---------- Khối thống kê "Số lượng đơn hàng theo trạng thái" — dùng chung cho dashboard
+     NVKD (toàn đội) lẫn dashboard CTV (chỉ đơn của riêng CTV đó), truyền sẵn mảng orders vào. ---------- */
+  function renderStatusSummary(containerId, subLabelId, rangeKey, orders){
+    const subEl = document.getElementById(subLabelId);
+    if(subEl) subEl.textContent = 'Kỳ: ' + RANGE_LABELS[rangeKey];
+    const container = document.getElementById(containerId);
+    if(!container) return;
+    container.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;">
+      ${ORDER_STATUS_LIST.map(s => {
+        const count = orders.filter(o => o.trangThai === s.key).length;
+        return `
+          <div class="staff-stat-card" style="padding:12px 14px;">
+            <div class="staff-stat-label">${escapeHtml(s.key)}</div>
+            <div class="staff-stat-value" style="font-size:18px;color:${s.color};">${count}</div>
+            <div class="staff-stat-sub">đơn hàng</div>
+          </div>`;
+      }).join('')}
+    </div>`;
+  }
 
   /* ---------- Biểu đồ cột ngang: Đóng góp doanh thu ---------- */
   function renderContributionChart(containerId, subLabelId, rangeKey){
@@ -254,7 +586,12 @@
     });
   }
 
-  /* ---------- Biểu đồ cột ngang: kết quả bán theo Loại dịch vụ ---------- */
+  /* ---------- Biểu đồ cột ngang: kết quả bán theo Loại dịch vụ ----------
+     FIX/BỔ SUNG: trước đây biểu đồ này gom nhóm tự do theo chuỗi loaiDichVu (chỉ có 2 giá trị
+     "Internet"/"Di động") và sắp xếp theo tổng số đơn giảm dần. Nay dựng CỐ ĐỊNH theo đúng
+     12 dịch vụ trong SERVICE_CATALOG (kể cả dịch vụ chưa phát sinh đơn trong kỳ vẫn hiện dòng
+     0 đơn), nhóm theo 4 nhóm nghiệp vụ (Dịch vụ cố định / Dịch vụ di động / Lan tỏa / Chăm sóc
+     khách hàng) có tiêu đề nhóm riêng — đúng trọng tâm "số lượng đơn hàng theo loại dịch vụ". */
   function renderServiceTypeChart(containerId, subLabelId, rangeKey){
     document.getElementById(subLabelId).textContent = 'Kỳ: ' + RANGE_LABELS[rangeKey];
 
@@ -264,44 +601,57 @@
       ctvOrders = ctvOrders.concat(collectOrders('ctv:' + c.id, rangeKey, new Date(c.ngayTaoISO)));
     });
 
+    // Khởi tạo đủ 12 dịch vụ (kể cả dịch vụ 0 đơn trong kỳ) để luôn thấy đúng cấu trúc cố định.
     const types = {};
+    SERVICE_CATALOG.forEach(svc => {
+      types[svc.key] = { key: svc.key, name: svc.name, group: svc.group, staff: 0, ctv: 0, total: 0 };
+    });
     staffOrders.forEach(o => {
-      if(!types[o.loaiDichVu]) types[o.loaiDichVu] = { name: o.loaiDichVu, staff: 0, ctv: 0, total: 0 };
-      types[o.loaiDichVu].staff++;
-      types[o.loaiDichVu].total++;
+      if(!types[o.dichVuKey]) return;
+      types[o.dichVuKey].staff++;
+      types[o.dichVuKey].total++;
     });
     ctvOrders.forEach(o => {
-      if(!types[o.loaiDichVu]) types[o.loaiDichVu] = { name: o.loaiDichVu, staff: 0, ctv: 0, total: 0 };
-      types[o.loaiDichVu].ctv++;
-      types[o.loaiDichVu].total++;
+      if(!types[o.dichVuKey]) return;
+      types[o.dichVuKey].ctv++;
+      types[o.dichVuKey].total++;
     });
 
-    const rows = Object.values(types).sort((a,b) => b.total - a.total);
-    const maxVal = Math.max(1, ...rows.map(r => r.total));
     const container = document.getElementById(containerId);
+    const maxVal = Math.max(1, ...Object.values(types).map(r => r.total));
 
-    if(rows.length === 0){
-      container.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:20px 0;">Không có dữ liệu đơn hàng trong kỳ này.</div>';
-      return;
-    }
+    let rowIdx = 0;
+    const rowsMeta = []; // giữ lại đúng thứ tự dòng đã render để gắn tooltip theo index
+    let bodyHtml = '';
+    SERVICE_GROUPS.forEach(g => {
+      const groupRows = SERVICE_CATALOG.filter(s => s.group === g.key).map(s => types[s.key]);
+      if(groupRows.length === 0) return;
+      bodyHtml += `<div style="font-size:12px;font-weight:700;color:${g.color};margin:${rowIdx === 0 ? '0' : '16px'} 0 8px;text-transform:uppercase;letter-spacing:.02em;">${g.icon} ${escapeHtml(g.label)}</div>`;
+      groupRows.forEach(r => {
+        bodyHtml += `
+          <div class="hbar-row" data-hbar-idx="${rowIdx}">
+            <div class="hbar-label" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div>
+            <div class="hbar-track" style="display:flex; padding: 0;">
+              <div class="hbar-fill" style="width:${r.staff / maxVal * 100}%; background:#EE0033; border-radius: 4px 0 0 4px; border-right: ${r.staff && r.ctv ? '1px solid #fff' : 'none'};"></div>
+              <div class="hbar-fill" style="width:${r.ctv / maxVal * 100}%; background:#2a78d6; border-radius: ${r.staff ? '0 4px 4px 0' : '4px'};"></div>
+            </div>
+            <div class="hbar-value">${r.total} đơn</div>
+          </div>
+        `;
+        rowsMeta.push(r);
+        rowIdx++;
+      });
+    });
 
     container.innerHTML = `<div class="chart-legend" style="margin-bottom:12px;">
       <div class="chart-legend-item"><span class="chart-legend-swatch" style="background:#EE0033;"></span>Bạn (NVKD)</div>
       <div class="chart-legend-item"><span class="chart-legend-swatch" style="background:#2a78d6;"></span>Cộng tác viên</div>
-    </div>` + rows.map((r, i) => `
-      <div class="hbar-row" data-hbar-idx="${i}" style="margin-bottom: 12px;">
-        <div class="hbar-label" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div>
-        <div class="hbar-track" style="display:flex; padding: 0;">
-          <div class="hbar-fill" style="width:${r.staff / maxVal * 100}%; background:#EE0033; border-radius: 4px 0 0 4px; border-right: ${r.staff && r.ctv ? '1px solid #fff' : 'none'};"></div>
-          <div class="hbar-fill" style="width:${r.ctv / maxVal * 100}%; background:#2a78d6; border-radius: ${r.staff ? '0 4px 4px 0' : '4px'};"></div>
-        </div>
-        <div class="hbar-value">${r.total} đơn</div>
-      </div>
-    `).join('') + `<div class="chart-tooltip" id="${containerId}-tooltip"></div>`;
+    </div>` + bodyHtml + `<div class="chart-tooltip" id="${containerId}-tooltip"></div>`;
 
     const tooltip = document.getElementById(containerId + '-tooltip');
-    container.querySelectorAll('.hbar-row').forEach((row, i) => {
-      const r = rows[i];
+    container.querySelectorAll('.hbar-row').forEach((row) => {
+      const r = rowsMeta[Number(row.dataset.hbarIdx)];
+      if(!r) return;
       row.addEventListener('pointermove', (e) => {
         tooltip.innerHTML = `<div class="ttl-name">${escapeHtml(r.name)}</div>
                              <div class="ttl-val">Bạn: ${r.staff} đơn | CTV: ${r.ctv} đơn</div>
@@ -520,7 +870,9 @@
   // 2 nơi gọi tới cùng 1 khối hiển thị này: (1) chính NVKD/CTV tự xem trước qua nút "Xem trang liên kết"
   // (showRefBadge bên dưới), và (2) khách hàng THẬT bấm vào link chia sẻ có kèm ?NV=... (initReferralFromUrl).
   function referrerFromCtv(ctv){
-    return { type:'ctv', hoTen: ctv.hoTen, sdt: ctv.sdt, avatar: ctv.avatar, code: ctv.sdt, ctvId: ctv.id, personKey: 'ctv:' + ctv.id };
+    // BỔ SUNG: CTV giờ cũng có địa chỉ (ctv.diaChi) để hiện trong huy hiệu, giống NVKD — dùng chung
+    // tên field "diaBan" với referrerFromStaff() để renderTrustBadge không cần phân biệt 2 luồng.
+    return { type:'ctv', hoTen: ctv.hoTen, sdt: ctv.sdt, avatar: ctv.avatar, diaBan: ctv.diaChi, code: ctv.sdt, ctvId: ctv.id, personKey: 'ctv:' + ctv.id };
   }
   function referrerFromStaff(){
     return { type:'staff', hoTen: STAFF_DEMO.hoTen, sdt: STAFF_DEMO.sdt, avatar: STAFF_DEMO.avatar, diaBan: STAFF_DEMO.diaBan, code: staffChannelNvCode(), personKey:'staff' };
@@ -535,13 +887,21 @@
 
   let badgeInterval = null;
   function renderTrustBadge(referrer){
-    const avatarUrl = referrer.avatar || (referrer.type === 'staff' ? 'avatar.png' : 'avatar_collab_1.png');
-    const avatarInner = `<img src="${avatarUrl}" alt="Ảnh đại diện ${escapeHtml(referrer.hoTen)}">`;
+    // FIX: trước đây fallback về 1 file ảnh cố định ('avatar.png'/'avatar_collab_1.png') bất kể
+    // referrer là ai — nếu CTV đó không có avatar riêng (vd. avatar:null) sẽ bị hiện NHẦM ảnh của
+    // người khác (thậm chí ảnh của chính NVKD). Nay dùng đúng chữ cái đầu tên (initialsOf) làm
+    // fallback, giống cách renderCtvGrid/renderCtvSelfAvatarDisplay đã xử lý khi thiếu ảnh.
+    const avatarInner = referrer.avatar
+      ? `<img src="${referrer.avatar}" alt="Ảnh đại diện ${escapeHtml(referrer.hoTen)}">`
+      : escapeHtml(initialsOf(referrer.hoTen));
     document.getElementById('ref-badge-avatar').innerHTML = avatarInner;
     document.getElementById('ref-badge-name').textContent = referrer.hoTen;
-    document.getElementById('ref-badge-role').innerHTML = referrer.type === 'staff'
-      ? `Nhân viên kinh doanh Viettel<br><span style="color:var(--text-muted);font-size:11px;">📍 ${referrer.diaBan}</span>`
-      : 'Cộng tác viên Viettel';
+    // BỔ SUNG: hiện địa chỉ (📍) cho cả NVKD lẫn CTV — trước đây chỉ NVKD có do referrerFromCtv()
+    // chưa gán diaBan. Gộp chung 1 nhánh, chỉ khác câu chữ vai trò theo type.
+    const roleLabel = referrer.type === 'staff' ? 'Nhân viên kinh doanh Viettel' : 'Cộng tác viên Viettel';
+    document.getElementById('ref-badge-role').innerHTML = referrer.diaBan
+      ? `${roleLabel}<br><span style="color:var(--text-muted);font-size:11px;">📍 ${escapeHtml(referrer.diaBan)}</span>`
+      : roleLabel;
     
     document.getElementById('ref-badge-rating').innerHTML = referrer.type === 'staff'
       ? `<div style="display:flex;align-items:center;gap:4px;margin-top:4px;font-size:11px;">
@@ -551,7 +911,9 @@
       : '';
     const callBtn = document.getElementById('ref-badge-call');
     callBtn.href = 'tel:' + referrer.sdt;
-    callBtn.innerHTML = '📞 ' + referrer.sdt;
+    callBtn.innerHTML = `<span class="ref-badge-btn-ico">📞</span><span class="ref-badge-btn-label">${escapeHtml(referrer.sdt)}</span>`;
+    const zaloBtn = document.getElementById('ref-badge-zalo');
+    if(zaloBtn) zaloBtn.href = zaloChatLink(referrer.sdt);
     document.getElementById('ref-badge').style.display = 'block';
 
     clearInterval(badgeInterval);
@@ -624,6 +986,20 @@
     if(!referrer) return;
     window.activeReferral = referrer;
     renderTrustBadge(referrer);
+
+    // BỔ SUNG: ghi nhận lượt truy cập của khách vào "Visitor Log" (mô phỏng — xem tài liệu thiết kế
+    // "Khách hàng tiềm năng"), làm cơ sở cho tab "🎯 Khách hàng tiềm năng" của NVKD/CTV. Thử lấy SĐT ngay
+    // nếu đã có nguồn đáng tin cậy (khách đã đăng nhập / nhận diện ngầm qua mạng); nếu chưa có thì ghi
+    // nhận lượt ghé trước, sẽ xin SĐT nhẹ nhàng sau nếu khách thể hiện đủ quan tâm (xem trackVisitorPackageView).
+    recordVisit(referrer);
+
+    // Link phân kênh theo dịch vụ (?DV=<mã dịch vụ>, xem SERVICE_CATALOG) — đưa thẳng khách hàng
+    // tới đúng trang dịch vụ tương ứng nếu dịch vụ đó có trang minh hoạ trong bản demo.
+    const dv = params.get('DV');
+    if(dv){
+      const svc = SERVICE_CATALOG.find(s => s.key === dv);
+      if(svc && svc.page) switchToPage(svc.page);
+    }
 
     const sp = params.get('SP');
     if(!sp) return;
@@ -737,6 +1113,11 @@
   //         serviceLabel/canLapDat: dùng khi ghi nhận đơn hàng nếu khách đăng ký qua giới thiệu (xem recordReferredOrder),
   //         onRegister: callback khi bấm "Đăng ký ngay" trong modal (dùng lại đúng luồng xác nhận đăng ký ở trang gốc) }
   function openPackageDetailModal(pkg, opts = {}){
+    // BỔ SUNG: nếu khách đang xem qua link giới thiệu (?NV=...), mỗi lần mở "Chi tiết gói cước" được tính
+    // là 1 tín hiệu quan tâm — dùng cho bước 2 của cơ chế thu thập SĐT "progressive" (xem tài liệu thiết kế
+    // "Khách hàng tiềm năng"). Không ảnh hưởng gì tới luồng hiển thị modal hiện có nếu không phải khách qua giới thiệu.
+    if(window.activeReferral) trackVisitorPackageView(pkg);
+
     const specs = pkgDetailSpecs(pkg);
     const giamPercent = pkg.giaGoc ? Math.round((1 - pkg.gia / pkg.giaGoc) * 100) : 0;
 
@@ -797,54 +1178,69 @@
   window.openPackageDetailModal = openPackageDetailModal;
 
   // Phóng to mã QR của 1 kênh phân phối dịch vụ (tái dùng cùng modal QR với CTV ở trên)
-  function openStaffChannelQrZoom(channelKey){
-    const ch = NVKD_CHANNELS.find(c => c.key === channelKey);
+  function openStaffChannelQrZoom(serviceKey){
+    const ch = SERVICE_CATALOG.find(c => c.key === serviceKey);
     if(!ch) return;
-    const link = referralLink(staffChannelNvCode());
+    const link = referralLink(staffChannelNvCode()) + '&DV=' + ch.key;
     document.getElementById('qr-zoom-content').innerHTML = qrSvg(link, { size:220, margin:2 });
-    document.getElementById('qr-zoom-title').textContent = ch.label;
+    document.getElementById('qr-zoom-title').textContent = ch.name;
     document.getElementById('qr-zoom-link').textContent = link;
     document.getElementById('qr-zoom-overlay').classList.add('show');
   }
 
-  /* ---------- Tab "Tài khoản của tôi": link phân kênh theo dịch vụ + ảnh đại diện NVKD ---------- */
+  /* ---------- Tab "Tài khoản của tôi": link phân kênh theo TỪNG DỊCH VỤ (12 dịch vụ, 4 nhóm) ----------
+     BỔ SUNG: trước đây chỉ có 3 link chung theo trang (Internet/Truyền hình, Di động/Sim số, Data/5G).
+     Nay mỗi dịch vụ cụ thể (FTTH, Combo, Truyền hình, Camera, Mua sim/số, Đổi eSIM, Mua gói Data,
+     Chuyển trả sau/trước, Đăng ký thông tin, Lan tỏa cài app, Chăm sóc thu cước) có link + mã QR
+     riêng (kèm &DV=<mã dịch vụ>) để NVKD gửi đúng dịch vụ cho khách hàng và vẫn được ghi nhận kết
+     quả về đúng dịch vụ đó trên dashboard. */
   function renderStaffChannelGrid(){
     const grid = document.getElementById('staff-channel-grid');
     if(!grid) return;
-    grid.innerHTML = NVKD_CHANNELS.map(ch => {
-      const link = referralLink(staffChannelNvCode()) + '&screen=' + ch.page;
-      return `
-        <div class="ctv-card">
-          <div class="ctv-card-top">
-            <div class="ctv-avatar" style="font-size:20px;">${ch.icon}</div>
-            <div>
-              <div class="ctv-name">${escapeHtml(ch.label)}</div>
-              <div class="ctv-meta">Link phân kênh dịch vụ</div>
+
+    let html = '';
+    SERVICE_GROUPS.forEach(g => {
+      const items = SERVICE_CATALOG.filter(s => s.group === g.key);
+      if(items.length === 0) return;
+      html += `<div style="grid-column:1/-1;font-size:13px;font-weight:700;color:${g.color};margin:${html ? '10px' : '0'} 0 -6px;text-transform:uppercase;letter-spacing:.02em;">${g.icon} ${escapeHtml(g.label)}</div>`;
+      items.forEach(ch => {
+        const link = referralLink(staffChannelNvCode()) + '&DV=' + ch.key;
+        html += `
+          <div class="ctv-card">
+            <div class="ctv-card-top">
+              <div class="ctv-avatar" style="font-size:20px;">${ch.icon}</div>
+              <div>
+                <div class="ctv-name">${escapeHtml(ch.name)}</div>
+                <div class="ctv-meta">${escapeHtml(g.label)}</div>
+              </div>
             </div>
-          </div>
-          <div class="ctv-qr-wrap" data-staff-qr-open="${ch.key}" style="cursor:pointer;" title="Xem mã QR phóng to">
-            ${qrSvg(link, { size:88 })}
-          </div>
-          <div class="ctv-link-row">
-            <input type="text" readonly value="${link}">
-            <button class="btn-outline" data-staff-copy-link="${ch.key}" style="padding:7px 10px;font-size:14px;" title="Sao chép">📋</button>
-          </div>
-          <div class="ctv-actions">
-            <button class="btn-outline" data-staff-view-channel="${ch.key}">👁 Xem trang dịch vụ</button>
-          </div>
-        </div>`;
-    }).join('');
+            <div class="ctv-qr-wrap" data-staff-qr-open="${ch.key}" style="cursor:pointer;" title="Xem mã QR phóng to">
+              ${qrSvg(link, { size:88 })}
+            </div>
+            <div class="ctv-link-row">
+              <input type="text" readonly value="${link}">
+              <button class="btn-outline" data-staff-copy-link="${ch.key}" style="padding:7px 10px;font-size:14px;" title="Sao chép">📋</button>
+            </div>
+            <div class="ctv-actions">
+              ${ch.page
+                ? `<button class="btn-outline" data-staff-view-channel="${ch.key}">👁 Xem trang dịch vụ</button>`
+                : `<button class="btn-outline" disabled style="opacity:.55;cursor:not-allowed;" title="Dịch vụ này chưa có trang minh hoạ riêng trong bản demo">— Chưa có trang minh hoạ</button>`}
+            </div>
+          </div>`;
+      });
+    });
+    grid.innerHTML = html;
 
     grid.querySelectorAll('[data-staff-qr-open]').forEach(el => {
       el.addEventListener('click', () => openStaffChannelQrZoom(el.dataset.staffQrOpen));
     });
     grid.querySelectorAll('[data-staff-copy-link]').forEach(el => {
-      el.addEventListener('click', () => copyText(referralLink(staffChannelNvCode())));
+      el.addEventListener('click', () => copyText(referralLink(staffChannelNvCode()) + '&DV=' + el.dataset.staffCopyLink));
     });
     grid.querySelectorAll('[data-staff-view-channel]').forEach(el => {
       el.addEventListener('click', () => {
-        const ch = NVKD_CHANNELS.find(c => c.key === el.dataset.staffViewChannel);
-        if(ch) {
+        const ch = SERVICE_CATALOG.find(c => c.key === el.dataset.staffViewChannel);
+        if(ch && ch.page) {
           switchToPage(ch.page);
           window.activeReferral = referrerFromStaff();
           renderTrustBadge(window.activeReferral);
@@ -991,6 +1387,8 @@
         <div class="staff-stat-value">${ctvHoatDong}/${ctvList.length}</div>
       </div>
     `;
+
+    renderStatusSummary('staff-status-summary', 'staff-status-summary-sub', rangeKey, collectAllOrdersForRange(rangeKey));
 
     const rows = [];
     rows.push(`
@@ -1276,9 +1674,12 @@
     document.getElementById('ctv-edit-sdt').value = c.sdt;
     document.getElementById('ctv-edit-error').textContent = '';
     
+    // FIX: trước đây fallback cứng về 'avatar_collab_1.png' khi CTV chưa có ảnh — sẽ hiện nhầm ảnh
+    // của người khác. Nay dùng chữ cái đầu tên (initialsOf), đồng bộ với renderCtvGrid.
     const previewEl = document.getElementById('ctv-edit-avatar-preview');
-    const avatarUrl = c.avatar || 'avatar_collab_1.png';
-    previewEl.innerHTML = `<img src="${avatarUrl}">`;
+    previewEl.innerHTML = c.avatar
+      ? `<img src="${c.avatar}">`
+      : escapeHtml(initialsOf(c.hoTen));
 
     ctvEditOverlay.classList.add('show');
   }
@@ -1353,6 +1754,8 @@
       ngayTaoISO: now.toISOString().slice(0,10),
       avatar: avatar || defaultAvatar,
       trangThai: 'active',
+      // CTV mới tạo mặc định cùng địa bàn với NVKD phụ trách (có thể sửa lại sau qua "✏️ Sửa").
+      diaChi: STAFF_DEMO.diaBan,
     };
     ctvList.push(ctv);
     return ctv;
@@ -1370,7 +1773,7 @@
     return `
       <h3 class="login-success-title">Tạo tài khoản CTV thành công</h3>
       <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:12px;">
-        <div class="ctv-avatar" style="width:48px;height:48px;"><img src="${ctv.avatar || 'avatar_collab_1.png'}"></div>
+        <div class="ctv-avatar" style="width:48px;height:48px;">${ctv.avatar ? `<img src="${ctv.avatar}">` : escapeHtml(initialsOf(ctv.hoTen))}</div>
         <button type="button" class="btn-outline" onclick="openCtvEditModal('${ctv.id}')" style="font-size:12px;padding:5px 10px;">📷 Đổi ảnh avatar</button>
       </div>
       <p class="login-success-msg">${escapeHtml(ctv.hoTen)} (${ctv.sdt}) đã được thêm vào danh sách CTV trực thuộc.</p>
@@ -1425,6 +1828,7 @@
     renderStaffOverview();
     renderCtvGrid();
     renderStaffChannelGrid();
+    renderStaffLeads();
   }
   function setStaffLoggedOut(){
     staffIsLoggedIn = false;
@@ -1485,33 +1889,45 @@
     document.getElementById('qr-zoom-overlay').classList.add('show');
   }
 
+  // BỔ SUNG: trước đây CTV chỉ có 4 link nhanh theo gói cước hard-code (SUN1T/STAR1T/5G230B/MXH100).
+  // Nay dùng chung đúng danh mục 12 dịch vụ (SERVICE_CATALOG) với NVKD, nhóm theo 4 nhóm nghiệp vụ,
+  // để CTV cũng có link/QR riêng cho từng dịch vụ gửi khách hàng, và kết quả được ghi nhận đúng dịch vụ.
   function renderCtvQuickLinks(){
     if(!loggedInCtv) return;
     const grid = document.getElementById('ctv-quick-links-grid');
     if(!grid) return;
-    const quickPackages = [
-      { id: 'SUN1T', name: 'SUN1T - 150.000đ/tháng', type: 'Internet cáp quang' },
-      { id: 'STAR1T', name: 'STAR1T - 210.000đ/tháng', type: 'Internet + Camera' },
-      { id: '5G230B', name: '5G230B - 230.000đ/tháng', type: 'Gói cước 5G' },
-      { id: 'MXH100', name: 'MXH100 - 100.000đ/tháng', type: 'Gói Data 4G (Free MXH)' }
-    ];
 
-    grid.innerHTML = quickPackages.map(pkg => {
-      const link = 'https://viettel.vn/vx/gioithieu?NV=' + loggedInCtv.sdt + '&SP=' + pkg.id;
-      return `
-        <div class="ctv-card">
-          <div style="font-weight:700;font-size:15px;color:var(--viettel-red);margin-bottom:4px;">${pkg.name}</div>
-          <div style="font-size:12.5px;color:var(--text-muted);margin-bottom:12px;">Loại: ${pkg.type}</div>
-          <div class="ctv-qr-wrap" style="max-width:120px;margin:0 auto 14px;cursor:pointer;" data-qr-title="${pkg.name}" data-qr-quick="${link}" title="Xem mã QR phóng to">
-            ${qrSvg(link, { size:100 })}
+    let html = '';
+    SERVICE_GROUPS.forEach(g => {
+      const items = SERVICE_CATALOG.filter(s => s.group === g.key);
+      if(items.length === 0) return;
+      html += `<div style="grid-column:1/-1;font-size:13px;font-weight:700;color:${g.color};margin:${html ? '10px' : '0'} 0 -6px;text-transform:uppercase;letter-spacing:.02em;">${g.icon} ${escapeHtml(g.label)}</div>`;
+      items.forEach(svc => {
+        const link = referralLink(loggedInCtv.sdt) + '&DV=' + svc.key;
+        html += `
+          <div class="ctv-card">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <span style="font-size:18px;">${svc.icon}</span>
+              <div style="font-weight:700;font-size:14.5px;color:var(--text-dark);">${escapeHtml(svc.name)}</div>
+            </div>
+            <div style="font-size:12.5px;color:var(--text-muted);margin-bottom:12px;">${escapeHtml(g.label)}</div>
+            <div class="ctv-qr-wrap" style="max-width:120px;margin:0 auto 14px;cursor:pointer;" data-qr-title="${escapeHtml(svc.name)}" data-qr-quick="${link}" title="Xem mã QR phóng to">
+              ${qrSvg(link, { size:100 })}
+            </div>
+            <div class="ctv-link-row">
+              <input type="text" readonly value="${link}">
+              <button class="btn-outline" data-copy-quick="${link}" style="padding:7px 10px;font-size:14px;" title="Sao chép">📋</button>
+            </div>
+            <div class="ctv-actions" style="margin-top:8px;">
+              ${svc.page
+                ? `<button class="btn-outline" data-ctv-view-channel="${svc.key}">👁 Xem trang dịch vụ</button>`
+                : `<button class="btn-outline" disabled style="opacity:.55;cursor:not-allowed;" title="Dịch vụ này chưa có trang minh hoạ riêng trong bản demo">— Chưa có trang minh hoạ</button>`}
+            </div>
           </div>
-          <div class="ctv-link-row">
-            <input type="text" readonly value="${link}">
-            <button class="btn-outline" data-copy-quick="${link}" style="padding:7px 10px;font-size:14px;" title="Sao chép">📋</button>
-          </div>
-        </div>
-      `;
-    }).join('');
+        `;
+      });
+    });
+    grid.innerHTML = html;
 
     grid.querySelectorAll('[data-copy-quick]').forEach(el => {
       el.addEventListener('click', () => copyText(el.dataset.copyQuick));
@@ -1519,6 +1935,19 @@
     grid.querySelectorAll('[data-qr-quick]').forEach(el => {
       el.addEventListener('click', () => {
         openCustomQrZoom(el.dataset.qrTitle, el.dataset.qrQuick);
+      });
+    });
+    // BỔ SUNG: CTV cũng xem trước trang dịch vụ giống NVKD — chuyển tới đúng trang + hiện huy hiệu
+    // "Được giới thiệu bởi" với thông tin của chính CTV này (renderTrustBadge tự ẩn sao/số đánh giá
+    // khi referrer.type === 'ctv', nên không cần xử lý thêm gì để khác NVKD ở phần đó).
+    grid.querySelectorAll('[data-ctv-view-channel]').forEach(el => {
+      el.addEventListener('click', () => {
+        const svc = SERVICE_CATALOG.find(s => s.key === el.dataset.ctvViewChannel);
+        if(svc && svc.page && loggedInCtv) {
+          switchToPage(svc.page);
+          window.activeReferral = referrerFromCtv(loggedInCtv);
+          renderTrustBadge(window.activeReferral);
+        }
       });
     });
   }
@@ -1545,6 +1974,7 @@
     document.querySelectorAll('#ctv-range-tabs .staff-range-btn').forEach(b => b.classList.toggle('active', b.dataset.range === 'thang-nay'));
     renderCtvSelfOverview();
     renderCtvQuickLinks();
+    renderCtvLeads();
   }
   function setCtvLoggedOut(){
     loggedInCtv = null;
@@ -1578,6 +2008,9 @@
         <div class="staff-stat-value">${agg.tongDonHang}</div>
       </div>
     `;
+
+    renderStatusSummary('ctv-self-status-summary', 'ctv-self-status-summary-sub', rangeKey,
+      collectOrders('ctv:' + loggedInCtv.id, rangeKey, createdDate));
 
     const series = monthlySeriesForChart('ctv:' + loggedInCtv.id, createdDate).map(s => s.doanhSo);
     renderTrendChart('ctv-self-trend-chart', [
@@ -1659,6 +2092,661 @@
     loginStaff: (phone) => setStaffLoggedIn(phone),
     loginCtv: (phone) => handleCtvLogin(phone),
   };
+
+  /* ============================================================================
+     TÍNH NĂNG: NHẬN DIỆN & ĐỐI CHIẾU "KHÁCH HÀNG TIỀM NĂNG" TỪ LINK PHÂN KÊNH
+     (xem tài liệu thiết kế "DEV-Thiet-Ke-Ky-Thuat-Khach-Hang-Tiem-Nang.doc" cùng thư mục)
+     Bản demo này KHÔNG có backend thật — dùng localStorage của trình duyệt để MÔ PHỎNG đúng luồng
+     nghiệp vụ (ở môi trường thật sẽ là Google Sheet "VisitorLog" ghi/đọc qua Apps Script). Các dòng
+     đánh dấu "TODO (Dev)" là nơi cần nối API/Apps Script thật khi triển khai chính thức.
+  ============================================================================ */
+  // v2: nâng cấp bộ dữ liệu demo (45 lượt ghé -> 43 khách sau khi gộp trùng SĐT, có kèm lịch sử ghi
+  // chú) cho khớp với sheet "VisitorLog" trong Google Sheet DucLQ_Data_LPK. Đổi tên key để các trình
+  // duyệt đã lỡ lưu bộ dữ liệu demo cũ (v1, chỉ 3 lead mẫu) tự động được cấp lại dữ liệu mới, không cần
+  // xoá localStorage thủ công.
+  const VISITOR_LOG_KEY = 'tammi_visitor_log_v2';
+  const VISITOR_ENGAGEMENT_THRESHOLD = 2; // số lượt xem "Chi tiết gói cước" trước khi hiện form nhẹ xin SĐT
+  const visitorPackageViewCount = {}; // đếm theo phiên trình duyệt (reset khi tải lại trang)
+
+  function loadVisitorLog(){
+    try { return JSON.parse(localStorage.getItem(VISITOR_LOG_KEY)) || []; }
+    catch(e){ return []; }
+  }
+  function saveVisitorLog(list){
+    try { localStorage.setItem(VISITOR_LOG_KEY, JSON.stringify(list)); }
+    catch(e){ /* bỏ qua nếu trình duyệt chặn localStorage (vd. chế độ duyệt web riêng tư) */ }
+  }
+
+  // SĐT cần LOẠI TRỪ khỏi danh sách "khách hàng tiềm năng" — chính NVKD đang đăng nhập + toàn bộ CTV
+  // trực thuộc, để NVKD/CTV tự bấm xem trước link của mình không bị tính nhầm thành 1 lead thật.
+  function excludedPhoneSet(){
+    const set = new Set(ctvList.map(c => c.sdt));
+    if(STAFF_DEMO.sdt) set.add(STAFF_DEMO.sdt);
+    return set;
+  }
+
+  // ID phiên khách ẩn danh khi chưa biết SĐT — lưu ở sessionStorage nên chỉ tồn tại trong 1 tab trình
+  // duyệt, KHÔNG dùng để định danh lâu dài (khác hẳn SĐT thật một khi đã thu thập được).
+  function getVisitorSessionId(){
+    let id = sessionStorage.getItem('tammi_visitor_session_id');
+    if(!id){
+      id = 'vs-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+      sessionStorage.setItem('tammi_visitor_session_id', id);
+    }
+    return id;
+  }
+
+  // TODO (Dev): ở môi trường thật, thay hàm này bằng lời gọi API "network enabler" nội bộ Viettel để đọc
+  // SĐT do hạ tầng mạng chèn sẵn vào header HTTP khi khách đang dùng DATA DI ĐỘNG của Viettel (không hoạt
+  // động qua Wifi/mạng khác). Trình duyệt không có quyền đọc tầng mạng nên bản demo luôn trả về null.
+  function detectCarrierPhoneSilently(){
+    return null;
+  }
+
+  // Nguồn SĐT đáng tin cậy nhất hiện có, đúng thứ tự ưu tiên trong tài liệu thiết kế: (1) khách đã tự
+  // đăng nhập ở trang này, (2) nhận diện ngầm qua mạng viễn thông.
+  function bestKnownCustomerPhone(){
+    if(window.currentCustomerPhone) return { sdt: window.currentCustomerPhone, nguon: 'khach-da-dang-nhap' };
+    const carrier = detectCarrierPhoneSilently();
+    if(carrier) return { sdt: carrier, nguon: 'ngam' };
+    return null;
+  }
+
+  function maskPhone(sdt){
+    if(!sdt) return '';
+    const s = String(sdt);
+    return s.length >= 6 ? s.slice(0, 3) + '***' + s.slice(-3) : s;
+  }
+
+  // Tìm/khởi tạo bản ghi visitor cho đúng người giới thiệu hiện tại — gộp theo SĐT nếu đã biết, nếu
+  // chưa biết thì gộp theo visitorId (phiên trình duyệt) để không đếm trùng khi khách xem nhiều gói/nhiều lần.
+  function findOrCreateVisitorEntry(referrer){
+    const list = loadVisitorLog();
+    const sessionId = getVisitorSessionId();
+    const known = bestKnownCustomerPhone();
+
+    let entry = null;
+    if(known && known.sdt){
+      entry = list.find(v => v.sdt === known.sdt && v.nguoiGioiThieuCode === referrer.code);
+    }
+    if(!entry){
+      entry = list.find(v => v.visitorId === sessionId && v.nguoiGioiThieuCode === referrer.code);
+    }
+    if(!entry){
+      entry = {
+        visitorId: sessionId,
+        sdt: null,
+        nguoiGioiThieuCode: referrer.code,
+        loaiNguoiGioiThieu: referrer.type,
+        lanDauISO: new Date().toISOString(),
+        lanCuoiISO: new Date().toISOString(),
+        soLanGhe: 0,
+        dichVuDaXem: [],
+        nguonThuThapSdt: 'chua-co',
+        loaiTru: false,
+        trangThaiXuLy: 'chua-lien-he',
+      };
+      list.push(entry);
+    }
+    return { list, entry };
+  }
+
+  // Gán SĐT (đã biết hoặc mới thu thập) vào 1 bản ghi visitor + áp dụng ngay bước loại trừ NVKD/CTV.
+  function applyPhoneToEntry(entry, sdt, nguon){
+    entry.sdt = sdt;
+    entry.nguonThuThapSdt = nguon;
+    entry.loaiTru = excludedPhoneSet().has(sdt);
+  }
+
+  // Ghi nhận 1 lượt truy cập qua link phân kênh — gọi từ initReferralFromUrl() mỗi khi tải trang có ?NV=...
+  function recordVisit(referrer){
+    const { list, entry } = findOrCreateVisitorEntry(referrer);
+    entry.soLanGhe += 1;
+    entry.lanCuoiISO = new Date().toISOString();
+    if(!entry.sdt){
+      const known = bestKnownCustomerPhone();
+      if(known && known.sdt) applyPhoneToEntry(entry, known.sdt, known.nguon);
+    }
+    saveVisitorLog(list);
+  }
+
+  // Ghi nhận 1 lượt xem "Chi tiết gói cước" — dùng để tính ngưỡng hiện form nhẹ xin SĐT (bước 2 của cơ
+  // chế thu thập "progressive"). Chỉ có ý nghĩa khi khách đang vào qua link giới thiệu (activeReferral).
+  function trackVisitorPackageView(pkg){
+    const referrer = window.activeReferral;
+    if(!referrer) return;
+    const { list, entry } = findOrCreateVisitorEntry(referrer);
+    if(pkg && pkg.ma && !entry.dichVuDaXem.includes(pkg.ma)) entry.dichVuDaXem.push(pkg.ma);
+    saveVisitorLog(list);
+
+    const sessionId = getVisitorSessionId();
+    visitorPackageViewCount[sessionId] = (visitorPackageViewCount[sessionId] || 0) + 1;
+
+    // Đã có SĐT (đăng nhập/nhận diện ngầm), hoặc khách đã từng bấm đóng banner trước đó -> không hỏi lại.
+    if(entry.sdt || entry.nguonThuThapSdt === 'tu-choi') return;
+    if(visitorPackageViewCount[sessionId] >= VISITOR_ENGAGEMENT_THRESHOLD){
+      showVisitorPhonePrompt(referrer);
+    }
+  }
+
+  // Hiện banner nhẹ xin SĐT — neo phía trên Huy hiệu tin cậy, KHÔNG chặn bất kỳ thao tác nào của khách.
+  function showVisitorPhonePrompt(referrer){
+    const box = document.getElementById('visitor-phone-prompt');
+    if(!box || box.classList.contains('show')) return;
+    document.getElementById('visitor-phone-prompt-text').textContent =
+      `Bạn có muốn ${referrer.hoTen} liên hệ tư vấn thêm không? Để lại số điện thoại để được gọi lại nhanh hơn (không bắt buộc).`;
+    box.classList.add('show');
+  }
+  function hideVisitorPhonePrompt(){
+    document.getElementById('visitor-phone-prompt')?.classList.remove('show');
+  }
+  document.getElementById('visitor-phone-prompt-close')?.addEventListener('click', () => {
+    // Khách chủ động từ chối — đánh dấu lại để không hỏi thêm lần nào nữa trong phiên này.
+    const referrer = window.activeReferral;
+    if(referrer){
+      const { list, entry } = findOrCreateVisitorEntry(referrer);
+      entry.nguonThuThapSdt = 'tu-choi';
+      saveVisitorLog(list);
+    }
+    hideVisitorPhonePrompt();
+  });
+  document.getElementById('visitor-phone-prompt-submit')?.addEventListener('click', () => {
+    const referrer = window.activeReferral;
+    if(!referrer) return;
+    const input = document.getElementById('visitor-phone-prompt-input');
+    const sdt = (input.value || '').replace(/\s+/g, '');
+    if(!PHONE_REGEX.test(sdt)){
+      input.style.borderColor = 'var(--viettel-red)';
+      return;
+    }
+    input.style.borderColor = '';
+    const { list, entry } = findOrCreateVisitorEntry(referrer);
+    applyPhoneToEntry(entry, sdt, 'chu-dong');
+    saveVisitorLog(list);
+    input.value = '';
+    hideVisitorPhonePrompt();
+  });
+
+  // ---------- Đối chiếu & phân loại ----------
+  // Tra 1 SĐT có từng xuất hiện trong đơn hàng hay không — tái dùng đúng collectAllOrdersForRange() đã có
+  // sẵn cho dashboard (gộp cả NVKD + mọi CTV, 12 tháng gần nhất) thay vì viết lại logic sinh dữ liệu đơn hàng.
+  function phoneHasOrderHistory(sdt){
+    if(!sdt) return false;
+    return collectAllOrdersForRange('12-thang').some(o => o.sdtKhachHang === sdt);
+  }
+
+  function classifyVisitor(entry){
+    if(entry.loaiTru) return 'loai-tru';
+    if(!entry.sdt) return 'chua-xac-dinh';
+    if(phoneHasOrderHistory(entry.sdt)) return 'khach-hang-hien-huu';
+    if(entry.soLanGhe >= 2) return 'tiem-nang-cao';
+    return 'tiem-nang-moi';
+  }
+
+  const LEAD_META = {
+    'tiem-nang-cao':       { label:'Tiềm năng cao',       cls:'lead-badge-cao',
+      khuyenNghi: e => `Đã xem ${e.soLanGhe} lần, chưa đăng ký — nên gọi/Zalo tư vấn trong 24h.` },
+    'tiem-nang-moi':       { label:'Tiềm năng mới',       cls:'lead-badge-moi',
+      khuyenNghi: () => `Khách mới ghé lần đầu — nên liên hệ trong 3 ngày.` },
+    'khach-hang-hien-huu': { label:'Khách hàng hiện hữu', cls:'lead-badge-hienhuu',
+      khuyenNghi: () => `Đã là khách hàng — có thể chăm sóc/gia hạn/giới thiệu gói mới.` },
+    'chua-xac-dinh':       { label:'Chưa xác định SĐT',   cls:'lead-badge-unknown',
+      khuyenNghi: () => `Chưa thu thập được số liên hệ.` },
+    'loai-tru':            { label:'Loại trừ (nội bộ)',   cls:'lead-badge-tru',
+      khuyenNghi: () => `Số điện thoại nội bộ (NVKD/CTV) — không tính là khách hàng.` },
+  };
+  function leadBadgeHtml(kind){
+    const meta = LEAD_META[kind];
+    return `<span class="lead-badge ${meta.cls}">${escapeHtml(meta.label)}</span>`;
+  }
+
+  // Hiện ghi chú MỚI NHẤT của NVKD/CTV về khách này, kèm gợi ý số lượng ghi chú lịch sử còn lại (hover
+  // vào để xem đầy đủ qua thuộc tính title) — để lần ghé/log tiếp theo vẫn nắm được bối cảnh đã trao đổi.
+  function ghiChuCellHtml(entry){
+    const notes = entry.ghiChu || [];
+    if(!notes.length) return '<span style="color:var(--text-muted);">—</span>';
+    const sorted = [...notes].sort((a, b) => new Date(a.ngay) - new Date(b.ngay));
+    const latest = sorted[sorted.length - 1];
+    const historyTitle = sorted.map(n => `${formatVNDate(n.ngay)} - ${n.tacGia}: ${n.noiDung}`).join('\n');
+    const moreTag = sorted.length > 1
+      ? ` <span style="color:var(--text-muted);font-size:10.5px;white-space:nowrap;">(+${sorted.length - 1} lịch sử)</span>`
+      : '';
+    return `<span title="${escapeHtml(historyTitle)}"><b>${escapeHtml(latest.tacGia)}:</b> ${escapeHtml(latest.noiDung)}</span>${moreTag}`;
+  }
+
+  // ---------- Hành động nhanh (Gọi / Zalo / Đánh dấu đã liên hệ / Bỏ qua) ----------
+  function updateLeadStatus(visitorId, nguoiGioiThieuCode, trangThai){
+    const list = loadVisitorLog();
+    const entry = list.find(v => v.visitorId === visitorId && v.nguoiGioiThieuCode === nguoiGioiThieuCode);
+    if(entry){
+      entry.trangThaiXuLy = trangThai;
+      saveVisitorLog(list);
+    }
+  }
+
+  // Dựng 1 dòng <tr> cho bảng lead — dùng chung cho cả 2 tab NVKD/CTV. showSource=true (bản NVKD): hiện
+  // thêm cột "Nguồn giới thiệu" để phân biệt lead của chính mình hay của CTV nào. Số bị "loại trừ" ẩn hẳn
+  // khỏi bảng (không chỉ gắn badge) đúng theo yêu cầu ban đầu.
+  function leadRowHtml(entry, showSource){
+    const kind = classifyVisitor(entry);
+    if(kind === 'loai-tru') return '';
+    const meta = LEAD_META[kind];
+    const actionable = kind !== 'chua-xac-dinh';
+    const sourceLabel = entry.loaiNguoiGioiThieu === 'staff'
+      ? `${STAFF_DEMO.hoTen} (NVKD)`
+      : (ctvList.find(c => c.sdt === entry.nguoiGioiThieuCode)?.hoTen || 'CTV') + ' (CTV)';
+    const phoneCell = entry.sdt ? maskPhone(entry.sdt) : '<i style="color:var(--text-muted);">Ẩn danh</i>';
+    const svcCell = entry.dichVuDaXem.length
+      ? entry.dichVuDaXem.map(escapeHtml).join(', ')
+      : '<span style="color:var(--text-muted);">—</span>';
+    const doneNote = entry.trangThaiXuLy === 'da-lien-he'
+      ? '<div style="font-size:11px;color:#1E7A45;margin-top:3px;">✔ Đã liên hệ</div>'
+      : entry.trangThaiXuLy === 'bo-qua'
+        ? '<div style="font-size:11px;color:var(--text-muted);margin-top:3px;">Đã bỏ qua</div>'
+        : '';
+    return `
+      <tr data-lead-visitor="${escapeHtml(entry.visitorId)}" data-lead-code="${escapeHtml(entry.nguoiGioiThieuCode)}">
+        <td>${phoneCell}</td>
+        ${showSource ? `<td>${escapeHtml(sourceLabel)}</td>` : ''}
+        <td>${formatVNDate(entry.lanCuoiISO.slice(0,10))}</td>
+        <td>${entry.soLanGhe}</td>
+        <td>${svcCell}</td>
+        <td>${leadBadgeHtml(kind)}</td>
+        <td style="font-size:12.5px;color:var(--text-muted);max-width:220px;">${escapeHtml(meta.khuyenNghi(entry))}${doneNote}</td>
+        <td style="font-size:12.5px;max-width:240px;">${ghiChuCellHtml(entry)}</td>
+        <td>
+          <div class="lead-actions">
+            ${actionable ? `<button class="lead-btn-call" data-lead-call="${escapeHtml(entry.sdt)}">📞 Gọi</button>` : ''}
+            ${actionable ? `<button class="lead-btn-zalo" data-lead-zalo="${escapeHtml(entry.sdt)}">💬 Zalo</button>` : ''}
+            ${actionable && entry.trangThaiXuLy !== 'da-lien-he' ? `<button data-lead-done>✔ Đã liên hệ</button>` : ''}
+            ${actionable && entry.trangThaiXuLy !== 'bo-qua' ? `<button data-lead-skip>Bỏ qua</button>` : ''}
+          </div>
+        </td>
+      </tr>`;
+  }
+
+  function bindLeadRowActions(container, onChange){
+    container.querySelectorAll('[data-lead-call]').forEach(btn => {
+      btn.addEventListener('click', () => { location.href = 'tel:' + btn.dataset.leadCall; });
+    });
+    container.querySelectorAll('[data-lead-zalo]').forEach(btn => {
+      btn.addEventListener('click', () => { window.open(zaloChatLink(btn.dataset.leadZalo), '_blank'); });
+    });
+    container.querySelectorAll('[data-lead-done]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tr = btn.closest('tr');
+        updateLeadStatus(tr.dataset.leadVisitor, tr.dataset.leadCode, 'da-lien-he');
+        onChange();
+      });
+    });
+    container.querySelectorAll('[data-lead-skip]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tr = btn.closest('tr');
+        updateLeadStatus(tr.dataset.leadVisitor, tr.dataset.leadCode, 'bo-qua');
+        onChange();
+      });
+    });
+  }
+
+  // ---------- Render tab NVKD: xem TẤT CẢ lead (chính mình + mọi CTV trực thuộc) ----------
+  function renderStaffLeads(){
+    const tbody = document.getElementById('staff-leads-table-body');
+    const emptyNote = document.getElementById('staff-leads-empty');
+    if(!tbody) return;
+    const list = loadVisitorLog();
+    const rows = list
+      .filter(e => e.nguoiGioiThieuCode === staffChannelNvCode() || ctvList.some(c => c.sdt === e.nguoiGioiThieuCode))
+      .sort((a, b) => new Date(b.lanCuoiISO) - new Date(a.lanCuoiISO))
+      .map(e => leadRowHtml(e, true))
+      .join('');
+    tbody.innerHTML = rows;
+    if(emptyNote) emptyNote.style.display = rows ? 'none' : 'block';
+    bindLeadRowActions(tbody, renderStaffLeads);
+  }
+
+  // ---------- Render tab CTV: CHỈ xem lead phát sinh từ đúng link của chính CTV này ----------
+  function renderCtvLeads(){
+    const tbody = document.getElementById('ctv-leads-table-body');
+    const emptyNote = document.getElementById('ctv-leads-empty');
+    if(!tbody || !loggedInCtv) return;
+    const list = loadVisitorLog();
+    const rows = list
+      .filter(e => e.nguoiGioiThieuCode === loggedInCtv.sdt)
+      .sort((a, b) => new Date(b.lanCuoiISO) - new Date(a.lanCuoiISO))
+      .map(e => leadRowHtml(e, false))
+      .join('');
+    tbody.innerHTML = rows;
+    if(emptyNote) emptyNote.style.display = rows ? 'none' : 'block';
+    bindLeadRowActions(tbody, renderCtvLeads);
+  }
+
+  // Làm mới bảng lead mỗi khi bấm đúng tab tương ứng (dữ liệu có thể vừa đổi do NVKD/CTV tự xem trước
+  // link của mình ở tab khác) — cộng thêm vào đúng handler chuyển tab sẵn có, không thay thế.
+  document.querySelector('#staff-main-tabs [data-staff-tab="leads"]')?.addEventListener('click', renderStaffLeads);
+  document.querySelector('#ctv-dashboard [data-tab="ctv-tab-leads"]')?.addEventListener('click', renderCtvLeads);
+
+  // Gieo sẵn dữ liệu lead minh hoạ (chỉ khi Visitor Log còn trống — vd. lần đầu mở demo trên trình
+  // duyệt này) để tab "Khách hàng tiềm năng" có dữ liệu xem thử ngay cho CẢ NVKD lẫn từng CTV (đặc biệt
+  // CTV Hoàng Tuấn Kiệt), không cần đợi có khách thật truy cập qua link. Bộ dữ liệu này khớp 1-1 với
+  // sheet "VisitorLog" trong Google Sheet DucLQ_Data_LPK (45 lượt ghé, gộp còn 43 khách sau khi hợp
+  // nhất 2 cặp khách quay lại), kèm lịch sử ghi chú (mảng `ghiChu`) để lần ghé/log tiếp theo vẫn hiển
+  // thị lại được các ghi chú trước đó — đúng yêu cầu "nắm được bối cảnh của khách hàng".
+  function seedDemoVisitorLogIfEmpty(){
+    if(loadVisitorLog().length > 0) return;
+    const iso = d => d + 'T00:00:00.000Z';
+    const ctvKiet = ctvList.find(c => c.sdt === '0989858785') || { sdt:'0989858785', hoTen:'Hoàng Tuấn Kiệt' };
+    const ctvLanHuong = ctvList.find(c => c.sdt === '0912000111') || { sdt:'0912000111', hoTen:'Trần Thị Lan Hương' };
+    const ctvHoangNam = ctvList.find(c => c.sdt === '0987000222') || { sdt:'0987000222', hoTen:'Lê Hoàng Nam' };
+    const ctvNgocThao = ctvList.find(c => c.sdt === '0977000333') || { sdt:'0977000333', hoTen:'Phạm Ngọc Thảo' };
+    const nvCode = staffChannelNvCode();
+    const gc = (ngay, tacGia, noiDung) => ({ ngay, tacGia, noiDung });
+
+    const entries = [
+      // ----- Gốc (vl-0001 .. vl-0010) -----
+      { visitorId:'vl-0001', sdt:'0938201122', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-18'), lanCuoiISO:iso('2026-07-22'), soLanGhe:3,
+        dichVuDaXem:['FTTH (Internet cáp quang)','Combo Internet + Truyền hình'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-22','NVKD - Lê Văn Linh','Đã nhắn Zalo giới thiệu gói FTTH, khách hẹn xem lại cuối tuần.') ] },
+      { visitorId:'vl-0002', sdt:'0912000111', nguoiGioiThieuCode:ctvLanHuong.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-20'), lanCuoiISO:iso('2026-07-20'), soLanGhe:1,
+        dichVuDaXem:['Mua gói Data'], nguonThuThapSdt:'chu-dong', loaiTru:true, trangThaiXuLy:'bo-qua',
+        ghiChu:[ gc('2026-07-20','CTV - Trần Thị Lan Hương','Tự kiểm tra link cá nhân trước khi gửi khách.') ] },
+      { visitorId:'vl-0003', sdt:'0977445566', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-15'), lanCuoiISO:iso('2026-07-21'), soLanGhe:4,
+        dichVuDaXem:['Mua gói Data','FTTH (Internet cáp quang)'],
+        nguonThuThapSdt:'khach-da-dang-nhap', loaiTru:false, trangThaiXuLy:'da-lien-he',
+        ghiChu:[ gc('2026-07-21','NVKD - Lê Văn Linh','Khách cũ, đã dùng gói Data - gợi ý nâng cấp FTTH, khách đồng ý cân nhắc.') ],
+        _hienHuu:'nvkd' },
+      { visitorId:'vl-0004', sdt:null, nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-22'), lanCuoiISO:iso('2026-07-22'), soLanGhe:1, dichVuDaXem:['FTTH (Internet cáp quang)'],
+        nguonThuThapSdt:'chua-co', loaiTru:false, trangThaiXuLy:'chua-lien-he', ghiChu:[] },
+      { visitorId:'vl-0005', sdt:'0955889900', nguoiGioiThieuCode:ctvHoangNam.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-19'), lanCuoiISO:iso('2026-07-22'), soLanGhe:2,
+        dichVuDaXem:['Combo Internet + Truyền hình','Camera'], nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-22','CTV - Lê Hoàng Nam','Đã gọi 2 lần, khách còn phân vân giữa Combo và FTTH.') ] },
+      { visitorId:'vl-0006', sdt:'0966009911', nguoiGioiThieuCode:ctvNgocThao.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-21'), lanCuoiISO:iso('2026-07-21'), soLanGhe:1, dichVuDaXem:['Mua gói Data'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-21','CTV - Phạm Ngọc Thảo','Mới nhắn hỏi giá, chưa phản hồi thêm.') ] },
+      { visitorId:'vl-0007', sdt:'0933112233', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-10'), lanCuoiISO:iso('2026-07-24'), soLanGhe:5,
+        dichVuDaXem:['Mua sim/số','FTTH (Internet cáp quang)'],
+        nguonThuThapSdt:'khach-da-dang-nhap', loaiTru:false, trangThaiXuLy:'da-lien-he',
+        ghiChu:[ gc('2026-07-24','NVKD - Lê Văn Linh','Khách quen, đã mua sim/số và FTTH - chăm sóc định kỳ.') ],
+        _hienHuu:'nvkd' },
+      { visitorId:'vl-0008', sdt:'0944118822', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-23'), lanCuoiISO:iso('2026-07-23'), soLanGhe:1, dichVuDaXem:['Camera'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-23','CTV - Hoàng Tuấn Kiệt','Khách hỏi về Camera, đã gửi thêm thông tin giá.') ] },
+      { visitorId:'vl-0009', sdt:'0909000123', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-24'), lanCuoiISO:iso('2026-07-24'), soLanGhe:1, dichVuDaXem:['FTTH (Internet cáp quang)'],
+        nguonThuThapSdt:'khach-da-dang-nhap', loaiTru:true, trangThaiXuLy:'bo-qua',
+        ghiChu:[ gc('2026-07-24','NVKD - Lê Văn Linh','Tự bấm thử link cá nhân để kiểm tra giao diện.') ] },
+      { visitorId:'vl-0010', sdt:'0922556677', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-17'), lanCuoiISO:iso('2026-07-23'), soLanGhe:3,
+        dichVuDaXem:['Truyền hình','Camera','Combo Internet + Truyền hình'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'da-lien-he',
+        ghiChu:[ gc('2026-07-23','NVKD - Lê Văn Linh','Đã gặp trực tiếp tư vấn, khách hẹn quyết định trong tuần.') ] },
+
+      // ----- 20 lead mới của NVKD (vl-0011 .. vl-0030) -----
+      { visitorId:'vl-0011', sdt:'0911223344', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-05'), lanCuoiISO:iso('2026-07-05'), soLanGhe:1, dichVuDaXem:['FTTH (Internet cáp quang)'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-05','NVKD - Lê Văn Linh','Khách mới ghé xem gói FTTH, chưa liên hệ.') ] },
+      { visitorId:'vl-0012', sdt:'0922113355', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-06'), lanCuoiISO:iso('2026-07-06'), soLanGhe:1, dichVuDaXem:['Combo Internet + Truyền hình'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-06','NVKD - Lê Văn Linh','Xem combo, chưa để lại phản hồi.') ] },
+      { visitorId:'vl-0013', sdt:'0933224466', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-07'), lanCuoiISO:iso('2026-07-07'), soLanGhe:1, dichVuDaXem:['Mua sim/số'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-07','NVKD - Lê Văn Linh','Quan tâm đổi số đẹp, sẽ theo dõi thêm.') ] },
+      { visitorId:'vl-0014', sdt:'0944335577', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-08'), lanCuoiISO:iso('2026-07-08'), soLanGhe:1, dichVuDaXem:['Camera'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-08','NVKD - Lê Văn Linh','Xem gói camera an ninh, chưa liên hệ.') ] },
+      { visitorId:'vl-0015', sdt:'0955446688', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-09'), lanCuoiISO:iso('2026-07-09'), soLanGhe:1, dichVuDaXem:['Mua gói Data'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-09','NVKD - Lê Văn Linh','Hỏi giá gói Data 5G, chưa phản hồi thêm.') ] },
+      { visitorId:'vl-0016', sdt:'0966557799', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-10'), lanCuoiISO:iso('2026-07-10'), soLanGhe:1, dichVuDaXem:['Truyền hình'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-10','NVKD - Lê Văn Linh','Quan tâm gói truyền hình, chưa liên hệ.') ] },
+      { visitorId:'vl-0017', sdt:'0977668811', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-11'), lanCuoiISO:iso('2026-07-11'), soLanGhe:1, dichVuDaXem:['FTTH (Internet cáp quang)'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-11','NVKD - Lê Văn Linh','Ghé xem FTTH tốc độ cao, chưa liên hệ.') ] },
+      { visitorId:'vl-0018', sdt:'0988779922', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-12'), lanCuoiISO:iso('2026-07-12'), soLanGhe:1, dichVuDaXem:['Đổi eSIM'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-12','NVKD - Lê Văn Linh','Hỏi thủ tục đổi eSIM, chưa liên hệ.') ] },
+      { visitorId:'vl-0019', sdt:'0912233445', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-13'), lanCuoiISO:iso('2026-07-13'), soLanGhe:1, dichVuDaXem:['Combo Internet + Truyền hình'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-13','NVKD - Lê Văn Linh','Xem combo giải trí, chưa liên hệ.') ] },
+      { visitorId:'vl-0020', sdt:'0923344556', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-14'), lanCuoiISO:iso('2026-07-14'), soLanGhe:1, dichVuDaXem:['Mua sim/số'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-14','NVKD - Lê Văn Linh','Quan tâm sim trả trước, chưa liên hệ.') ] },
+      { visitorId:'vl-0021', sdt:'0934455667', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-12'), lanCuoiISO:iso('2026-07-16'), soLanGhe:2,
+        dichVuDaXem:['FTTH (Internet cáp quang)','Camera'], nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-16','NVKD - Lê Văn Linh','Ghé lại lần 2 xem thêm Camera, cần gọi tư vấn gấp.') ] },
+      { visitorId:'vl-0022', sdt:'0945566778', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-10'), lanCuoiISO:iso('2026-07-17'), soLanGhe:2,
+        dichVuDaXem:['Combo Internet + Truyền hình'], nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'da-lien-he',
+        ghiChu:[ gc('2026-07-17','NVKD - Lê Văn Linh','Đã gọi tư vấn, khách hẹn quyết định cuối tuần.') ] },
+      { visitorId:'vl-0023', sdt:'0956677889', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-11'), lanCuoiISO:iso('2026-07-18'), soLanGhe:2,
+        dichVuDaXem:['Mua gói Data'], nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-18','NVKD - Lê Văn Linh','Ghé xem lần 2, nên chủ động gọi trước 25/07.') ] },
+      { visitorId:'vl-0024', sdt:'0967788990', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-13'), lanCuoiISO:iso('2026-07-19'), soLanGhe:2,
+        dichVuDaXem:['Truyền hình','FTTH (Internet cáp quang)'], nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'da-lien-he',
+        ghiChu:[ gc('2026-07-19','NVKD - Lê Văn Linh','Đã nhắn Zalo, khách đang so sánh giá đối thủ.') ] },
+      // vl-0025 + vl-0026 gộp: khách Lâm Thị Kim quay lại lần 2 — minh hoạ trực tiếp yêu cầu
+      // "hiển thị lại các ghi chú lịch sử" (2 ghi chú, 2 mốc thời gian, cùng 1 SĐT).
+      { visitorId:'vl-0025', sdt:'0978899001', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-15'), lanCuoiISO:iso('2026-07-21'), soLanGhe:2,
+        dichVuDaXem:['Mua gói Data','FTTH (Internet cáp quang)'], nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'da-lien-he',
+        ghiChu:[
+          gc('2026-07-15','NVKD - Lê Văn Linh','Lâm Thị Kim mới ghé xem gói Data, chưa liên hệ.'),
+          gc('2026-07-21','NVKD - Lê Văn Linh','Gọi lại lần 2, Lâm Thị Kim đã đồng ý dùng thử FTTH, hẹn lắp đặt tuần sau.'),
+        ] },
+      { visitorId:'vl-0027', sdt:'0988556677', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-20'), lanCuoiISO:iso('2026-07-22'), soLanGhe:2,
+        dichVuDaXem:['Combo Internet + Truyền hình'], nguonThuThapSdt:'khach-da-dang-nhap', loaiTru:false, trangThaiXuLy:'da-lien-he',
+        ghiChu:[ gc('2026-07-22','NVKD - Lê Văn Linh','Khách cũ (Lê Văn Cường) - gợi ý nâng cấp combo, khách đồng ý xem xét.') ],
+        _hienHuu:'nvkd' },
+      { visitorId:'vl-0028', sdt:'0966223344', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-19'), lanCuoiISO:iso('2026-07-23'), soLanGhe:2,
+        dichVuDaXem:['Mua sim/số'], nguonThuThapSdt:'khach-da-dang-nhap', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-23','NVKD - Lê Văn Linh','Khách cũ (Phạm Thị Hoa) quay lại xem thêm sim số đẹp.') ],
+        _hienHuu:'nvkd' },
+      { visitorId:'vl-0029', sdt:'0987000222', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-24'), lanCuoiISO:iso('2026-07-24'), soLanGhe:1, dichVuDaXem:['FTTH (Internet cáp quang)'],
+        nguonThuThapSdt:'khach-da-dang-nhap', loaiTru:true, trangThaiXuLy:'bo-qua',
+        ghiChu:[ gc('2026-07-24','NVKD - Lê Văn Linh','Trùng SĐT CTV Lê Hoàng Nam - tự xem trước link, không tính lead.') ] },
+      { visitorId:'vl-0030', sdt:null, nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+        lanDauISO:iso('2026-07-24'), lanCuoiISO:iso('2026-07-24'), soLanGhe:1, dichVuDaXem:['Camera'],
+        nguonThuThapSdt:'chua-co', loaiTru:false, trangThaiXuLy:'chua-lien-he', ghiChu:[] },
+
+      // ----- 15 lead mới của CTV Hoàng Tuấn Kiệt (vl-0031 .. vl-0045) -----
+      { visitorId:'vl-0031', sdt:'0913344556', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-05'), lanCuoiISO:iso('2026-07-05'), soLanGhe:1, dichVuDaXem:['Mua gói Data'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-05','CTV - Hoàng Tuấn Kiệt','Khách mới hỏi gói Data, chưa liên hệ.') ] },
+      { visitorId:'vl-0032', sdt:'0924455667', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-06'), lanCuoiISO:iso('2026-07-06'), soLanGhe:1, dichVuDaXem:['FTTH (Internet cáp quang)'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-06','CTV - Hoàng Tuấn Kiệt','Xem FTTH, chưa phản hồi thêm.') ] },
+      { visitorId:'vl-0033', sdt:'0935566778', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-07'), lanCuoiISO:iso('2026-07-07'), soLanGhe:1, dichVuDaXem:['Camera'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-07','CTV - Hoàng Tuấn Kiệt','Hỏi camera an ninh, chưa liên hệ.') ] },
+      { visitorId:'vl-0034', sdt:'0946677889', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-08'), lanCuoiISO:iso('2026-07-08'), soLanGhe:1, dichVuDaXem:['Combo Internet + Truyền hình'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-08','CTV - Hoàng Tuấn Kiệt','Xem combo, chưa liên hệ.') ] },
+      { visitorId:'vl-0035', sdt:'0957788990', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-09'), lanCuoiISO:iso('2026-07-09'), soLanGhe:1, dichVuDaXem:['Mua sim/số'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-09','CTV - Hoàng Tuấn Kiệt','Hỏi sim số đẹp, chưa liên hệ.') ] },
+      { visitorId:'vl-0036', sdt:'0968899001', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-10'), lanCuoiISO:iso('2026-07-10'), soLanGhe:1, dichVuDaXem:['Đổi eSIM'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-10','CTV - Hoàng Tuấn Kiệt','Hỏi thủ tục eSIM, chưa liên hệ.') ] },
+      { visitorId:'vl-0037', sdt:'0979900112', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-11'), lanCuoiISO:iso('2026-07-11'), soLanGhe:1, dichVuDaXem:['Truyền hình'],
+        nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-11','CTV - Hoàng Tuấn Kiệt','Xem gói truyền hình, chưa liên hệ.') ] },
+      { visitorId:'vl-0038', sdt:'0914455226', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-10'), lanCuoiISO:iso('2026-07-18'), soLanGhe:2,
+        dichVuDaXem:['FTTH (Internet cáp quang)','Camera'], nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'da-lien-he',
+        ghiChu:[ gc('2026-07-18','CTV - Hoàng Tuấn Kiệt','Đã gọi, khách quan tâm combo FTTH+Camera.') ] },
+      { visitorId:'vl-0039', sdt:'0925566337', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-11'), lanCuoiISO:iso('2026-07-19'), soLanGhe:2,
+        dichVuDaXem:['Mua gói Data'], nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-19','CTV - Hoàng Tuấn Kiệt','Ghé lần 2, cần chủ động liên hệ sớm.') ] },
+      { visitorId:'vl-0040', sdt:'0936677448', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-12'), lanCuoiISO:iso('2026-07-20'), soLanGhe:2,
+        dichVuDaXem:['Combo Internet + Truyền hình'], nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'da-lien-he',
+        ghiChu:[ gc('2026-07-20','CTV - Hoàng Tuấn Kiệt','Đã nhắn Zalo, khách hẹn quyết định trong tuần.') ] },
+      // vl-0041 + vl-0042 gộp: khách Võ Thị Diễm quay lại lần 2 — minh hoạ thứ hai cho lịch sử ghi chú.
+      { visitorId:'vl-0041', sdt:'0947788556', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-14'), lanCuoiISO:iso('2026-07-22'), soLanGhe:2,
+        dichVuDaXem:['Mua gói Data','FTTH (Internet cáp quang)'], nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'da-lien-he',
+        ghiChu:[
+          gc('2026-07-14','CTV - Hoàng Tuấn Kiệt','Võ Thị Diễm mới ghé xem gói Data, chưa liên hệ.'),
+          gc('2026-07-22','CTV - Hoàng Tuấn Kiệt','Gọi lại, Võ Thị Diễm đang cân nhắc giá, hẹn phản hồi tuần sau.'),
+        ] },
+      { visitorId:'vl-0043', sdt:'0912334455', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-21'), lanCuoiISO:iso('2026-07-23'), soLanGhe:2,
+        dichVuDaXem:['Truyền hình'], nguonThuThapSdt:'khach-da-dang-nhap', loaiTru:false, trangThaiXuLy:'chua-lien-he',
+        ghiChu:[ gc('2026-07-23','CTV - Hoàng Tuấn Kiệt','Khách cũ (Hoàng Văn Đức) ghé xem thêm gói truyền hình.') ],
+        _hienHuu:'kiet' },
+      { visitorId:'vl-0044', sdt:'0989858785', nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-24'), lanCuoiISO:iso('2026-07-24'), soLanGhe:1, dichVuDaXem:['FTTH (Internet cáp quang)'],
+        nguonThuThapSdt:'khach-da-dang-nhap', loaiTru:true, trangThaiXuLy:'bo-qua',
+        ghiChu:[ gc('2026-07-24','CTV - Hoàng Tuấn Kiệt','Tự bấm thử link cá nhân, không tính lead.') ] },
+      { visitorId:'vl-0045', sdt:null, nguoiGioiThieuCode:ctvKiet.sdt, loaiNguoiGioiThieu:'ctv',
+        lanDauISO:iso('2026-07-24'), lanCuoiISO:iso('2026-07-24'), soLanGhe:1, dichVuDaXem:['Camera'],
+        nguonThuThapSdt:'chua-co', loaiTru:false, trangThaiXuLy:'chua-lien-he', ghiChu:[] },
+    ];
+
+    // Với các lead được thiết kế để minh hoạ phân loại "Khách hàng hiện hữu" (_hienHuu), gán SĐT THẬT
+    // lấy từ chính dữ liệu đơn hàng đang chạy (collectAllOrdersForRange) thay vì SĐT tự đặt cố định —
+    // để classifyVisitor() (dựa trên phoneHasOrderHistory) luôn nhận diện đúng, không lệ thuộc số liệu
+    // đơn hàng ngẫu nhiên theo seed hiện tại. Nếu không tìm đủ SĐT thật (trường hợp hiếm), giữ nguyên
+    // SĐT mẫu — lead vẫn hiển thị bình thường, chỉ khác nhãn phân loại.
+    try {
+      const allOrders = collectAllOrdersForRange('12-thang');
+      const nvkdPhones = [...new Set(allOrders.filter(o => !o.sdtCTV).map(o => o.sdtKhachHang))];
+      const kietPhones = [...new Set(allOrders.filter(o => o.sdtCTV === ctvKiet.sdt).map(o => o.sdtKhachHang))];
+      let nvkdIdx = 0, kietIdx = 0;
+      entries.forEach(e => {
+        if(e._hienHuu === 'nvkd' && nvkdPhones[nvkdIdx]) e.sdt = nvkdPhones[nvkdIdx++];
+        else if(e._hienHuu === 'kiet' && kietPhones[kietIdx]) e.sdt = kietPhones[kietIdx++];
+        delete e._hienHuu;
+      });
+    } catch(e) { /* nếu chưa sẵn sàng dữ liệu đơn hàng, giữ nguyên SĐT mẫu đã gán ở trên */ }
+
+    saveVisitorLog(entries);
+  }
+  seedDemoVisitorLogIfEmpty();
+
+  // ---------- Tab "Tài liệu Marketing" (NVKD + CTV) ----------
+  // Dữ liệu demo mô phỏng đúng cấu trúc sheet "TaiLieuMarketing" trong Google Sheet DucLQ_Data_LPK
+  // (do các phòng ban quản lý sản phẩm Di động/Cố định đăng tải, NVKD/CTV chỉ xem + tải về).
+  const TAI_LIEU_MARKETING = [
+    { ma:'TL001', ten:'Giới thiệu Gói cước Data 5G', dichVu:'Di động', loaiNoiDung:'Tài liệu giới thiệu SP', nenTang:'',
+      moTa:'Tài liệu giới thiệu chi tiết gói Data 5G: thông tin gói, giá cước, ưu đãi, FAQ.', dinhDang:'DOC',
+      ngayDang:'2026-07-01', phongBan:'Phòng QLSP Di động',
+      link:'https://drive.google.com/file/d/1JO8N2zV_MlAl17LFGur_nkxwCXcpfKVA/view?usp=drivesdk' },
+    { ma:'TL002', ten:'Giới thiệu Combo Internet + Truyền hình', dichVu:'Cố định', loaiNoiDung:'Tài liệu giới thiệu SP', nenTang:'',
+      moTa:'Tài liệu giới thiệu combo FTTH + Truyền hình: thông số, giá cước, kịch bản tư vấn.', dinhDang:'DOC',
+      ngayDang:'2026-07-02', phongBan:'Phòng QLSP Cố định',
+      link:'https://drive.google.com/file/d/1Z0sOljH02kD5OqkWWA1lWzZZU2IurInA/view?usp=drivesdk' },
+    { ma:'TL003', ten:'Content Facebook - Khuyến mãi Data 5G', dichVu:'Di động', loaiNoiDung:'Content MXH', nenTang:'Facebook',
+      moTa:'Bài đăng Facebook giới thiệu ưu đãi tặng 1 tháng Data 5G.', dinhDang:'TXT',
+      ngayDang:'2026-07-03', phongBan:'Phòng QLSP Di động',
+      link:'https://drive.google.com/file/d/1d3kK1vCFYrMmRU3E8EMVIS6IMgaYgE2_/view?usp=drivesdk' },
+    { ma:'TL004', ten:'Kịch bản TikTok - Data 5G', dichVu:'Di động', loaiNoiDung:'Content MXH', nenTang:'TikTok',
+      moTa:'Kịch bản video ngắn 15-20 giây quảng bá gói Data 5G.', dinhDang:'TXT',
+      ngayDang:'2026-07-04', phongBan:'Phòng QLSP Di động',
+      link:'https://drive.google.com/file/d/1NsMb456RTr2uwqMweRSVGJjU7Z4j665G/view?usp=drivesdk' },
+    { ma:'TL005', ten:'Content Zalo - Ưu đãi Combo FTTH', dichVu:'Cố định', loaiNoiDung:'Content MXH', nenTang:'Zalo',
+      moTa:'Bài chia sẻ Zalo giới thiệu ưu đãi lắp đặt miễn phí Combo FTTH.', dinhDang:'TXT',
+      ngayDang:'2026-07-05', phongBan:'Phòng QLSP Cố định',
+      link:'https://drive.google.com/file/d/17EcyNt2Rnts6m69OAdDmodytVScZ7Jwc/view?usp=drivesdk' },
+    { ma:'TL006', ten:'Kịch bản YouTube - Combo FTTH', dichVu:'Cố định', loaiNoiDung:'Content MXH', nenTang:'YouTube',
+      moTa:'Kịch bản video 60 giây giới thiệu Combo Internet + Truyền hình.', dinhDang:'TXT',
+      ngayDang:'2026-07-06', phongBan:'Phòng QLSP Cố định',
+      link:'https://drive.google.com/file/d/1ZUsEi1Xn9IGQnyRSG6QWNPOrPnsr0wxJ/view?usp=drivesdk' },
+    { ma:'TL007', ten:'Banner Data 5G 1080x1080', dichVu:'Di động', loaiNoiDung:'Hình ảnh SP', nenTang:'',
+      moTa:'Ảnh banner vuông dùng cho Facebook/Zalo/Instagram quảng bá gói Data 5G.', dinhDang:'SVG',
+      ngayDang:'2026-07-07', phongBan:'Phòng QLSP Di động',
+      link:'https://drive.google.com/file/d/1lIcdDZuLrXWLd-rFpmj-I0N9AeWUiV11/view?usp=drivesdk' },
+    { ma:'TL008', ten:'Banner Combo Internet + Truyền hình 1080x1080', dichVu:'Cố định', loaiNoiDung:'Hình ảnh SP', nenTang:'',
+      moTa:'Ảnh banner vuông quảng bá Combo Internet + Truyền hình.', dinhDang:'SVG',
+      ngayDang:'2026-07-08', phongBan:'Phòng QLSP Cố định',
+      link:'https://drive.google.com/file/d/1c9Pw2i-Ln9opELrRCRsGcJD9zJc4oQp0/view?usp=drivesdk' },
+  ];
+
+  const DOC_LOAI_META = {
+    'Tài liệu giới thiệu SP': { cls:'doc-badge-gioithieu', icon:'📄' },
+    'Content MXH':            { cls:'doc-badge-content',   icon:'📱' },
+    'Hình ảnh SP':            { cls:'doc-badge-hinhanh',   icon:'🖼️' },
+  };
+
+  function docCardHtml(doc){
+    const meta = DOC_LOAI_META[doc.loaiNoiDung] || { cls:'doc-badge-dv', icon:'📁' };
+    const nenTangBadge = doc.nenTang ? `<span class="doc-badge doc-badge-dv">${escapeHtml(doc.nenTang)}</span>` : '';
+    return `
+      <div class="doc-card" data-ma="${doc.ma}">
+        <div class="doc-card-top">
+          <div class="doc-card-icon">${meta.icon}</div>
+          <div class="doc-card-title">${escapeHtml(doc.ten)}</div>
+        </div>
+        <div class="doc-badge-row">
+          <span class="doc-badge ${meta.cls}">${escapeHtml(doc.loaiNoiDung)}</span>
+          <span class="doc-badge doc-badge-dv">${escapeHtml(doc.dichVu)}</span>
+          ${nenTangBadge}
+        </div>
+        <div class="doc-card-desc">${escapeHtml(doc.moTa)}</div>
+        <div class="doc-card-meta">Định dạng: ${escapeHtml(doc.dinhDang)} · Đăng ngày ${formatVNDate ? formatVNDate(doc.ngayDang) : doc.ngayDang} · ${escapeHtml(doc.phongBan)}</div>
+        <div class="doc-card-footer">
+          <a class="doc-download-btn" href="${doc.link}" target="_blank" rel="noopener">⭳ Tải về</a>
+        </div>
+      </div>`;
+  }
+
+  // Render lưới tài liệu theo 2 bộ lọc (Dịch vụ + Loại nội dung) — dùng chung cho cả NVKD lẫn CTV
+  // vì kho tài liệu là chung, không phân biệt theo người xem.
+  function renderDocGrid(gridId, emptyId, filterDichVuId, filterLoaiId){
+    const grid = document.getElementById(gridId);
+    const emptyNote = document.getElementById(emptyId);
+    if(!grid) return;
+    const dichVu = document.getElementById(filterDichVuId)?.value || 'all';
+    const loai = document.getElementById(filterLoaiId)?.value || 'all';
+    const filtered = TAI_LIEU_MARKETING.filter(d => {
+      return (dichVu === 'all' || d.dichVu === dichVu) && (loai === 'all' || d.loaiNoiDung === loai);
+    });
+    grid.innerHTML = filtered.map(docCardHtml).join('');
+    if(emptyNote) emptyNote.style.display = filtered.length ? 'none' : 'block';
+  }
+
+  function renderStaffDocs(){ renderDocGrid('staff-doc-grid', 'staff-doc-empty', 'staff-doc-filter-dichvu', 'staff-doc-filter-loai'); }
+  function renderCtvDocs(){ renderDocGrid('ctv-doc-grid', 'ctv-doc-empty', 'ctv-doc-filter-dichvu', 'ctv-doc-filter-loai'); }
+
+  document.querySelector('#staff-main-tabs [data-staff-tab="tailieu"]')?.addEventListener('click', renderStaffDocs);
+  document.querySelector('#ctv-dashboard [data-tab="ctv-tab-tailieu"]')?.addEventListener('click', renderCtvDocs);
+  document.getElementById('staff-doc-filter-dichvu')?.addEventListener('change', renderStaffDocs);
+  document.getElementById('staff-doc-filter-loai')?.addEventListener('change', renderStaffDocs);
+  document.getElementById('ctv-doc-filter-dichvu')?.addEventListener('change', renderCtvDocs);
+  document.getElementById('ctv-doc-filter-loai')?.addEventListener('change', renderCtvDocs);
 
   // "Phiên giới thiệu" đang hoạt động (đọc được từ URL ?NV=... khi khách hàng bấm link chia sẻ) — null nghĩa
   // là khách vào trang bình thường, không qua giới thiệu. showInternetSummary()/showDataSummary() đọc biến

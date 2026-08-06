@@ -1423,7 +1423,7 @@
           <table class="sim-table" id="orders-table">
             <thead>
               <tr>
-                <th>Mã đơn hàng</th><th>Ngày</th><th>Loại dịch vụ</th><th>Khách hàng</th><th>SĐT KH</th>
+                <th>Mã đơn hàng</th><th>Ngày</th><th>Loại dịch vụ</th><th>Tên gói cước</th><th>Khách hàng</th><th>SĐT KH</th>
                 <th>NVKD</th><th>CTV</th><th>NV kỹ thuật</th><th>Trạng thái</th><th>Giá trị</th>
               </tr>
             </thead>
@@ -1580,7 +1580,7 @@
           <table class="sim-table" id="ctv-orders-table">
             <thead>
               <tr>
-                <th>Mã đơn hàng</th><th>Ngày</th><th>Loại dịch vụ</th><th>Khách hàng</th><th>SĐT KH</th>
+                <th>Mã đơn hàng</th><th>Ngày</th><th>Loại dịch vụ</th><th>Tên gói cước</th><th>Khách hàng</th><th>SĐT KH</th>
                 <th>NVKD phụ trách</th><th>NV kỹ thuật</th><th>Trạng thái</th><th>Giá trị</th>
               </tr>
             </thead>
@@ -5227,6 +5227,7 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
         <td>${escapeHtml(o.maDonHang)}</td>
         <td>${formatVNDate(o.ngay)}</td>
         <td>${escapeHtml(o.loaiDichVu)}</td>
+        <td>${o.tenGoiCuoc ? escapeHtml(o.tenGoiCuoc) : ''}</td>
         <td>${escapeHtml(o.hoTenKhachHang)}</td>
         <td>${escapeHtml(o.sdtKhachHang)}</td>
         ${identityCells}
@@ -5500,11 +5501,10 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
             : 'Đã hủy';
 
           // Bổ sung tên gói cước (nếu có)
-          let loaiDichVuName = svc.name;
+          let tenGoiCuoc = null;
           if (MOCK_PLANS[svc.key]) {
             const planPool = MOCK_PLANS[svc.key];
-            const planName = planPool[Math.floor(randomSeeded(h + 9) * planPool.length)];
-            loaiDichVuName += ' ' + planName;
+            tenGoiCuoc = planPool[Math.floor(randomSeeded(h + 9) * planPool.length)];
           }
 
           orders.push({
@@ -5515,7 +5515,8 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
             giaTri: val,
             trangThai,
             dichVuKey: svc.key,
-            loaiDichVu: loaiDichVuName,
+            loaiDichVu: svc.name,
+            tenGoiCuoc: tenGoiCuoc,
             hoTenKhachHang: randomCustomerName(h),
             sdtKhachHang: '09' + String(h % 100000000).padStart(8, '0'),
             tenNVKD: STAFF_DEMO.hoTen,

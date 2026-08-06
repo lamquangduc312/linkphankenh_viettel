@@ -1991,6 +1991,10 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
 
   function setLoggedIn(phone){
     loggedInPhone = phone;
+    // BỔ SUNG: đưa SĐT khách hàng thường vừa đăng nhập ra window để khối script "Khách hàng tiềm năng"
+    // (script #3) tận dụng luôn làm nguồn thu thập SĐT mạnh nhất — khách đã tự đăng nhập thì không cần
+    // hỏi lại qua banner nhẹ nữa (xem detectLoggedInCustomerPhone() ở khối script Kênh NVKD/CTV).
+    window.currentCustomerPhone = phone;
     loginBtn.outerHTML = `
       <button class="user-chip" id="btn-open-login">
         <span class="avatar">${phone.slice(-2)}</span>${phone}
@@ -2001,6 +2005,7 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
 
   function setLoggedOut(){
     loggedInPhone = null;
+    window.currentCustomerPhone = null;
     const chip = document.getElementById('btn-open-login');
     if(chip){
       chip.outerHTML = `<button class="login-btn" id="btn-open-login">Đăng nhập</button>`;

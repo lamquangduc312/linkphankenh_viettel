@@ -157,6 +157,32 @@
 
 <!-- ================= PAGE 1: INTERNET / TRUYỀN HÌNH ================= -->
 <section class="page active" id="page-internet">
+  <div class="section">
+    <h2>Danh sách gói Internet - Truyền hình</h2>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="tab-goi-internet">Gói Internet</button>
+      <button class="tab-btn" data-tab="tab-mesh-cao">Mesh Wifi tốc độ cao</button>
+      <button class="tab-btn" data-tab="tab-combo">Combo Internet - Truyền hình</button>
+      <button class="tab-btn" data-tab="tab-camera">Combo Internet - Camera</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-goi-internet">
+      <div class="card-grid" id="grid-goi-internet"></div>
+    </div>
+    <div class="tab-panel" id="tab-mesh-cao">
+      <div class="card-grid" id="grid-mesh-cao"></div>
+    </div>
+    <div class="tab-panel" id="tab-combo">
+      <div class="card-grid" id="grid-combo"></div>
+    </div>
+    <div class="tab-panel" id="tab-camera">
+      <div class="card-grid" id="grid-camera"></div>
+    </div>
+  </div>
+
+  <div class="selection-summary" id="internet-summary"></div>
+
+  <!-- Banner giới thiệu — theo yêu cầu, chuyển xuống cuối trang thay vì đầu trang -->
   <div class="hero">
     <div class="hero-card">
       <div class="hero-inner hero-split">
@@ -186,62 +212,22 @@
       </div>
     </div>
   </div>
-
-  <div class="section">
-    <h2>Danh sách gói Internet - Truyền hình</h2>
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="tab-goi-internet">Gói Internet</button>
-      <button class="tab-btn" data-tab="tab-mesh-cao">Mesh Wifi tốc độ cao</button>
-      <button class="tab-btn" data-tab="tab-combo">Combo Internet - Truyền hình</button>
-      <button class="tab-btn" data-tab="tab-camera">Combo Internet - Camera</button>
-    </div>
-
-    <div class="tab-panel active" id="tab-goi-internet">
-      <div class="card-grid" id="grid-goi-internet"></div>
-    </div>
-    <div class="tab-panel" id="tab-mesh-cao">
-      <div class="card-grid" id="grid-mesh-cao"></div>
-    </div>
-    <div class="tab-panel" id="tab-combo">
-      <div class="card-grid" id="grid-combo"></div>
-    </div>
-    <div class="tab-panel" id="tab-camera">
-      <div class="card-grid" id="grid-camera"></div>
-    </div>
-  </div>
-
-  <div class="selection-summary" id="internet-summary"></div>
 </section>
 
 <!-- ================= PAGE 2: SIM SO ================= -->
 <section class="page" id="page-sim">
-  <div class="hero">
-    <div class="hero-card hero-mobile">
-      <div class="hero-inner hero-split">
-        <div class="hero-content hero-text">
-          <h1>Dịch vụ di động</h1>
-          <p class="hero-subtitle">Kết nối không giới hạn, theo cách của bạn.</p>
-          <div class="hero-pills">
-            <button class="hero-pill" data-target="goi-cuoc"><span class="pill-ico">📱</span>Gói cước di động</button>
-            <button class="hero-pill" data-target="sim-so"><span class="pill-ico">💳</span>Dịch vụ SIM số</button>
-            <button class="hero-pill" data-target="gtgt"><span class="pill-ico">🎁</span>Dịch vụ GTGT</button>
-            <button class="hero-pill" data-target="quoc-te"><span class="pill-ico">🌐</span>Dịch vụ quốc tế</button>
-          </div>
-          <div class="hero-pill-note" id="hero-pill-note" style="display:none;font-size:12px;color:rgba(255,255,255,.85);margin-top:10px;"></div>
-        </div>
-        <div class="hero-media" aria-hidden="true">
-          <svg viewBox="0 0 260 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="130" cy="112" r="100" fill="#fff" fill-opacity=".08"/>
-            <path d="M130 196C82 176 40 142 40 100 40 70 62 48 90 48c22 0 38 13 40 30 2-17 18-30 40-30 28 0 50 22 50 52 0 42-42 76-90 96Z" fill="#fff" fill-opacity=".14"/>
-            <rect x="88" y="58" width="52" height="94" rx="12" fill="#fff" fill-opacity=".95"/>
-            <rect x="98" y="72" width="32" height="56" rx="4" fill="var(--viettel-red)" fill-opacity=".25"/>
-            <circle cx="114" cy="140" r="5" fill="var(--viettel-red)"/>
-            <rect x="150" y="86" width="40" height="68" rx="10" fill="#fff" fill-opacity=".82"/>
-            <rect x="158" y="96" width="24" height="40" rx="3" fill="var(--viettel-red)" fill-opacity=".2"/>
-            <circle cx="170" cy="146" r="4" fill="var(--viettel-red)"/>
-          </svg>
-        </div>
+  <!-- Thanh chọn nhanh — giữ nguyên vị trí đầu trang theo yêu cầu, tách khỏi banner trang trí
+       để banner có thể chuyển xuống cuối trang mà không ảnh hưởng đến việc truy cập nhanh 4 dịch vụ. -->
+  <div class="section" style="padding-bottom:0;">
+    <div class="quick-nav-card">
+      <div class="quick-nav-title">Chọn nhanh dịch vụ di động</div>
+      <div class="hero-pills">
+        <button class="hero-pill" data-target="goi-cuoc"><span class="pill-ico">📱</span>Gói cước di động</button>
+        <button class="hero-pill" data-target="sim-so"><span class="pill-ico">💳</span>Dịch vụ SIM số</button>
+        <button class="hero-pill" data-target="gtgt"><span class="pill-ico">🎁</span>Dịch vụ GTGT</button>
+        <button class="hero-pill" data-target="quoc-te"><span class="pill-ico">🌐</span>Dịch vụ quốc tế</button>
       </div>
+      <div class="hero-pill-note" id="hero-pill-note" style="display:none;font-size:12px;color:var(--text-muted);margin-top:10px;"></div>
     </div>
   </div>
 
@@ -288,6 +274,30 @@
     </div>
 
     <div class="selection-summary" id="sim-summary"></div>
+  </div>
+
+  <!-- Banner giới thiệu — theo yêu cầu, chuyển xuống cuối trang; 4 nút chọn nhanh vẫn giữ nguyên ở đầu trang -->
+  <div class="hero">
+    <div class="hero-card hero-mobile">
+      <div class="hero-inner hero-split">
+        <div class="hero-content hero-text">
+          <h1>Dịch vụ di động</h1>
+          <p class="hero-subtitle">Kết nối không giới hạn, theo cách của bạn.</p>
+        </div>
+        <div class="hero-media" aria-hidden="true">
+          <svg viewBox="0 0 260 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="130" cy="112" r="100" fill="#fff" fill-opacity=".08"/>
+            <path d="M130 196C82 176 40 142 40 100 40 70 62 48 90 48c22 0 38 13 40 30 2-17 18-30 40-30 28 0 50 22 50 52 0 42-42 76-90 96Z" fill="#fff" fill-opacity=".14"/>
+            <rect x="88" y="58" width="52" height="94" rx="12" fill="#fff" fill-opacity=".95"/>
+            <rect x="98" y="72" width="32" height="56" rx="4" fill="var(--viettel-red)" fill-opacity=".25"/>
+            <circle cx="114" cy="140" r="5" fill="var(--viettel-red)"/>
+            <rect x="150" y="86" width="40" height="68" rx="10" fill="#fff" fill-opacity=".82"/>
+            <rect x="158" y="96" width="24" height="40" rx="3" fill="var(--viettel-red)" fill-opacity=".2"/>
+            <circle cx="170" cy="146" r="4" fill="var(--viettel-red)"/>
+          </svg>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -343,6 +353,8 @@
       <div class="staff-main-tabs" id="staff-main-tabs">
         <button class="staff-main-tab-btn active" data-staff-tab="dashboard">Dashboard</button>
         <button class="staff-main-tab-btn" data-staff-tab="ctv">Quản lý cộng tác viên</button>
+        <button class="staff-main-tab-btn" data-staff-tab="leads">🎯 Khách hàng tiềm năng</button>
+        <button class="staff-main-tab-btn" data-staff-tab="tailieu">📁 Tài liệu Marketing</button>
         <button class="staff-main-tab-btn" data-staff-tab="account">Tài khoản của tôi</button>
       </div>
 
@@ -355,6 +367,12 @@
         </div>
 
         <div class="staff-stats" id="staff-stats"></div>
+
+        <div class="chart-card" style="margin-bottom:18px;">
+          <h3 style="font-size:14px;font-weight:700;margin-bottom:2px;">Số lượng đơn hàng theo trạng thái</h3>
+          <div class="chart-sub" id="staff-status-summary-sub">Kỳ: Tháng này</div>
+          <div id="staff-status-summary"></div>
+        </div>
 
         <div class="charts-row">
           <div class="chart-card">
@@ -422,7 +440,7 @@
           <table class="sim-table" id="orders-table">
             <thead>
               <tr>
-                <th>Mã đơn hàng</th><th>Ngày</th><th>Loại dịch vụ</th><th>Khách hàng</th><th>SĐT KH</th>
+                <th>Mã đơn hàng</th><th>Ngày</th><th>Loại dịch vụ</th><th>Tên gói cước</th><th>Khách hàng</th><th>SĐT KH</th>
                 <th>NVKD</th><th>CTV</th><th>NV kỹ thuật</th><th>Trạng thái</th><th>Giá trị</th>
               </tr>
             </thead>
@@ -438,6 +456,54 @@
         </div>
 
         <div class="ctv-grid" id="ctv-grid"></div>
+      </div>
+
+      <!-- Tab "Khách hàng tiềm năng": khách truy cập qua link phân kênh (của NVKD hoặc bất kỳ CTV nào),
+           đối chiếu với đơn hàng + lịch sử truy cập, loại trừ SĐT nội bộ (NVKD/CTV), phân loại + khuyến nghị. -->
+      <div class="staff-tab-panel" id="staff-tab-leads">
+        <p style="font-size:12.5px;color:var(--text-muted);margin:-4px 0 16px;">
+          Danh sách khách hàng đã truy cập qua link phân kênh của bạn hoặc của các CTV trực thuộc — đã tự động loại trừ số điện thoại nội bộ (NVKD/CTV).
+        </p>
+        <div style="overflow-x:auto;">
+          <table class="sim-table">
+            <thead>
+              <tr>
+                <th>Số điện thoại</th><th>Nguồn giới thiệu</th><th>Lần ghé gần nhất</th><th>Số lần ghé</th>
+                <th>Dịch vụ đã xem</th><th>Phân loại</th><th>Khuyến nghị</th><th>Ghi chú</th><th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="staff-leads-table-body"></tbody>
+          </table>
+        </div>
+        <div class="lead-empty-note" id="staff-leads-empty" style="display:none;margin-top:12px;">
+          Chưa có khách hàng nào truy cập qua link phân kênh trong phiên làm việc này.
+        </div>
+      </div>
+
+      <!-- Tab "Tài liệu Marketing": kho tài liệu do các phòng ban quản lý sản phẩm (Di động/Cố định)
+           đăng tải — tài liệu giới thiệu SP, content chia sẻ MXH (FB/Zalo/YouTube/TikTok), hình ảnh SP —
+           để NVKD/CTV tải về sử dụng khi bán hàng/làm nội dung. -->
+      <div class="staff-tab-panel" id="staff-tab-tailieu">
+        <p style="font-size:12.5px;color:var(--text-muted);margin:-4px 0 16px;">
+          Tài liệu do phòng ban quản lý sản phẩm Di động/Cố định đăng tải. Tải về để sử dụng khi tư vấn khách hàng hoặc đăng nội dung lên mạng xã hội.
+        </p>
+        <div class="doc-filter-row">
+          <select class="order-person-filter" id="staff-doc-filter-dichvu">
+            <option value="all">Tất cả dịch vụ</option>
+            <option value="Di động">Di động</option>
+            <option value="Cố định">Cố định</option>
+          </select>
+          <select class="order-person-filter" id="staff-doc-filter-loai">
+            <option value="all">Tất cả loại nội dung</option>
+            <option value="Tài liệu giới thiệu SP">Tài liệu giới thiệu SP</option>
+            <option value="Content MXH">Content MXH</option>
+            <option value="Hình ảnh SP">Hình ảnh SP</option>
+          </select>
+        </div>
+        <div class="doc-card-grid" id="staff-doc-grid"></div>
+        <div class="lead-empty-note" id="staff-doc-empty" style="display:none;margin-top:12px;">
+          Không có tài liệu nào khớp với bộ lọc đã chọn.
+        </div>
       </div>
 
       <div class="staff-tab-panel" id="staff-tab-account">
@@ -484,6 +550,8 @@
       <!-- CTV Tabs -->
       <div class="staff-nav" style="margin-bottom:20px;border-bottom:1px solid var(--border);padding:0;">
         <span class="staff-nav-link tab-btn active" data-tab="ctv-tab-sales" style="padding-bottom:10px;margin-right:20px;cursor:pointer;font-weight:600;">Kết quả bán hàng</span>
+        <span class="staff-nav-link tab-btn" data-tab="ctv-tab-leads" style="padding-bottom:10px;margin-right:20px;cursor:pointer;font-weight:600;">🎯 Khách hàng tiềm năng</span>
+        <span class="staff-nav-link tab-btn" data-tab="ctv-tab-tailieu" style="padding-bottom:10px;margin-right:20px;cursor:pointer;font-weight:600;">📁 Tài liệu Marketing</span>
         <span class="staff-nav-link tab-btn" data-tab="ctv-tab-account" style="padding-bottom:10px;cursor:pointer;font-weight:600;">Tài khoản của bạn</span>
       </div>
 
@@ -497,6 +565,12 @@
         </div>
 
         <div class="staff-stats" id="ctv-self-stats"></div>
+
+        <div class="chart-card" style="margin-bottom:18px;max-width:640px;">
+          <h3 style="font-size:14px;font-weight:700;margin-bottom:2px;">Số lượng đơn hàng theo trạng thái</h3>
+          <div class="chart-sub" id="ctv-self-status-summary-sub">Kỳ: Tháng này</div>
+          <div id="ctv-self-status-summary"></div>
+        </div>
 
         <div class="charts-row" style="grid-template-columns:1fr;max-width:640px;">
           <div class="chart-card">
@@ -523,7 +597,7 @@
           <table class="sim-table" id="ctv-orders-table">
             <thead>
               <tr>
-                <th>Mã đơn hàng</th><th>Ngày</th><th>Loại dịch vụ</th><th>Khách hàng</th><th>SĐT KH</th>
+                <th>Mã đơn hàng</th><th>Ngày</th><th>Loại dịch vụ</th><th>Tên gói cước</th><th>Khách hàng</th><th>SĐT KH</th>
                 <th>NVKD phụ trách</th><th>NV kỹ thuật</th><th>Trạng thái</th><th>Giá trị</th>
               </tr>
             </thead>
@@ -531,6 +605,52 @@
           </table>
         </div>
         <div class="order-table-note" id="ctv-orders-table-note"></div>
+      </div>
+
+      <!-- Tab "Khách hàng tiềm năng" của riêng CTV này — chỉ hiện lead phát sinh từ đúng link giới thiệu
+           của CTV đang đăng nhập (không thấy lead của NVKD hay CTV khác). -->
+      <div class="tab-panel" id="ctv-tab-leads">
+        <p style="font-size:12.5px;color:var(--text-muted);margin:-4px 0 16px;">
+          Danh sách khách hàng đã truy cập qua liên kết giới thiệu của riêng bạn.
+        </p>
+        <div style="overflow-x:auto;">
+          <table class="sim-table">
+            <thead>
+              <tr>
+                <th>Số điện thoại</th><th>Lần ghé gần nhất</th><th>Số lần ghé</th>
+                <th>Dịch vụ đã xem</th><th>Phân loại</th><th>Khuyến nghị</th><th>Ghi chú</th><th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="ctv-leads-table-body"></tbody>
+          </table>
+        </div>
+        <div class="lead-empty-note" id="ctv-leads-empty" style="display:none;margin-top:12px;">
+          Chưa có khách hàng nào truy cập qua liên kết giới thiệu của bạn.
+        </div>
+      </div>
+
+      <!-- Tab "Tài liệu Marketing" của CTV — cùng kho tài liệu với NVKD. -->
+      <div class="tab-panel" id="ctv-tab-tailieu">
+        <p style="font-size:12.5px;color:var(--text-muted);margin:-4px 0 16px;">
+          Tài liệu do phòng ban quản lý sản phẩm Di động/Cố định đăng tải. Tải về để sử dụng khi tư vấn khách hàng hoặc đăng nội dung lên mạng xã hội.
+        </p>
+        <div class="doc-filter-row">
+          <select class="order-person-filter" id="ctv-doc-filter-dichvu">
+            <option value="all">Tất cả dịch vụ</option>
+            <option value="Di động">Di động</option>
+            <option value="Cố định">Cố định</option>
+          </select>
+          <select class="order-person-filter" id="ctv-doc-filter-loai">
+            <option value="all">Tất cả loại nội dung</option>
+            <option value="Tài liệu giới thiệu SP">Tài liệu giới thiệu SP</option>
+            <option value="Content MXH">Content MXH</option>
+            <option value="Hình ảnh SP">Hình ảnh SP</option>
+          </select>
+        </div>
+        <div class="doc-card-grid" id="ctv-doc-grid"></div>
+        <div class="lead-empty-note" id="ctv-doc-empty" style="display:none;margin-top:12px;">
+          Không có tài liệu nào khớp với bộ lọc đã chọn.
+        </div>
       </div>
 
       <!-- Tab 2: Tài khoản của bạn -->

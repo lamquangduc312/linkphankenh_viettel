@@ -1,0 +1,145 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="UTF-8">
+<title>Thiet Ke Ky Thuat - Khach Hang Tiem Nang Tu Link Phan Kenh</title>
+<!--[if gte mso 9]>
+<xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml>
+<![endif]-->
+<style>
+  @page Section1 { size: 21cm 29.7cm; margin: 2.2cm 2cm 2.2cm 2cm; }
+  div.Section1 { page: Section1; }
+  body{ font-family:"Calibri","Segoe UI",Arial,sans-serif; font-size:11pt; color:#1A1A1A; line-height:1.42; }
+  h1{ font-size:19pt; color:#C4002A; border-bottom:2px solid #C4002A; padding-bottom:6px; margin-top:24px; }
+  h2{ font-size:14.5pt; color:#C4002A; margin-top:20px; margin-bottom:8px; }
+  h3{ font-size:12pt; color:#1A1A1A; margin-top:14px; margin-bottom:6px; }
+  p{ margin:6px 0; }
+  .cover{ text-align:center; margin-top:60px; }
+  .cover h1{ border:none; font-size:24pt; margin-bottom:4px; }
+  .meta-box{ background:#F7F7F9; border:1px solid #E7E7EA; border-radius:6px; padding:14px 18px; margin:26px auto; max-width:520px; text-align:left; font-size:10.5pt; }
+  table{ border-collapse:collapse; width:100%; margin:10px 0 18px; font-size:9.6pt; }
+  table th{ background:#C4002A; color:#fff; padding:6px 8px; text-align:left; border:1px solid #99001F; }
+  table td{ padding:6px 8px; border:1px solid #E0E0E0; vertical-align:top; }
+  table tr:nth-child(even) td{ background:#FAFAFA; }
+  .mono{ font-family:"Consolas","Courier New",monospace; font-size:9.2pt; background:#F3F3F5; padding:1px 4px; border-radius:3px; }
+  .codebox{ font-family:"Consolas","Courier New",monospace; font-size:9pt; background:#1A1A1A; color:#EDEDED; padding:10px 14px; border-radius:6px; white-space:pre; margin:8px 0 14px; }
+  .note{ background:#FFF8E6; border:1px dashed #F4D57A; color:#7A5C00; padding:8px 12px; border-radius:6px; margin:8px 0; }
+  .decision{ background:#EAF4EC; border:1px solid #B7DBC0; color:#1A5C2E; padding:8px 12px; border-radius:6px; margin:8px 0; }
+  .page-break{ page-break-before:always; }
+  ul,ol{ margin:6px 0 6px 22px; } li{ margin:3px 0; }
+</style>
+</head>
+<body>
+<div class="Section1">
+
+<div class="cover">
+<p style="color:#C4002A;font-weight:bold;letter-spacing:2px;font-size:11pt;">VIETTEL TAMMI</p>
+<h1>THIẾT KẾ KỸ THUẬT</h1>
+<p style="font-size:13pt;color:#555;">Nhận diện &amp; đối chiếu Khách hàng tiềm năng từ Link Phân Kênh</p>
+<div class="meta-box">
+<p><b>Áp dụng cho:</b> <span class="mono">index.html</span> &mdash; thư mục <span class="mono">Viettel_Portal_LPK</span></p>
+<p><b>Ngày lập:</b> 24/07/2026 &nbsp;|&nbsp; <b>Người chuẩn bị:</b> P.NVBH 2026</p>
+<p><b>Trạng thái:</b> Đã chốt phương án với người yêu cầu, sẵn sàng triển khai</p>
+</div>
+</div>
+
+<div class="page-break"></div>
+
+<h1>1. BÀI TOÁN &amp; PHẠM VI</h1>
+<p>Khi khách hàng mở webapp bằng di động qua link phân kênh (<span class="mono">?NV=...</span>), hệ thống cần: (1) thu thập số điện thoại của khách theo cách ít gây khó chịu nhất, (2) đối chiếu số đó với CSDL Đơn hàng và CSDL Lịch sử truy cập, (3) loại trừ số thuê bao của chính NVKD và các CTV trực thuộc, (4) phân loại khách + đưa ra khuyến nghị hành động, (5) hiển thị toàn bộ trong 1 tab mới trên Dashboard.</p>
+
+<h2>1.1. Các quyết định đã chốt</h2>
+<table>
+<tr><th style="width:30%;">Hạng mục</th><th>Phương án được chọn</th></tr>
+<tr><td>Phương pháp thu thập SĐT</td><td><b>Phương án C &mdash; Progressive/Kết hợp:</b> không hỏi ngay khi khách vào trang; thử nhận diện ngầm qua mạng Viettel trước (nếu có hạ tầng); nếu không được, chỉ hiện form nhẹ xin SĐT đúng lúc khách đã thể hiện quan tâm thật sự (xem gói lần 2 trở lên)</td></tr>
+<tr><td>Nơi lưu trữ Visitor Log</td><td><b>Google Sheets</b> (qua Apps Script) cho môi trường thật; bản demo trong <span class="mono">index.html</span> mô phỏng bằng <span class="mono">localStorage</span> vì đây là trang tĩnh không có backend</td></tr>
+<tr><td>Phạm vi hiển thị tab mới</td><td><b>NVKD xem toàn bộ</b> (chính mình + tất cả CTV) &mdash; <b>mỗi CTV chỉ xem lead phát sinh từ link của chính mình</b></td></tr>
+</table>
+
+<h1>2. LUỒNG DỮ LIỆU TỔNG THỂ (Web/App &rarr; Apps Script &rarr; Google Sheet)</h1>
+<div class="codebox">Khách hàng (Mobile Webapp, mở link ?NV=...)
+   |
+   |  (1) Thử nhận diện ngầm SĐT qua mạng Viettel (network header/MSISDN) - chỉ khi đang dùng data Viettel
+   |  (2) Nếu không được: theo dõi mức độ quan tâm (số lần xem chi tiết gói); đủ ngưỡng -> hiện form nhẹ xin SĐT
+   v
+Ghi "lượt truy cập" (visit event): NV, DV/SP đang xem, SĐT (nếu có), thời điểm
+   |
+   v
+Apps Script Web App - doPost("logVisit")  --batch--> Google Sheet "VisitorLog"
+   |
+   v
+Apps Script function "classifyVisitor(sdt)":
+   - Đọc danh sách loại trừ (Sheet "NhanVien" + "CongTacVien" - cột SĐT)
+   - Đọc Sheet "DonHang" (hoặc DB đơn hàng hiện có) - tìm SĐT đã từng mua
+   - Đọc lại chính Sheet "VisitorLog" - đếm số lần ghé trước đây của SĐT/thiết bị này
+   - Trả về: loai-tru | khach-hang-hien-huu | tiem-nang-cao | tiem-nang-moi | chua-xac-dinh
+   |
+   v
+Dashboard NVKD/CTV - tab "🎯 Khách hàng tiềm năng" - doGet("getLeads", scope)
+</div>
+<div class="note">Bản demo trong <span class="mono">index.html</span> hiện tại KHÔNG có backend Apps Script thật (toàn bộ dữ liệu CTV/đơn hàng là mock trong bộ nhớ trình duyệt) &mdash; phần code minh hoạ sẽ dùng <span class="mono">localStorage</span> để mô phỏng đúng luồng nghiệp vụ trên, có ghi chú rõ ràng trong code (<span class="mono">// TODO (Dev)</span>) tại các điểm cần thay bằng lời gọi Apps Script thật khi lên môi trường chính thức.</div>
+
+<h1>3. SCHEMA DỮ LIỆU ĐỀ XUẤT (Google Sheet "VisitorLog")</h1>
+<table>
+<tr><th>Cột</th><th>Kiểu</th><th>Mô tả</th></tr>
+<tr><td class="mono">visitorId</td><td>string</td><td>ID phiên khách (uuid), dùng để gộp các lượt ghé khi chưa biết SĐT</td></tr>
+<tr><td class="mono">sdt</td><td>string|null</td><td>Số điện thoại khách (chuẩn hoá 10 số), null nếu chưa thu thập được</td></tr>
+<tr><td class="mono">nguoiGioiThieuCode</td><td>string</td><td>Giá trị tham số <span class="mono">?NV=</span> (mã NVKD hoặc SĐT CTV)</td></tr>
+<tr><td class="mono">loaiNguoiGioiThieu</td><td>staff|ctv</td><td>Phân biệt NVKD hay CTV</td></tr>
+<tr><td class="mono">lanDauISO</td><td>datetime</td><td>Thời điểm ghé lần đầu</td></tr>
+<tr><td class="mono">lanCuoiISO</td><td>datetime</td><td>Thời điểm ghé gần nhất</td></tr>
+<tr><td class="mono">soLanGhe</td><td>int</td><td>Tổng số lượt truy cập ghi nhận được</td></tr>
+<tr><td class="mono">dichVuDaXem</td><td>string[]</td><td>Danh sách dịch vụ/gói đã xem (nối bằng dấu phẩy)</td></tr>
+<tr><td class="mono">nguonThuThapSdt</td><td>ngam|chu-dong|khach-da-dang-nhap|chua-co</td><td>Cách SĐT được thu thập, phục vụ đo lường hiệu quả từng phương pháp</td></tr>
+<tr><td class="mono">phanLoai</td><td>enum</td><td>Kết quả đối chiếu (xem mục 5)</td></tr>
+<tr><td class="mono">trangThaiXuLy</td><td>chua-lien-he|da-lien-he|bo-qua</td><td>NVKD/CTV tự cập nhật sau khi thao tác trên tab mới</td></tr>
+</table>
+
+<h1>4. PHƯƠNG PHÁP THU THẬP SĐT (Progressive/Kết hợp)</h1>
+<ol>
+<li><b>Bước 0 &mdash; Tận dụng dữ liệu đã có:</b> nếu khách đã đăng nhập vai trò "khách hàng thường" ở trang (qua modal đăng nhập OTP hiện có), lấy luôn SĐT đó &mdash; không cần hỏi lại.</li>
+<li><b>Bước 1 &mdash; Nhận diện ngầm qua mạng viễn thông:</b> gọi hàm <span class="mono">detectCarrierPhoneSilently()</span> &mdash; ở môi trường thật đây là nơi tích hợp API network enabler nội bộ Viettel (đọc SĐT từ header do hạ tầng mạng chèn khi khách dùng data di động Viettel). Bản demo trả về <span class="mono">null</span> vì không có quyền truy cập tầng mạng từ trình duyệt.</li>
+<li><b>Bước 2 &mdash; Theo dõi mức độ quan tâm:</b> nếu 2 bước trên chưa có SĐT, đếm số lần khách mở modal "Chi tiết gói cước" trong phiên (biến đếm gắn theo <span class="mono">visitorId</span>). Đạt ngưỡng (đề xuất: từ lượt xem thứ 2) mới hiện form nhẹ.</li>
+<li><b>Bước 3 &mdash; Form nhẹ, không chặn thao tác:</b> hiện dưới dạng banner nhỏ cạnh Huy hiệu tin cậy (không phải modal chặn toàn màn hình) — "Để [Tên NVKD/CTV] tư vấn nhanh hơn, để lại SĐT của bạn (không bắt buộc)" + ô nhập + nút Gửi. Khách có thể bỏ qua bất kỳ lúc nào.</li>
+</ol>
+<div class="note">Lưu ý pháp lý: SĐT là dữ liệu cá nhân theo Nghị định 13/2023/NĐ-CP. Form ở Bước 3 cần có dòng chú thích ngắn về mục đích sử dụng (để NVKD/CTV liên hệ tư vấn) trước khi khách bấm Gửi.</div>
+
+<h1>5. LOGIC ĐỐI CHIẾU &amp; PHÂN LOẠI</h1>
+<table>
+<tr><th>Bước</th><th>Điều kiện kiểm tra</th><th>Kết quả</th></tr>
+<tr><td>1</td><td>SĐT trùng với SĐT NVKD hiện tại hoặc bất kỳ CTV nào trong <span class="mono">ctvList</span></td><td><b>loai-tru</b> — ẩn khỏi danh sách lead, không tính là khách</td></tr>
+<tr><td>2</td><td>Chưa thu thập được SĐT (im lặng/khách từ chối)</td><td><b>chua-xac-dinh</b> — chỉ đếm lượt xem ẩn danh, không có nút hành động liên hệ</td></tr>
+<tr><td>3</td><td>SĐT có xuất hiện trong CSDL Đơn hàng (đã từng mua bất kỳ dịch vụ nào)</td><td><b>khach-hang-hien-hu</b>u — chăm sóc/upsell, không tính là lead mới</td></tr>
+<tr><td>4</td><td>Chưa từng mua, đã ghé &ge; 2 lần</td><td><b>tiem-nang-cao</b> — ưu tiên liên hệ trong 24h</td></tr>
+<tr><td>5</td><td>Chưa từng mua, ghé lần đầu</td><td><b>tiem-nang-moi</b> — liên hệ trong 3 ngày</td></tr>
+</table>
+
+<h2>5.1. Bảng khuyến nghị hành động hiển thị trên tab</h2>
+<table>
+<tr><th>Phân loại</th><th>Màu badge</th><th>Khuyến nghị hiển thị</th><th>Nút hành động</th></tr>
+<tr><td>Tiềm năng cao</td><td>Đỏ</td><td>"Khách đã xem {n} lần, chưa đăng ký &mdash; nên gọi/Zalo tư vấn trong 24h"</td><td>Gọi, Zalo, Đánh dấu đã liên hệ</td></tr>
+<tr><td>Tiềm năng mới</td><td>Cam</td><td>"Khách mới ghé lần đầu &mdash; nên liên hệ trong 3 ngày"</td><td>Gọi, Zalo, Đánh dấu đã liên hệ, Bỏ qua</td></tr>
+<tr><td>Khách hàng hiện hữu</td><td>Xanh dương</td><td>"Đã là khách hàng &mdash; có thể chăm sóc/gia hạn/giới thiệu gói mới"</td><td>Gọi, Zalo</td></tr>
+<tr><td>Chưa xác định SĐT</td><td>Xám</td><td>"Chưa thu thập được số liên hệ"</td><td>(không có)</td></tr>
+</table>
+
+<h1>6. THIẾT KẾ TAB MỚI "🎯 KHÁCH HÀNG TIỀM NĂNG"</h1>
+<p><b>Vị trí:</b> tab thứ 4 trong Dashboard NVKD (cạnh Dashboard / Quản lý CTV / Tài khoản của tôi); tab thứ 3 trong Dashboard CTV (cạnh Kết quả bán hàng / Tài khoản của bạn).</p>
+<p><b>Cột hiển thị:</b> SĐT (ẩn bớt: 090***123), Lần ghé gần nhất, Số lần ghé, Dịch vụ đã xem, Nguồn giới thiệu (chỉ ở bản NVKD, để phân biệt lead của CTV nào), Phân loại (badge màu), Khuyến nghị, Hành động.</p>
+<p><b>Khác biệt NVKD/CTV:</b> NVKD thấy toàn bộ lead (của mình + của tất cả CTV, có cột "Nguồn"); CTV chỉ thấy lead phát sinh từ đúng link của chính CTV đó (lọc theo <span class="mono">nguoiGioiThieuCode === ctv.sdt</span>), không có cột "Nguồn".</p>
+
+<h1>7. DANH SÁCH THAY ĐỔI CẦN THỰC HIỆN TRONG index.html (bản demo)</h1>
+<table>
+<tr><th>Khu vực</th><th>Thay đổi</th></tr>
+<tr><td>HTML</td><td>Thêm nút tab + panel bảng cho NVKD (<span class="mono">staff-tab-leads</span>) và CTV (<span class="mono">ctv-tab-leads</span>); thêm banner form nhẹ cạnh Huy hiệu tin cậy</td></tr>
+<tr><td>CSS</td><td>Thêm 4 class màu badge phân loại lead, style banner thu thập SĐT</td></tr>
+<tr><td>JS &mdash; dữ liệu</td><td><span class="mono">loadVisitorLog/saveVisitorLog</span> (localStorage), <span class="mono">excludedPhoneSet()</span>, seed vài lead demo có sẵn để tab không trống khi mới đăng nhập</td></tr>
+<tr><td>JS &mdash; thu thập</td><td><span class="mono">detectCarrierPhoneSilently()</span> (stub trả null + TODO), đếm lượt xem gói theo <span class="mono">visitorId</span>, hiện/ẩn banner form nhẹ</td></tr>
+<tr><td>JS &mdash; đối chiếu</td><td><span class="mono">classifyVisitor(entry)</span> tra cứu qua <span class="mono">collectAllOrdersForRange()</span> đã có sẵn để tìm SĐT trong đơn hàng</td></tr>
+<tr><td>JS &mdash; hiển thị</td><td><span class="mono">renderStaffLeads()</span>, <span class="mono">renderCtvLeads()</span>, gọi trong <span class="mono">setStaffLoggedIn()</span>/<span class="mono">setCtvLoggedIn()</span> và khi bấm tab tương ứng</td></tr>
+<tr><td>JS &mdash; hook</td><td>Gọi ghi nhận lượt ghé trong <span class="mono">initReferralFromUrl()</span>; đếm lượt xem gói trong <span class="mono">openPackageDetailModal()</span></td></tr>
+</table>
+
+<p style="margin-top:24px;font-size:9pt;color:#999;text-align:center;">&mdash; Hết tài liệu &mdash;</p>
+</div>
+</body>
+</html>

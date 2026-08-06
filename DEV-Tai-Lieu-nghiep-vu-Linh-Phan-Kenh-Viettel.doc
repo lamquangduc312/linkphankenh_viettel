@@ -1,0 +1,289 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="UTF-8">
+<title>Tai Lieu Nghiep Vu Link Phan Kenh Viettel</title>
+<!--[if gte mso 9]>
+<xml>
+<w:WordDocument>
+<w:View>Print</w:View>
+<w:Zoom>100</w:Zoom>
+<w:DoNotOptimizeForBrowser/>
+</w:WordDocument>
+</xml>
+<![endif]-->
+<style>
+  @page Section1 { size: 21cm 29.7cm; margin: 2.2cm 2cm 2.2cm 2cm; }
+  div.Section1 { page: Section1; }
+  body{ font-family:"Calibri","Segoe UI",Arial,sans-serif; font-size:11pt; color:#1A1A1A; line-height:1.42; }
+  h1{ font-size:20pt; color:#C4002A; border-bottom:2px solid #C4002A; padding-bottom:6px; margin-top:26px; }
+  h2{ font-size:15pt; color:#C4002A; margin-top:22px; margin-bottom:8px; }
+  h3{ font-size:12.5pt; color:#1A1A1A; margin-top:16px; margin-bottom:6px; }
+  h4{ font-size:11.5pt; color:#333333; margin-top:12px; margin-bottom:4px; }
+  p{ margin:6px 0; }
+  .cover{ text-align:center; margin-top:60px; }
+  .cover h1{ border:none; font-size:26pt; margin-bottom:4px; }
+  .cover .sub{ font-size:13pt; color:#555; margin-top:2px; }
+  .meta-box{ background:#F7F7F9; border:1px solid #E7E7EA; border-radius:6px; padding:14px 18px; margin:26px auto; max-width:520px; text-align:left; font-size:10.5pt; }
+  table{ border-collapse:collapse; width:100%; margin:10px 0 18px; font-size:9.8pt; }
+  table th{ background:#C4002A; color:#fff; padding:6px 8px; text-align:left; border:1px solid #99001F; }
+  table td{ padding:6px 8px; border:1px solid #E0E0E0; vertical-align:top; }
+  table tr:nth-child(even) td{ background:#FAFAFA; }
+  .mono{ font-family:"Consolas","Courier New",monospace; font-size:9.3pt; background:#F3F3F5; padding:1px 4px; border-radius:3px; }
+  .codebox{ font-family:"Consolas","Courier New",monospace; font-size:9.3pt; background:#1A1A1A; color:#EDEDED; padding:10px 14px; border-radius:6px; white-space:pre; margin:8px 0 14px; }
+  .note{ background:#FFF8E6; border:1px dashed #F4D57A; color:#7A5C00; padding:8px 12px; border-radius:6px; margin:8px 0; }
+  .critical{ background:#FDECEA; border:1px solid #E5A0A0; color:#8A1414; padding:10px 14px; border-radius:6px; margin:8px 0; font-weight:bold; }
+  .tag-red{ color:#C4002A; font-weight:bold; }
+  .tag-yellow{ color:#8A6D00; font-weight:bold; }
+  .tag-green{ color:#1A7A3C; font-weight:bold; }
+  .toc a{ color:#1A1A1A; text-decoration:none; }
+  .toc-item{ margin:4px 0; }
+  .page-break{ page-break-before:always; }
+  ul,ol{ margin:6px 0 6px 22px; }
+  li{ margin:3px 0; }
+</style>
+</head>
+<body>
+<div class="Section1">
+
+<div class="cover">
+<p style="color:#C4002A;font-weight:bold;letter-spacing:2px;font-size:11pt;">VIETTEL TAMMI</p>
+<h1>TÀI LIỆU NGHIỆP VỤ &amp; HƯỚNG DẪN SỬ DỤNG</h1>
+<p class="sub">Tính năng "Link Phân Kênh" &mdash; Portal demo Internet/Truyền hình &amp; Di động</p>
+<div class="meta-box">
+<p><b>Đối tượng:</b> Nhân viên kinh doanh (NVKD), Cộng tác viên (CTV), Đội ngũ Dev/BA</p>
+<p><b>Nguồn phân tích:</b> <span class="mono">index.html</span> (6.947 dòng) &amp; <span class="mono">main.js</span> (277 dòng)<br/>thư mục <span class="mono">Viettel_Portal_LPK</span></p>
+<p><b>Ngày lập tài liệu:</b> 24/07/2026</p>
+<p><b>Người chuẩn bị:</b> P.NVBH 2026 (phongnvbh2026@gmail.com)</p>
+</div>
+</div>
+
+<div class="page-break"></div>
+
+<h1>MỤC LỤC</h1>
+<div class="toc">
+<div class="toc-item">1. Tổng quan &amp; phạm vi tài liệu</div>
+<div class="toc-item">2. Kiến trúc &amp; luồng dữ liệu tổng thể</div>
+<div class="toc-item">3. Hướng dẫn sử dụng theo vai trò</div>
+<div class="toc-item">&nbsp;&nbsp;&nbsp;3.1. Nhân viên kinh doanh (NVKD)</div>
+<div class="toc-item">&nbsp;&nbsp;&nbsp;3.2. Cộng tác viên (CTV)</div>
+<div class="toc-item">&nbsp;&nbsp;&nbsp;3.3. Khách hàng (truy cập qua link giới thiệu)</div>
+<div class="toc-item">&nbsp;&nbsp;&nbsp;3.4. Kịch bản demo trải nghiệm đầy đủ</div>
+<div class="toc-item">4. Thống kê chi tiết nghiệp vụ &amp; cấu trúc dữ liệu dùng chung</div>
+<div class="toc-item">5. Các trang sản phẩm liên quan</div>
+<div class="toc-item">6. Cảnh báo kỹ thuật &mdash; Các vấn đề cần xử lý</div>
+<div class="toc-item">7. Khuyến nghị cho đội Dev</div>
+<div class="toc-item">8. Phụ lục &mdash; Danh sách hàm JavaScript quan trọng</div>
+</div>
+
+<div class="page-break"></div>
+
+<h1>1. TỔNG QUAN &amp; PHẠM VI TÀI LIỆU</h1>
+<p>Tài liệu này thống kê toàn bộ nghiệp vụ đã được xây dựng trong file <span class="mono">index.html</span> của portal demo Viettel &mdash; tập trung vào tính năng <b>Link Phân Kênh</b>: cơ chế cho phép Nhân viên kinh doanh (NVKD) và Cộng tác viên (CTV) tạo liên kết/QR giới thiệu riêng, theo dõi đơn hàng và doanh số phát sinh từ khách hàng truy cập qua liên kết đó.</p>
+<p>Tài liệu được biên soạn bằng cách đọc toàn bộ mã nguồn thực tế (không chỉ dựa trên tài liệu mô tả trước đó), đối chiếu từng nghiệp vụ với đúng hàm/biến/dòng code triển khai, nhằm phục vụ đồng thời hai mục đích:</p>
+<ol>
+<li><b>Hướng dẫn sử dụng</b> cho NVKD/CTV/Khách hàng thao tác đúng trên hệ thống demo.</li>
+<li><b>Tài liệu kỹ thuật cho Dev/BA</b>: liệt kê chính xác cấu trúc dữ liệu, tham số, và đặc biệt là các <b>sai lệch/lỗi</b> phát hiện được giữa mô tả nghiệp vụ và code thực tế, để đội Dev có cơ sở sửa lỗi hoặc cập nhật lại phạm vi tính năng.</li>
+</ol>
+<div class="note">Lưu ý phạm vi: đây là trang <b>demo tĩnh phía client</b> (thuần HTML/CSS/JS nhúng trong 1 file), toàn bộ dữ liệu (danh sách CTV, đơn hàng, doanh số) là <b>dữ liệu mô phỏng nằm trong bộ nhớ trình duyệt</b>, không kết nối Google Sheets/API/Database thật như kiến trúc chuẩn của dự án Viettel Tammi. Tài liệu này chỉ mô tả đúng phạm vi của bản demo hiện có trong thư mục <span class="mono">Viettel_Portal_LPK</span>.</div>
+
+<h1>2. KIẾN TRÚC &amp; LUỒNG DỮ LIỆU TỔNG THỂ</h1>
+<p>Toàn bộ logic nằm trong 1 file <span class="mono">index.html</span> (6.947 dòng), chia thành các vùng sau:</p>
+<table>
+<tr><th>Vùng dòng</th><th>Nội dung</th></tr>
+<tr><td>1 &ndash; 693</td><td>CSS toàn trang (biến màu thương hiệu Viettel, bố cục, responsive di động)</td></tr>
+<tr><td>697 &ndash; 1.477</td><td>HTML tĩnh: header, các modal (đăng nhập, OTP, sửa CTV, xác nhận, phóng to QR, chi tiết gói), 4 trang chính (Internet/Truyền hình, Di động/Sim số, Data/5G, Hỗ trợ nhân viên)</td></tr>
+<tr><td>1.478 &ndash; 2.711</td><td>Thư viện tạo mã QR nhúng ngay trong file (không gọi API bên ngoài)</td></tr>
+<tr><td>2.712 &ndash; 4.059</td><td>Biến <span class="mono">DATA</span>: toàn bộ 121 mã gói cước, tổng hợp thủ công từ website viettel.vn</td></tr>
+<tr><td>4.060 &ndash; 4.542</td><td>Script #1: hiển thị thẻ gói cước, xác nhận đăng ký minh hoạ, chuyển tab, trang Sim số</td></tr>
+<tr><td>4.543 &ndash; 4.872</td><td>Script #2: luồng đăng nhập theo số điện thoại + OTP (dùng chung cho Khách hàng/NVKD/CTV)</td></tr>
+<tr><td>4.874 &ndash; 6.944</td><td>Script #3 (lớn nhất): toàn bộ nghiệp vụ Link Phân Kênh &mdash; quản lý CTV, Trust Badge, ghi nhận đơn hàng, dashboard, biểu đồ, xuất CSV</td></tr>
+</table>
+<p>Ba khối script trao đổi dữ liệu qua các biến gắn vào <span class="mono">window</span>: <span class="mono">window.StaffPortal</span>, <span class="mono">window.activeReferral</span>, <span class="mono">window.recordReferredOrder</span>, <span class="mono">window.openPackageDetailModal</span>.</p>
+<div class="note"><b>Ghi chú:</b> file <span class="mono">main.js</span> (277 dòng) tồn tại trong thư mục nhưng <b>không được index.html gọi tới</b> &mdash; đây là mã nguồn của một phiên bản/prototype cũ hơn (dùng tham số <span class="mono">?ref=</span>, gọi API ngoài <span class="mono">api.qrserver.com</span> để vẽ QR). Xem khuyến nghị ở mục 7.</div>
+
+<div class="page-break"></div>
+<h1>3. HƯỚNG DẪN SỬ DỤNG THEO VAI TRÒ</h1>
+
+<h2>3.1. Nhân viên kinh doanh (NVKD)</h2>
+<p>Tài khoản demo duy nhất: <b>Lê Văn Linh</b> &mdash; Mã NV <span class="mono">NVKD00123</span>, Địa bàn Quận 1, TP.HCM.</p>
+<h3>a) Đăng nhập</h3>
+<p>Vào mục <b>Hỗ trợ nhân viên</b> trên thanh menu &rarr; chọn tab dịch vụ <b>Nhân viên KD</b> trong màn hình đăng nhập &rarr; nhập số điện thoại &rarr; nhập mã OTP (bản demo chấp nhận bất kỳ 6 chữ số nào).</p>
+<h3>b) Quản lý Cộng tác viên (CTV)</h3>
+<ul>
+<li><b>Thêm mới CTV:</b> nhập Họ tên + Số điện thoại (có kiểm tra đầu số di động hợp lệ 03/05/07/08/09 và không trùng với CTV khác) + xác thực OTP thật (so khớp mã demo đã sinh).</li>
+<li><b>Sửa thông tin:</b> chỉnh Họ tên, Số điện thoại, Ảnh đại diện của CTV.</li>
+<li><b>Tạm khoá / Mở khoá:</b> đổi trạng thái Hoạt động &harr; Đã khoá &mdash; CTV bị khoá sẽ không đăng nhập được nhưng dữ liệu đơn hàng lịch sử vẫn giữ nguyên.</li>
+<li><b>Xoá CTV:</b> loại bỏ tài khoản khỏi danh sách (có modal xác nhận trước khi xoá).</li>
+</ul>
+<div class="note">Danh sách demo có sẵn 5 CTV: Trần Thị Lan Hương, Lê Hoàng Nam, Phạm Ngọc Thảo, Đinh Văn Khoá (đang khoá), Hoàng Tuấn Kiệt.</div>
+<h3>c) Tạo &amp; chia sẻ liên kết giới thiệu</h3>
+<ul>
+<li><b>Liên kết tổng:</b> vào tab "Tài khoản của tôi" để lấy link + mã QR định danh riêng của NVKD, dạng <span class="mono">https://viettel.vn/vx/gioithieu?NV=CNKD_HCM_LINHLV12</span>.</li>
+<li><b>Liên kết theo dịch vụ:</b> mục "Link phân kênh theo dịch vụ" cung cấp sẵn 12 liên kết (mỗi liên kết trỏ thẳng tới 1 trong 12 dịch vụ NVKD phụ trách, xem bảng ở mục 4.2), kèm nút "Xem trang dịch vụ" để tự kiểm tra giao diện trước khi gửi khách.</li>
+<li><b>Liên kết 1 gói cước cụ thể:</b> mở modal "Chi tiết gói cước" bất kỳ &rarr; khối "Chia sẻ gói cước này" (neo góc phải) &rarr; sao chép link hoặc tải QR.</li>
+<li><b>Tải QR về máy:</b> dùng nút tải PNG ở mọi vị trí có mã QR.</li>
+</ul>
+<h3>d) Xem báo cáo &amp; xuất dữ liệu</h3>
+<ul>
+<li>Chọn khoảng thời gian: Tháng này / Tháng trước / 3 tháng / 12 tháng.</li>
+<li>Xem 4 chỉ số tổng quan (doanh số cá nhân, doanh số toàn đội CTV, tổng doanh số, số CTV có phát sinh), bảng số đơn theo trạng thái, 3 biểu đồ (xu hướng 12 tháng, đóng góp theo người, theo loại dịch vụ), bảng "Doanh thu sắp ghi nhận" (đơn Đang thực hiện), bảng chi tiết theo từng người, và bảng danh sách đơn hàng (giới hạn hiển thị 60 dòng gần nhất trên màn hình).</li>
+<li><b>Xuất CSV:</b> có 2 loại file riêng biệt &mdash; báo cáo tổng hợp theo người (Doanh số/Thuê bao mới/Số đơn) và danh sách đơn hàng chi tiết (đầy đủ thông tin từng đơn).</li>
+</ul>
+
+<h2>3.2. Cộng tác viên (CTV)</h2>
+<h3>a) Đăng nhập</h3>
+<p>Chọn tab dịch vụ <b>Cộng tác viên</b> trong màn hình đăng nhập &rarr; nhập đúng số điện thoại đã được NVKD tạo trước đó &rarr; nhập OTP (demo chấp nhận mọi mã 6 số). Nếu số điện thoại chưa được đăng ký hoặc đã bị khoá, hệ thống báo lỗi tương ứng.</p>
+<h3>b) Dashboard 2 tab</h3>
+<ul>
+<li><b>Tab "Kết quả bán hàng":</b> xem doanh số và số đơn hàng do chính CTV bán được, bảng trạng thái đơn, biểu đồ xu hướng 12 tháng cá nhân, bảng đơn hàng chi tiết (có bộ lọc trạng thái riêng, cap 60 dòng, xuất CSV riêng).</li>
+<li><b>Tab "Tài khoản của bạn":</b>
+  <ul>
+    <li>Liên kết giới thiệu chung (link + QR dùng số điện thoại của CTV làm định danh).</li>
+    <li>"Liên kết nhanh đến dịch vụ" &mdash; danh sách link theo 12 dịch vụ (giống NVKD), có nút sao chép nhanh 📋 để gửi khách.</li>
+    <li>Xuất báo cáo tổng quan (CSV).</li>
+    <li>Đổi ảnh đại diện cá nhân.</li>
+  </ul>
+</li>
+</ul>
+<div class="note">Bản demo hiện <b>chưa</b> có mục hiển thị "Hoa hồng được nhận" hay tỷ lệ chia sẻ &mdash; xem chi tiết sai lệch ở mục 6, hạng mục 2.</div>
+
+<h2>3.3. Khách hàng (truy cập qua link giới thiệu)</h2>
+<h3>a) Nhận diện người giới thiệu</h3>
+<p>Khi khách hàng mở một liên kết có chứa <span class="mono">?NV=&lt;mã người giới thiệu&gt;</span>, hệ thống tự động nhận diện và hiển thị <b>Huy hiệu "Được giới thiệu bởi"</b> ở góc dưới &ndash; bên trái màn hình, gồm: ảnh đại diện, họ tên, vai trò (NVKD/CTV Viettel), khu vực phụ trách, đánh giá sao (chỉ có ở NVKD), nút gọi điện và nút nhắn Zalo trực tiếp. Huy hiệu tự ẩn sau khoảng 33 phút hoặc khi khách bấm nút đóng.</p>
+<h3>b) Điều hướng thông minh (Smart Routing)</h3>
+<ul>
+<li>Nếu link có thêm <span class="mono">&amp;DV=&lt;mã dịch vụ&gt;</span>: tự động chuyển sang đúng trang của dịch vụ đó.</li>
+<li>Nếu link có thêm <span class="mono">&amp;SP=&lt;mã gói&gt;</span>: tự động chuyển trang, chọn đúng tab/danh mục, và <b>tự mở sẵn modal chi tiết</b> của gói cước đó.</li>
+</ul>
+<h3>c) Đăng ký gói cước</h3>
+<p>Khách hàng bấm "Đăng ký"/"Đăng ký ngay" trên bất kỳ gói nào &mdash; hệ thống dự kiến sẽ tự gán mã người giới thiệu vào đơn hàng để NVKD/CTV nhìn thấy trong dashboard của họ.</p>
+<div class="critical">⚠ CẢNH BÁO: Ở phiên bản mã nguồn hiện tại, bước "tự động ghi nhận đơn hàng" nói trên <b>không hoạt động</b> do lỗi kỹ thuật (gọi tới các hàm chưa được định nghĩa trong code). Xem phân tích đầy đủ tại mục 6, hạng mục 1. Cần đội Dev xử lý trước khi đưa vào vận hành/demo cho khách hàng thật.</div>
+
+<h2>3.4. Kịch bản demo trải nghiệm đầy đủ</h2>
+<ol>
+<li>Đăng nhập với vai trò NVKD hoặc CTV.</li>
+<li>Mở chi tiết một gói cước bất kỳ, bấm "Sao chép liên kết" (hoặc dùng "Liên kết nhanh" theo dịch vụ).</li>
+<li>Mở một trình duyệt ẩn danh (Incognito) để giả lập khách hàng mới, dán link và truy cập.</li>
+<li>Kết quả mong đợi: trang tự mở đúng gói/dịch vụ tương ứng; Huy hiệu tin cậy hiển thị đầy đủ ảnh, chức danh, nút liên hệ của người giới thiệu.</li>
+<li>Bấm "Đăng ký" &mdash; <i>về mặt thiết kế</i> đơn hàng sẽ được cộng vào doanh số của người đã chia sẻ link (hiện đang bị lỗi kỹ thuật, xem mục 3.3.c).</li>
+</ol>
+
+<div class="page-break"></div>
+<h1>4. THỐNG KÊ CHI TIẾT NGHIỆP VỤ &amp; CẤU TRÚC DỮ LIỆU DÙNG CHUNG</h1>
+
+<h2>4.1. Tham số đường link (Query String)</h2>
+<table>
+<tr><th>Tham số</th><th>Ý nghĩa</th><th>Cách sinh giá trị</th><th>Ghi chú</th></tr>
+<tr><td class="mono">NV</td><td>Định danh người giới thiệu</td><td>NVKD: <span class="mono">CNKD_&lt;tỉnh&gt;_&lt;email nội bộ&gt;</span> (vd <span class="mono">CNKD_HCM_LINHLV12</span>); CTV: số điện thoại</td><td>Bắt buộc để kích hoạt Huy hiệu tin cậy</td></tr>
+<tr><td class="mono">SP</td><td>Mã gói cước cụ thể</td><td>Mã gói trong danh mục 121 gói (vd <span class="mono">5G230B</span>)</td><td>Mở sẵn modal chi tiết đúng gói</td></tr>
+<tr><td class="mono">DV</td><td>Mã dịch vụ (1 trong 12 dịch vụ)</td><td>vd <span class="mono">ftth</span>, <span class="mono">mua-goi-data</span>, <span class="mono">doi-esim</span>...</td><td>Chỉ chuyển trang, không mở modal gói cụ thể</td></tr>
+</table>
+
+<h2>4.2. Danh mục 12 dịch vụ NVKD/CTV phụ trách</h2>
+<table>
+<tr><th>Nhóm</th><th>Dịch vụ</th><th>Trang liên kết</th><th>Tính là thuê bao mới?</th><th>Khoảng giá trị đơn (demo)</th></tr>
+<tr><td rowspan="4">Dịch vụ cố định</td><td>FTTH (Internet cáp quang)</td><td>Trang Internet/Truyền hình</td><td>Có</td><td>150.000 &ndash; 450.000đ</td></tr>
+<tr><td>Combo Internet + Truyền hình</td><td>Trang Internet/Truyền hình</td><td>Có</td><td>210.000 &ndash; 550.000đ</td></tr>
+<tr><td>Truyền hình</td><td>Trang Internet/Truyền hình</td><td>Có</td><td>90.000 &ndash; 250.000đ</td></tr>
+<tr><td>Camera</td><td>Trang Internet/Truyền hình</td><td>Có</td><td>100.000 &ndash; 300.000đ</td></tr>
+<tr><td rowspan="6">Dịch vụ di động</td><td>Mua SIM/số</td><td>Trang Di động/Sim số</td><td>Có</td><td>50.000 &ndash; 500.000đ</td></tr>
+<tr><td>Đổi eSIM</td><td>Trang Di động/Sim số</td><td>Không</td><td>25.000đ (cố định)</td></tr>
+<tr><td>Mua gói Data</td><td>Trang Data/5G</td><td>Không</td><td>70.000 &ndash; 230.000đ</td></tr>
+<tr><td>Chuyển sang trả sau</td><td>Trang Di động/Sim số</td><td>Không</td><td>&mdash;</td></tr>
+<tr><td>Chuyển sang trả trước</td><td>Trang Di động/Sim số</td><td>Không</td><td>&mdash;</td></tr>
+<tr><td>Đăng ký thông tin thuê bao</td><td>Trang Di động/Sim số</td><td>Không</td><td>&mdash;</td></tr>
+<tr><td>Lan tỏa</td><td>Lan tỏa cài đặt App</td><td><i>(chưa có trang minh hoạ)</i></td><td>Không</td><td>10.000 &ndash; 30.000đ</td></tr>
+<tr><td>Chăm sóc khách hàng</td><td>Chăm sóc thu cước</td><td><i>(chưa có trang minh hoạ)</i></td><td>Không</td><td>&mdash;</td></tr>
+</table>
+<p style="font-size:9.5pt;color:#666;">"Tính là thuê bao mới" quyết định đơn hàng Hoàn thành của dịch vụ đó có được cộng vào chỉ số "Thuê bao mới" trên dashboard hay không.</p>
+
+<h2>4.3. Cơ chế sinh dữ liệu đơn hàng minh hoạ</h2>
+<p>Toàn bộ số liệu bán hàng hiển thị trên dashboard <b>không phải dữ liệu lưu trữ thật</b> mà được sinh lại mỗi lần tải trang, dựa theo một công thức có "hạt giống" (seed) cố định gắn với từng người bán và từng ngày &mdash; nhờ vậy số liệu hiển thị nhất quán giữa các lần xem, nhưng sẽ đổi hẳn nếu xoá/tạo lại CTV. Quy tắc mô phỏng:</p>
+<ul>
+<li>Mỗi ngày có 25% khả năng phát sinh 1 đơn hàng.</li>
+<li>Nếu có đơn: chọn ngẫu nhiên 1 trong 12 dịch vụ, sinh giá trị đơn theo khoảng giá của dịch vụ đó (làm tròn 10.000đ).</li>
+<li>Trạng thái đơn được phân bổ theo tỉ lệ: Hoàn thành 45%, Đang thực hiện 23%, Đang triển khai 20%, Đã hủy 12%.</li>
+<li>Tên khách hàng được sinh ngẫu nhiên từ danh sách họ/tên tiếng Việt có sẵn.</li>
+</ul>
+<p>Chỉ đơn ở trạng thái <b>Hoàn thành</b> được cộng vào "Doanh số" &mdash; đúng theo chính sách chung của hệ thống.</p>
+
+<h2>4.4. Danh mục gói cước (121 mã)</h2>
+<table>
+<tr><th>Nhóm dữ liệu</th><th>Số lượng</th><th>Ví dụ mã gói</th></tr>
+<tr><td>Gói Internet</td><td>10</td><td>NETVT01_T, NETVT2_T, MESHVT1_T, MESHVT3_H...</td></tr>
+<tr><td>Gói Combo (Internet+TV/Camera)</td><td>5</td><td>NETVT2T_GIAITRIBOX, MESHVT1H_CAM1...</td></tr>
+<tr><td>SIM số mẫu</td><td>10</td><td>Giá cố định 60.000đ / 12 tháng</td></tr>
+<tr><td>Gói Data/5G</td><td>30</td><td>5G70, 5G150, 5G230B, 5G380B... (kèm biến thể 3/6/12 tháng)</td></tr>
+<tr><td>Gói Roaming (quốc tế)</td><td>~34</td><td>IRU1, TQ5, THAI5, HQ5, UAE5, ASEAN5...</td></tr>
+<tr><td>Gói HOT / Mạng xã hội / Siêu ưu đãi</td><td>~32</td><td>ST7K, 5G10, FB5K, YT5K, V25B, MI7D...</td></tr>
+<tr><td>Gói Tặng</td><td>0</td><td>Chưa có dữ liệu demo</td></tr>
+</table>
+
+<h2>4.5. Trạng thái đơn hàng &amp; quy tắc số điện thoại</h2>
+<p>4 trạng thái thống nhất toàn hệ thống: <b>Hoàn thành</b> · <b>Đang thực hiện</b> · <b>Đang triển khai</b> · <b>Đã hủy</b>. Quy tắc số điện thoại hợp lệ: đầu số 03/05/07/08/09, đủ 10 chữ số &mdash; áp dụng khi khách hàng đăng nhập và khi NVKD tạo CTV mới (không áp dụng khi NVKD/CTV tự đăng nhập).</p>
+
+<div class="page-break"></div>
+<h1>5. CÁC TRANG SẢN PHẨM LIÊN QUAN</h1>
+<h3>5.1. Trang Internet / Truyền hình</h3>
+<p>4 tab con: Gói Internet, Mesh Wifi tốc độ cao, Combo Internet&ndash;Truyền hình, Combo Internet&ndash;Camera. Mỗi gói có 2 nút: "Đăng ký" (hiện khối xác nhận minh hoạ) và "Chi tiết gói cước" (mở modal đầy đủ thông tin).</p>
+<h3>5.2. Trang Di động / Sim số</h3>
+<p>Thanh chọn nhanh dịch vụ di động (Gói cước di động, Dịch vụ SIM số, Dịch vụ GTGT, Dịch vụ quốc tế), toggle Trả trước/Trả sau, tìm kiếm số theo chuỗi con, bảng danh sách số mẫu.</p>
+<h3>5.3. Trang Data/5G</h3>
+<p>6 danh mục: Gói HOT, Gói 5G (mặc định), Miễn phí MXH, Siêu ưu đãi thoại/data, Gói roaming, Gói tặng (chưa có dữ liệu) &mdash; mỗi danh mục có bộ lọc thời hạn và sắp xếp theo giá riêng.</p>
+<h3>5.4. Modal "Chi tiết gói cước"</h3>
+<p>Dùng chung cho mọi loại gói ở mọi trang, hiển thị tối đa 12 trường thông tin (chỉ hiện trường nào có dữ liệu), khối "Quyền lợi khi đăng ký" và khối chia sẻ link/QR (chỉ hiện khi đang đăng nhập vai trò NVKD/CTV).</p>
+
+<div class="page-break"></div>
+<h1>6. CẢNH BÁO KỸ THUẬT &mdash; CÁC VẤN ĐỀ CẦN XỬ LÝ</h1>
+<p>Danh sách dưới đây liệt kê các điểm code thực tế <b>khác với</b> mô tả nghiệp vụ mong muốn, xếp theo mức độ ưu tiên xử lý.</p>
+
+<table>
+<tr><th style="width:8%;">Mức độ</th><th style="width:26%;">Vấn đề</th><th>Mô tả</th></tr>
+<tr><td class="tag-red">Nghiêm trọng</td><td>Ghi nhận đơn hàng tự động không hoạt động</td><td>Hàm xử lý khi khách hàng bấm "Đăng ký" qua link giới thiệu (<span class="mono">recordReferredOrder</span>) gọi tới 3 hàm/biến chưa từng được định nghĩa trong code (<span class="mono">genMonthlySales</span>, <span class="mono">TECHNICIAN_NAMES</span>, <span class="mono">_monthlySalesCache</span>). Hậu quả: khi khách bấm "Đăng ký", trình duyệt phát sinh lỗi và đơn hàng <b>không được ghi nhận vào dashboard</b> của NVKD/CTV &mdash; đây là chức năng trọng tâm của cả tính năng Link Phân Kênh nhưng hiện chưa chạy được, cần đội Dev vá lại trước khi demo cho khách hàng thật.</td></tr>
+<tr><td class="tag-red">Nghiêm trọng</td><td>Chưa có tính năng "Tỷ lệ chia sẻ hoa hồng"</td><td>Mô tả nghiệp vụ mong muốn NVKD cấu hình % hoa hồng cho từng CTV (mặc định 50%), nhưng trong code hiện tại <b>không hề có</b> trường dữ liệu, biểu mẫu nhập liệu hay công thức tính liên quan đến hoa hồng, ở cả phía NVKD lẫn CTV. Dashboard hiện chỉ hiển thị "Doanh số", chưa có "Hoa hồng được nhận".</td></tr>
+<tr><td class="tag-yellow">Trung bình</td><td>Mã gói ví dụ không khớp dữ liệu thật</td><td>Chỉ có mã <span class="mono">5G230B</span> tồn tại thật trong 121 mã gói. "Liên kết nhanh" của CTV/NVKD thực tế hoạt động theo 12 <b>dịch vụ</b> (<span class="mono">?DV=</span>), không phải theo từng mã gói cước cụ thể.</td></tr>
+<tr><td class="tag-yellow">Trung bình</td><td>Xác thực OTP không nhất quán</td><td>Luồng đăng nhập của Khách hàng/NVKD/CTV chấp nhận <b>bất kỳ mã 6 số nào</b> (không so khớp thật), trong khi luồng NVKD tạo CTV mới lại <b>có</b> so khớp mã OTP thật. Cần thống nhất lại hành vi trước khi bàn giao.</td></tr>
+<tr><td class="tag-yellow">Trung bình</td><td>File main.js không được sử dụng</td><td>Thuộc kiến trúc/phiên bản cũ (tham số <span class="mono">?ref=</span>, gọi API ngoài <span class="mono">api.qrserver.com</span>, đếm ngược lưu localStorage), không liên quan đến <span class="mono">index.html</span> hiện tại. Nên loại bỏ khỏi thư mục hoặc ghi chú rõ để tránh nhầm lẫn khi bàn giao/bảo trì.</td></tr>
+<tr><td class="tag-yellow">Trung bình</td><td>Toggle Trả trước/Trả sau không lọc dữ liệu</td><td>Ở trang Sim số, toggle chỉ đổi nhãn hiển thị, danh sách 10 số mẫu luôn giữ nguyên bất kể lựa chọn nào.</td></tr>
+<tr><td class="tag-yellow">Trung bình</td><td>Dropdown "Chọn gói cước chính" không hoạt động</td><td>Không gắn sự kiện xử lý khi chọn; 4 mã gói liệt kê trong dropdown cũng không khớp với danh mục gói chính thức.</td></tr>
+<tr><td class="tag-green">Thấp</td><td>"Quyền lợi khi đăng ký" là nội dung tĩnh</td><td>4 dòng quyền lợi hiển thị giống hệt nhau cho mọi gói cước, chưa tuỳ biến theo từng gói.</td></tr>
+<tr><td class="tag-green">Thấp</td><td>Vị trí Huy hiệu tin cậy</td><td>Hiển thị ở góc dưới&ndash;bên trái màn hình (không phải góc phải như một số mô tả trước đây) &mdash; cần đối chiếu lại với yêu cầu thiết kế UI gốc.</td></tr>
+<tr><td class="tag-green">Thấp</td><td>Đếm ngược hiệu lực Huy hiệu không lưu trạng thái</td><td>Mỗi lần huy hiệu được gọi lại (kể cả do NVKD/CTV tự xem trước) sẽ tự reset lại 2000 giây từ đầu.</td></tr>
+<tr><td class="tag-green">Thấp</td><td>Ảnh đại diện chỉ lưu tạm trên trình duyệt</td><td>Ảnh tải lên (NVKD, từng CTV) dùng cơ chế đọc file tạm thời, sẽ mất khi tải lại trang &mdash; chưa có lưu trữ phía máy chủ.</td></tr>
+</table>
+
+<h1>7. KHUYẾN NGHỊ CHO ĐỘI DEV</h1>
+<ol>
+<li><b>Ưu tiên 1:</b> Viết lại hàm ghi nhận đơn hàng giới thiệu để không còn gọi tới các hàm/biến chưa định nghĩa; hợp nhất đơn hàng giới thiệu vào cùng luồng dữ liệu đang dùng để tính doanh số/đơn hàng trên dashboard, để đơn hàng mới thực sự hiển thị cho NVKD/CTV.</li>
+<li><b>Ưu tiên 2:</b> Làm rõ với BA/Khách hàng nội bộ xem tính năng "Tỷ lệ chia sẻ hoa hồng" có còn là yêu cầu chính thức hay không &mdash; nếu có, cần bổ sung trường dữ liệu ở CTV, biểu mẫu nhập ở NVKD, và khối hiển thị "Hoa hồng được nhận" ở dashboard CTV; nếu không, cần cập nhật lại tài liệu mô tả nghiệp vụ cho khớp thực tế.</li>
+<li>Thống nhất lại cơ chế xác thực OTP (nên xác thực thật ở tất cả các luồng, hoặc ghi rõ đây là hành vi demo có chủ đích).</li>
+<li>Xem xét loại bỏ <span class="mono">main.js</span> khỏi thư mục dự án nếu không còn dùng, để tránh nhầm lẫn khi bảo trì về sau.</li>
+<li>Hoàn thiện các UI còn dang dở: lọc Trả trước/Trả sau theo đúng loại thuê bao, gắn sự kiện cho dropdown "Chọn gói cước chính", cá nhân hoá nội dung "Quyền lợi khi đăng ký" theo từng gói.</li>
+<li>Khi tính năng được đưa vào môi trường thật, cần thay toàn bộ cơ chế lưu dữ liệu tạm trên trình duyệt (danh sách CTV, đơn hàng, ảnh đại diện) bằng kết nối Google Sheets/Database thật theo đúng kiến trúc chuẩn của dự án Viettel Tammi.</li>
+</ol>
+
+<div class="page-break"></div>
+<h1>8. PHỤ LỤC &mdash; DANH SÁCH HÀM JAVASCRIPT QUAN TRỌNG</h1>
+<table>
+<tr><th>Nhóm</th><th>Hàm</th><th>Vai trò</th></tr>
+<tr><td>Dữ liệu/Danh mục</td><td class="mono">findPkgLocation(ma)</td><td>Tra vị trí (trang/tab/danh mục) của 1 mã gói phục vụ tham số <span class="mono">?SP=</span></td></tr>
+<tr><td>Đăng ký minh hoạ</td><td class="mono">showInternetSummary, showDataSummary</td><td>Hiện khối xác nhận minh hoạ + gọi ghi nhận đơn nếu có người giới thiệu</td></tr>
+<tr><td>Modal chi tiết gói</td><td class="mono">openPackageDetailModal, closePkgDetailModal</td><td>Modal dùng chung mọi loại gói cước</td></tr>
+<tr><td>OTP khách hàng/NVKD/CTV</td><td class="mono">sendOtp</td><td>OTP không xác thực thật (chấp nhận mọi mã 6 số)</td></tr>
+<tr><td>OTP tạo CTV</td><td class="mono">OtpModal</td><td>OTP có xác thực thật</td></tr>
+<tr><td>Quản lý CTV</td><td class="mono">createCtvRecord, openCtvEditModal, toggleCtvStatus, deleteCtvRecord</td><td>CRUD danh sách CTV</td></tr>
+<tr><td>Xử lý người giới thiệu</td><td class="mono">resolveReferrer, renderTrustBadge, initReferralFromUrl</td><td>Xử lý tham số URL + hiển thị Huy hiệu tin cậy</td></tr>
+<tr><td>Ghi nhận đơn (đang lỗi)</td><td class="mono">recordReferredOrder</td><td>Gọi hàm chưa định nghĩa &rarr; lỗi runtime</td></tr>
+<tr><td>Số liệu minh hoạ</td><td class="mono">collectOrders, aggregateSales</td><td>Sinh dữ liệu đơn hàng/doanh số bằng công thức có seed</td></tr>
+<tr><td>Dashboard NVKD</td><td class="mono">renderStaffOverview, renderOrdersTable</td><td>Tổng quan + bảng đơn hàng</td></tr>
+<tr><td>Dashboard CTV</td><td class="mono">renderCtvSelfOverview, renderCtvQuickLinks</td><td>Tổng quan + liên kết nhanh</td></tr>
+<tr><td>Xuất báo cáo</td><td class="mono">exportSalesCSV, exportOrdersCSV</td><td>2 loại CSV: tổng hợp và chi tiết đơn hàng</td></tr>
+<tr><td>Biểu đồ</td><td class="mono">renderTrendChart, renderContributionChart, renderServiceTypeChart</td><td>3 biểu đồ SVG tự vẽ, có tooltip</td></tr>
+<tr><td>Mã QR</td><td class="mono">qrSvg, downloadQrPng</td><td>Vẽ QR ngay trong trình duyệt (không gọi API ngoài) + xuất PNG</td></tr>
+</table>
+
+<p style="margin-top:30px;font-size:9pt;color:#999;text-align:center;">&mdash; Hết tài liệu &mdash;</p>
+
+</div>
+</body>
+</html>

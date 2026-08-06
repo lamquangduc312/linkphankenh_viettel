@@ -1,0 +1,709 @@
+Created At: 2026-07-06T04:05:05Z
+Completed At: 2026-07-06T04:05:06Z
+File Path: `file:///G:/VIETTEL%20TAMMI/C%C4%90BR+D%C4%90_PYC%20Link%20phan%20kenh/Viettel_Portal_LPK/index.html`
+Total Lines: 6358
+Total Bytes: 247746
+Showing lines 4300 to 5000
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+4300:   });
+4301: });
+4302: 
+4303: document.getElementById('chon-so-khac').addEventListener('click', () => {
+4304:   simSearchTerm = '';
+4305:   document.getElementById('sim-search').value = '';
+4306:   renderSimTable();
+4307: });
+4308: 
+4309: /* ---------- Nút pill trên banner "Dịch vụ di động" ---------- */
+4310: document.querySelectorAll('.hero-pill').forEach(pill => {
+4311:   pill.addEventListener('click', () => {
+4312:     const target = pill.dataset.target;
+4313:     const note = document.getElementById('hero-pill-note');
+4314:     note.style.display = 'none';
+4315: 
+4316:     if(target === 'sim-so'){
+4317:       document.getElementById('sim-so').scrollIntoView({behavior:'smooth', block:'start'});
+4318:     } else if(target === 'goi-cuoc' || target === 'quoc-te'){
+4319:       switchToPage('page-data');
+4320:       window.scrollTo({top:0, behavior:'smooth'});
+4321:       const catKey = target === 'goi-cuoc' ? '5g' : 'roaming';
+4322:       document.querySelector(`.data-cat-tab[data-cat="${catKey}"]`)?.click();
+4323:     } else {
+4324:       note.textContent = 'Dịch vụ GTGT chưa có dữ liệu demo — chỉ Gói cước di động, SIM số và Dịch vụ quốc tế (roaming) được tổng hợp từ ảnh chụp màn hình bạn cung cấp.';
+4325:       note.style.display = 'block';
+4326:     }
+4327:   });
+4328: });
+4329: 
+4330: /* ======================================================
+4331:    ĐĂNG NHẬP THEO SỐ ĐIỆN THOẠI (mô phỏng OTP)
+4332:    Lưu ý: đây là trang demo tĩnh, KHÔNG có backend/API SMS
+4333:    thật. Mã OTP được sinh ngẫu nhiên phía trình duyệt và
+4334:    hiển thị công khai trong khung "demo hint" để có thể
+4335:    test luồng mà không cần tổng đài SMS thật. Tuyệt đối
+4336:    không dùng cách này cho môi trường production.
+4337:    ====================================================== */
+4338: (function(){
+4339:   const overlay = document.getElementById('login-overlay');
+4340:   const stepPhone = document.getElementById('step-phone');
+4341:   const stepOtp = document.getElementById('step-otp');
+4342:   const stepSuccess = document.getElementById('step-success');
+4343: 
+4344:   const phoneInput = document.getElementById('login-phone');
+4345:   const phoneClear = document.getElementById('login-phone-clear');
+4346:   const phoneError = document.getElementById('login-phone-error');
+4347:   const btnSendOtp = document.getElementById('btn-send-otp');
+4348: 
+4349:   const otpBoxesWrap = document.getElementById('otp-boxes');
+4350:   const otpBoxes = Array.from(document.querySelectorAll('.otp-box'));
+4351:   const otpPhoneDisplay = document.getElementById('login-otp-phone-display');
+4352:   const otpError = document.getElementById('login-otp-error');
+4353:   const demoHint = document.getElementById('login-demo-hint');
+4354:   const resendEl = document.getElementById('otp-resend');
+4355:   const expireCountEl = document.getElementById('otp-expire-count');
+4356:   const btnOtpCancel = document.getElementById('btn-otp-cancel');
+4357:   const btnOtpConfirm = document.getElementById('btn-otp-confirm');
+4358: 
+4359:   const loginBtn = document.getElementById('btn-open-login');
+4360:   const loginAltNote = document.getElementById('login-alt-note');
+4361:   const loginSuccessMsg = document.getElementById('login-success-msg');
+4362:   const btnLoginDone = document.getElementById('btn-login-done');
+4363: 
+4364:   const PHONE_REGEX = /^0(3|5|7|8|9)[0-9]{8}$/;
+4365:   const RESEND_SECONDS = 57;
+4366:   const EXPIRE_SECONDS = 4 * 60 + 57; // 4:57
+4367: 
+4368:   let demoOtp = '';
+4369:   let resendTimer = null;
+4370:   let expireTimer = null;
+4371:   let resendLeft = 0;
+4372:   let expireLeft = 0;
+4373:   let loggedInPhone = null;
+4374: 
+4375:   function genOtp(){
+4376:     return String(Math.floor(100000 + Math.random() * 900000));
+4377:   }
+4378: 
+4379:   function formatMMSS(totalSec){
+4380:     const m = Math.floor(totalSec / 60);
+4381:     const s = totalSec % 60;
+4382:     return m + ':' + String(s).padStart(2, '0');
+4383:   }
+4384: 
+4385:   function showStep(step){
+4386:     [stepPhone, stepOtp, stepSuccess].forEach(s => s.style.display = 'none');
+4387:     step.style.display = 'block';
+4388:     if(step === stepSuccess) replaySuccessIcoAnim(step);
+4389:   }
+4390: 
+4391:   function openModal(preferredService){
+4392:     overlay.classList.add('show');
+4393:     // Mặc định chọn tab dịch vụ theo trang hiện tại đang xem (trang Hỗ trợ nhân viên -> mặc định tab Nhân viên KD)
+4394:     const currentPage = document.querySelector('.page.active')?.id;
+4395:     document.querySelectorAll('.login-service-tab').forEach(t => t.classList.remove('active'));
+4396:     let wantService = preferredService;
+4397:     if(!wantService){
+4398:       if(currentPage === 'page-staff') wantService = 'nvkd';
+4399:       else if(currentPage === 'page-sim' || currentPage === 'page-data') wantService = 'di-dong';
+4400:       else wantService = 'internet-tv';
+4401:     }
+4402:     const targetTab = document.querySelector(`.login-service-tab[data-service="${wantService}"]`)
+4403:       || document.querySelector('.login-service-tab');
+4404:     targetTab.classList.add('active');
+4405:     showStep(stepPhone);
+4406:     phoneError.textContent = '';
+4407:   }
+4408: 
+4409:   function closeModal(){
+4410:     overlay.classList.remove('show');
+4411:     stopTimers();
+4412:   }
+4413: 
+4414:   function resetPhoneStep(){
+4415:     phoneInput.value = '';
+4416:     phoneClear.style.display = 'none';
+4417:     btnSendOtp.disabled = true;
+4418:     phoneError.textContent = '';
+4419:   }
+4420: 
+4421:   function stopTimers(){
+4422:     if(resendTimer){ clearInterval(resendTimer); resendTimer = null; }
+4423:     if(expireTimer){ clearInterval(expireTimer); expireTimer = null; }
+4424:   }
+4425: 
+4426:   function renderResendCounting(sec){
+4427:     resendEl.innerHTML = `Gửi lại OTP (<b>${sec}</b>s)`;
+4428:   }
+4429: 
+4430:   function startResendTimer(){
+4431:     resendLeft = RESEND_SECONDS;
+4432:     resendEl.classList.remove('resend-active');
+4433:     renderResendCounting(resendLeft);
+4434:     if(resendTimer) clearInterval(resendTimer);
+4435:     resendTimer = setInterval(() => {
+4436:       resendLeft--;
+4437:       if(resendLeft <= 0){
+4438:         clearInterval(resendTimer);
+4439:         resendTimer = null;
+4440:         resendEl.textContent = 'Gửi lại OTP';
+4441:         resendEl.classList.add('resend-active');
+4442:       } else {
+4443:         renderResendCounting(resendLeft);
+4444:       }
+4445:     }, 1000);
+4446:   }
+4447: 
+4448:   function startExpireTimer(){
+4449:     expireLeft = EXPIRE_SECONDS;
+4450:     expireCountEl.textContent = formatMMSS(expireLeft);
+4451:     if(expireTimer) clearInterval(expireTimer);
+4452:     expireTimer = setInterval(() => {
+4453:       expireLeft--;
+4454:       if(expireLeft <= 0){
+4455:         clearInterval(expireTimer);
+4456:         expireTimer = null;
+4457:         expireCountEl.textContent = '0:00';
+4458:         otpError.textContent = 'Mã OTP đã hết hạn. Vui lòng bấm "Gửi lại OTP".';
+4459:         otpBoxes.forEach(b => b.disabled = true);
+4460:         btnOtpConfirm.disabled = true;
+4461:       } else {
+4462:         expireCountEl.textContent = formatMMSS(expireLeft);
+4463:       }
+4464:     }, 1000);
+4465:   }
+4466: 
+4467:   function sendOtp(){
+4468:     demoOtp = genOtp();
+4469:     otpPhoneDisplay.textContent = phoneInput.value;
+4470:     demoHint.innerHTML = `Đây là bản demo (không gửi SMS thật). Mã OTP của bạn là: <b>${demoOtp}</b>`;
+4471:     otpError.textContent = '';
+4472:     otpBoxes.forEach(b => { b.value = ''; b.disabled = false; });
+4473:     btnOtpConfirm.disabled = true;
+4474:     showStep(stepOtp);
+4475:     startResendTimer();
+4476:     startExpireTimer();
+4477:     setTimeout(() => otpBoxes[0].focus(), 50);
+4478:   }
+4479: 
+4480:   function getOtpValue(){
+4481:     return otpBoxes.map(b => b.value).join('');
+4482:   }
+4483: 
+4484:   function checkOtpComplete(){
+4485:     const val = getOtpValue();
+4486:     btnOtpConfirm.disabled = val.length !== 6;
+4487:   }
+4488: 
+4489:   function setLoggedIn(phone){
+4490:     loggedInPhone = phone;
+4491:     const masked = phone.slice(0, 4) + '***' + phone.slice(-2);
+4492:     loginBtn.outerHTML = `
+4493:       <button class="user-chip" id="btn-open-login">
+4494:         <span class="avatar">${phone.slice(-2)}</span>${masked}
+4495:       </button>`;
+4496:     bindLoginButton();
+4497:     document.body.classList.add('is-logged-in');
+4498:   }
+4499: 
+4500:   function setLoggedOut(){
+4501:     loggedInPhone = null;
+4502:     const chip = document.getElementById('btn-open-login');
+4503:     if(chip){
+4504:       chip.outerHTML = `<button class="login-btn" id="btn-open-login">Đăng nhập</button>`;
+4505:       bindLoginButton();
+4506:     }
+4507:     document.body.classList.remove('is-logged-in');
+4508:   }
+4509: 
+4510:   function bindLoginButton(){
+4511:     const btn = document.getElementById('btn-open-login');
+4512:     btn.addEventListener('click', () => {
+4513:       if(loggedInPhone){
+4514:         setLoggedOut();
+4515:       } else {
+4516:         openModal();
+4517:       }
+4518:     });
+4519:   }
+4520: 
+4521:   /* ---- Sự kiện: bước 1 - số điện thoại ---- */
+4522:   phoneInput.addEventListener('input', () => {
+4523:     phoneInput.value = phoneInput.value.replace(/[^0-9]/g, '');
+4524:     phoneClear.style.display = phoneInput.value ? 'block' : 'none';
+4525:     const valid = PHONE_REGEX.test(phoneInput.value);
+4526:     btnSendOtp.disabled = !valid;
+4527:     phoneInput.classList.toggle('invalid', phoneInput.value.length >= 10 && !valid);
+4528:     phoneError.textContent = (phoneInput.value.length >= 10 && !valid)
+4529:       ? 'Số điện thoại không đúng định dạng (VD: 0989xxxxxx).' : '';
+4530:   });
+4531:   phoneClear.addEventListener('click', () => {
+4532:     resetPhoneStep();
+4533:     phoneInput.focus();
+4534:   });
+4535:   btnSendOtp.addEventListener('click', () => {
+4536:     if(!PHONE_REGEX.test(phoneInput.value)){
+4537:       phoneError.textContent = 'Vui lòng nhập số điện thoại hợp lệ.';
+4538:       return;
+4539:     }
+4540:     sendOtp();
+4541:   });
+4542:   phoneInput.addEventListener('keydown', (e) => {
+4543:     if(e.key === 'Enter' && !btnSendOtp.disabled) sendOtp();
+4544:   });
+4545: 
+4546:   document.querySelectorAll('.login-service-tab').forEach(tab => {
+4547:     tab.addEventListener('click', () => {
+4548:       document.querySelectorAll('.login-service-tab').forEach(t => t.classList.remove('active'));
+4549:       tab.classList.add('active');
+4550:     });
+4551:   });
+4552: 
+4553:   document.getElementById('btn-login-password').addEventListener('click', () => {
+4554:     loginAltNote.textContent = 'Đăng nhập bằng mật khẩu không khả dụng trong bản demo — vui lòng dùng OTP.';
+4555:   });
+4556:   document.getElementById('btn-login-qr').addEventListener('click', () => {
+4557:     loginAltNote.textContent = 'Đăng nhập bằng QR Code không khả dụng trong bản demo — vui lòng dùng OTP.';
+4558:   });
+4559: 
+4560:   /* ---- Sự kiện: bước 2 - mã OTP ---- */
+4561:   otpBoxes.forEach((box, idx) => {
+4562:     box.addEventListener('input', () => {
+4563:       box.value = box.value.replace(/[^0-9]/g, '').slice(0, 1);
+4564:       if(box.value && idx < otpBoxes.length - 1) otpBoxes[idx + 1].focus();
+4565:       otpError.textContent = '';
+4566:       checkOtpComplete();
+4567:     });
+4568:     box.addEventListener('keydown', (e) => {
+4569:       if(e.key === 'Backspace' && !box.value && idx > 0) otpBoxes[idx - 1].focus();
+4570:       if(e.key === 'Enter' && !btnOtpConfirm.disabled) btnOtpConfirm.click();
+4571:     });
+4572:     box.addEventListener('paste', (e) => {
+4573:       const text = (e.clipboardData.getData('text') || '').replace(/[^0-9]/g, '').slice(0, 6);
+4574:       if(text.length === 6){
+4575:         e.preventDefault();
+4576:         otpBoxes.forEach((b, i) => b.value = text[i] || '');
+4577:         checkOtpComplete();
+4578:         otpBoxes[5].focus();
+4579:       }
+4580:     });
+4581:   });
+4582: 
+4583:   resendEl.addEventListener('click', () => {
+4584:     if(!resendEl.classList.contains('resend-active')) return;
+4585:     sendOtp(); // sinh OTP mới + reset cả 2 bộ đếm
+4586:   });
+4587: 
+4588:   document.getElementById('login-back').addEventListener('click', () => {
+4589:     stopTimers();
+4590:     showStep(stepPhone);
+4591:   });
+4592: 
+4593:   btnOtpCancel.addEventListener('click', closeModal);
+4594: 
+4595:   btnOtpConfirm.addEventListener('click', () => {
+4596:     const entered = getOtpValue();
+4597:     if(entered.length !== 6) return;
+4598:     if(entered === demoOtp){
+4599:       stopTimers();
+4600:       const role = document.querySelector('.login-service-tab.active')?.dataset.service;
+4601:       if(role === 'nvkd'){
+4602:         loginSuccessMsg.innerHTML = `Chào mừng Nhân viên kinh doanh! Số điện thoại <b>${phoneInput.value}</b> đã xác thực thành công.`;
+4603:       } else if(role === 'ctv'){
+4604:         loginSuccessMsg.innerHTML = `Chào mừng Cộng tác viên! Số điện thoại <b>${phoneInput.value}</b> đã xác thực thành công.`;
+4605:       } else {
+4606:         loginSuccessMsg.innerHTML = `Chào mừng bạn! Số điện thoại <b>${phoneInput.value}</b> đã đăng nhập thành công.`;
+4607:       }
+4608:       showStep(stepSuccess);
+4609:     } else {
+4610:       otpError.textContent = 'Mã OTP không đúng. Vui lòng kiểm tra lại.';
+4611:       otpBoxes.forEach(b => b.value = '');
+4612:       otpBoxes[0].focus();
+4613:       btnOtpConfirm.disabled = true;
+4614:     }
+4615:   });
+4616: 
+4617:   btnLoginDone.addEventListener('click', () => {
+4618:     const phone = phoneInput.value;
+4619:     const role = document.querySelector('.login-service-tab.active')?.dataset.service;
+4620:     closeModal();
+4621:     resetPhoneStep();
+4622:     // NVKD/CTV dùng chung ô "Đăng nhập" nhưng dẫn vào Kênh Hỗ trợ nhân viên (page-staff) thay vì
+4623:     // đăng nhập khách hàng thông thường — logic đăng nhập NVKD/CTV nằm ở khối script riêng
+4624:     // (window.StaffPortal), tách biệt để không lẫn với state đăng nhập khách hàng ở trên.
+4625:     if(role === 'nvkd'){
+4626:       window.StaffPortal?.loginStaff();
+4627:     } else if(role === 'ctv'){
+4628:       window.StaffPortal?.loginCtv(phone);
+4629:     } else {
+4630:       setLoggedIn(phone);
+4631:     }
+4632:   });
+4633: 
+4634:   /* ---- Đóng modal ---- */
+4635:   document.getElementById('login-close').addEventListener('click', closeModal);
+4636:   overlay.addEventListener('click', (e) => {
+4637:     if(e.target === overlay) closeModal();
+4638:   });
+4639:   document.addEventListener('keydown', (e) => {
+4640:     if(e.key === 'Escape' && overlay.classList.contains('show')) closeModal();
+4641:   });
+4642: 
+4643:   bindLoginButton();
+4644: 
+4645:   // Nút "Đăng nhập ngay" ở trạng thái khoá của trang Hỗ trợ nhân viên: mở CHÍNH modal đăng
+4646:   // nhập này (mặc định tab "Nhân viên KD"), thay vì có một modal đăng nhập riêng cho NVKD/CTV.
+4647:   document.getElementById('btn-open-login-from-staff')?.addEventListener('click', () => openModal('nvkd'));
+4648: 
+4649:   // Các mục trong dropdown "Hỗ trợ khách hàng"/"My Viettel" chỉ là minh hoạ, chặn nhảy trang khi click
+4650:   document.querySelectorAll('.dropdown-col a').forEach(a => {
+4651:     a.addEventListener('click', (e) => e.preventDefault());
+4652:   });
+4653: })();
+4654: </script>
+4655: 
+4656: <script>
+4657: /* ======================================================
+4658:    KÊNH NHÂN VIÊN KINH DOANH ĐỊA BÀN (demo)
+4659:    - Đăng nhập NVKD bằng OTP (dùng chung modal OtpModal tái sử dụng bên dưới,
+4660:      đồng thời phục vụ luôn bước "Tạo cộng tác viên mới" để tránh lặp code đếm
+4661:      ngược Gửi lại OTP / OTP hết hạn đã viết cho modal đăng nhập khách hàng).
+4662:    - Tổng quan kết quả bán hàng: bộ lọc nhanh Tháng này / Tháng trước / 3 tháng / 12 tháng,
+4663:      áp dụng cho cả doanh số cá nhân NVKD lẫn từng CTV trực thuộc.
+4664:    - Quản lý CTV: tạo mới (SĐT + Họ tên + OTP) -> sinh mã/liên kết giới thiệu + mã QR,
+4665:      cho phép cập nhật ảnh đại diện.
+4666:    - Xuất báo cáo CSV: toàn bộ hoặc theo từng CTV.
+4667:    - Huy hiệu "đang xem qua liên kết giới thiệu" hiển thị ở mọi trang khi bấm "Xem trang liên kết".
+4668:    Toàn bộ dữ liệu (nhân viên, danh sách CTV, số liệu bán hàng) đều là DỮ LIỆU DEMO
+4669:    sinh ngẫu nhiên có seed (không lấy từ hệ thống thật của Viettel).
+4670:    ====================================================== */
+4671: (function(){
+4672: 
+4673:   const PHONE_REGEX = /^0(3|5|7|8|9)[0-9]{8}$/;
+4674: 
+4675:   /* ---------- Seeded RNG (mulberry32) — để số liệu demo ổn định giữa các lần render ---------- */
+4676:   function mulberry32(seed){
+4677:     return function(){
+4678:       seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+4679:       let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+4680:       t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+4681:       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+4682:     };
+4683:   }
+4684:   function hashSeed(str){
+4685:     let h = 0;
+4686:     for(let i=0;i<str.length;i++){ h = (h*31 + str.charCodeAt(i)) | 0; }
+4687:     return h;
+4688:   }
+4689: 
+4690:   /* ---------- Vẽ mã QR dạng SVG từ chuỗi text (dùng thư viện QRCode nhúng offline phía trên) ---------- */
+4691:   function qrSvg(text, opts){
+4692:     opts = opts || {};
+4693:     const size = opts.size || 120;
+4694:     const margin = opts.margin != null ? opts.margin : 2;
+4695:     const qr = new QRCode(-1, QRCode.ErrorCorrectLevel.M);
+4696:     qr.addData(text);
+4697:     qr.make();
+4698:     const n = qr.getModuleCount();
+4699:     const cell = size / (n + margin * 2);
+4700:     let rects = '';
+4701:     for(let r=0;r<n;r++){
+4702:       for(let c=0;c<n;c++){
+4703:         if(qr.isDark(r,c)){
+4704:           const x = (c + margin) * cell, y = (r + margin) * cell;
+4705:           rects += `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${(cell+0.6).toFixed(2)}" height="${(cell+0.6).toFixed(2)}" fill="#1A1A1A"/>`;
+4706:         }
+4707:       }
+4708:     }
+4709:     return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg" style="background:#fff;border-radius:6px;">${rects}</svg>`;
+4710:   }
+4711: 
+4712:   /* ---------- Dữ liệu demo: hồ sơ NVKD + danh sách CTV trực thuộc ---------- */
+4713:   const STAFF_DEMO = {
+4714:     hoTen: 'Nguyễn Văn A',
+4715:     maNV: 'NVKD00123',
+4716:     diaBan: 'Địa bàn Quận 1, TP.HCM',
+4717:     tinhCode: 'HCM',   // mã viết tắt tỉnh/thành theo địa bàn (vd. Hà Nội = HNI, TP.HCM = HCM) — dùng để dựng link phân kênh
+4718:     email: 'AVN1',     // phần tên trước @ trong email nội bộ NVKD: Tên + chữ cái đầu Họ/Đệm + số thứ tự tránh trùng (cấp bởi phòng nhân sự)
+4719:     sdt: '0909000123', // số điện thoại liên hệ hiển thị cho khách hàng ở khối "Được giới thiệu bởi" (nút Gọi điện/Nhắn Zalo)
+4720:     avatar: null, // cập nhật được qua nút 📷 trong tab "Tài khoản của tôi", chỉ lưu tạm trong bộ nhớ trình duyệt
+4721:   };
+4722: 
+4723:   // Danh sách kênh phân phối theo từng dịch vụ — dùng chung 1 liên kết/mã QR định danh theo NVKD
+4724:   // (xem staffChannelNvCode), chỉ khác nhau ở trang dịch vụ mà nút "Xem trang dịch vụ" điều hướng tới.
+4725:   const NVKD_CHANNELS = [
+4726:     { key:'internet', label:'Internet / Truyền hình', icon:'🌐', page:'page-internet' },
+4727:     { key:'di-dong',  label:'Di động / Sim số',        icon:'📱', page:'page-sim' },
+4728:     { key:'data-5g',  label:'Gói cước Data/5G',        icon:'📶', page:'page-data' },
+4729:   ];
+4730: 
+4731:   // Mã định danh kênh giới thiệu của NVKD, đúng theo cấu trúc nghiệp vụ thật:
+4732:   // CNKD (cố định) + mã viết tắt địa bàn (tỉnh/thành) + email nội bộ (không gồm đuôi @...).
+4733:   // Không phân biệt theo dịch vụ (khác với CTV) vì đây là mã định danh NHÂN VIÊN, dùng chung cho mọi dịch vụ.
+4734:   function staffChannelNvCode(){
+4735:     return `CNKD_${STAFF_DEMO.tinhCode}_${STAFF_DEMO.email}`;
+4736:   }
+4737: 
+4738:   let ctvList = [
+4739:     { id:'ctv-001', hoTen:'Trần Thị B', sdt:'0912000111', ngayTaoISO:'2026-03-12', avatar:null, trangThai:'active' },
+4740:     { id:'ctv-002', hoTen:'Lê Văn C',   sdt:'0987000222', ngayTaoISO:'2026-04-02', avatar:null, trangThai:'active' },
+4741:     { id:'ctv-003', hoTen:'Phạm Thị D', sdt:'0977000333', ngayTaoISO:'2026-05-20', avatar:null, trangThai:'active' },
+4742:   ];
+4743: 
+4744:   // Liên kết phân kênh: mã NV truyền qua query string ?NV=
+4745:   // - CTV: dùng thẳng số điện thoại làm mã định danh (xem các lời gọi referralLink(ctv.sdt)).
+4746:   // - NVKD: dùng mã staffChannelNvCode() ở trên (CNKD_<tỉnh>_<email>).
+4747:   function referralLink(code){ return 'https://viettel.vn/vx/gioithieu?NV=' + code; }
+4748: 
+4749:   function initialsOf(name){
+4750:     const parts = name.trim().split(/\s+/);
+4751:     return (parts[parts.length-1][0] || '?').toUpperCase();
+4752:   }
+4753: 
+4754:   function formatVNDate(iso){
+4755:     const d = new Date(iso + 'T00:00:00');
+4756:     return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
+4757:   }
+4758: 
+4759:   function formatVND(n){ return Math.round(n).toLocaleString('vi-VN') + 'đ'; }
+4760: 
+4761:   /* ---------- Sinh số liệu bán hàng demo theo tháng (seed theo "personKey" để ổn định) ---------- */
+4762:   function monthKey(d){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'); }
+4763: 
+4764:   function lastNMonths(n){
+4765:     const now = new Date();
+4766:     const arr = [];
+4767:     for(let i=n-1;i>=0;i--){ arr.push(new Date(now.getFullYear(), now.getMonth() - i, 1)); }
+4768:     return arr; // arr[arr.length-1] = tháng hiện tại
+4769:   }
+4770:   const MONTHS_12 = lastNMonths(12);
+4771: 
+4772:   /* ---------- Dữ liệu tham chiếu để sinh đơn hàng chi tiết demo (khách hàng, dịch vụ, kỹ thuật viên) ---------- */
+4773:   const CUSTOMER_SURNAMES = ['Nguyễn','Trần','Lê','Phạm','Hoàng','Huỳnh','Phan','Vũ','Võ','Đặng','Bùi','Đỗ','Hồ','Ngô','Dương','Lý'];
+4774:   const CUSTOMER_GIVEN_NAMES = ['Văn An','Thị Bích','Minh Khoa','Thị Hoa','Đức Thắng','Thị Lan','Quốc Huy','Thị Mai','Anh Tuấn','Thị Ngọc','Hoàng Long','Thị Thu','Gia Bảo','Thị Hương','Xuân Sơn','Thị Linh'];
+4775:   const TECHNICIAN_NAMES = ['Trần Văn Hùng','Nguyễn Minh Tuấn','Lê Văn Đức','Phạm Quốc Bảo'];
+4776:   const SERVICE_TYPES = [
+4777:     { name:'Internet cáp quang', needInstall:true },
+4778:     { name:'Truyền hình', needInstall:true },
+4779:     { name:'Combo Internet - Truyền hình', needInstall:true },
+4780:     { name:'Di động trả trước (SIM)', needInstall:false },
+4781:     { name:'Di động trả sau (SIM)', needInstall:false },
+4782:     { name:'Gói cước Data/5G', needInstall:false },
+4783:     { name:'Gói Roaming', needInstall:false },
+4784:   ];
+4785:   const PHONE_PREFIXES_KH = ['090','091','093','094','070','079','077','088','098','097','096'];
+4786: 
+4787:   function pick(rng, arr){ return arr[Math.floor(rng() * arr.length)]; }
+4788: 
+4789:   function randomPhone(rng){
+4790:     let s = pick(rng, PHONE_PREFIXES_KH);
+4791:     for(let i=0;i<7;i++) s += Math.floor(rng()*10);
+4792:     return s;
+4793:   }
+4794: 
+4795:   // Trạng thái đơn hàng: đơn càng cũ (monthsAgo lớn) càng có xu hướng đã "Hoàn thành";
+4796:   // đơn của tháng hiện tại phần lớn vẫn đang xử lý — mô phỏng vòng đời đơn hàng thực tế.
+4797:   function pickOrderStatus(rng, monthsAgo){
+4798:     const pCancel = 0.08;
+4799:     const pDone = Math.min(0.85, 0.35 + monthsAgo * 0.045);
+4800:     const r = rng();
+4801:     if(r < pCancel) return 'Đã hủy';
+4802:     if(r < pCancel + pDone) return 'Hoàn thành';
+4803:     const half = pCancel + pDone + (1 - pCancel - pDone) / 2;
+4804:     return r < half ? 'Đang triển khai' : 'Đang thực hiện';
+4805:   }
+4806: 
+4807:   // personKey dạng 'ctv:<id>' -> tra cứu CTV tương ứng (tra cứu "sống" theo ctvList hiện tại,
+4808:   // để CTV vừa được tạo mới vẫn được nhận diện đúng tên/SĐT trong dữ liệu đơn hàng).
+4809:   function resolveCtvFromPersonKey(personKey){
+4810:     if(personKey.indexOf('ctv:') === 0){
+4811:       const id = personKey.slice(4);
+4812:       return ctvList.find(c => c.id === id) || null;
+4813:     }
+4814:     return null;
+4815:   }
+4816: 
+4817:   function genOrdersForMonth(rng, personKey, monthDate, monthsAgo, count){
+4818:     const ctv = resolveCtvFromPersonKey(personKey);
+4819:     // Với tháng hiện tại, chỉ sinh đơn hàng trong khoảng ngày 1 -> hôm nay (tránh đơn hàng bị
+4820:     // gán ngày trong tương lai của chính tháng đang chạy).
+4821:     const now = new Date();
+4822:     const isCurrentMonth = monthDate.getFullYear() === now.getFullYear() && monthDate.getMonth() === now.getMonth();
+4823:     const daysInMonth = isCurrentMonth ? now.getDate() : new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0).getDate();
+4824:     const orders = [];
+4825:     for(let i = 0; i < count; i++){
+4826:       const day = 1 + Math.floor(rng() * daysInMonth);
+4827:       const ngayISO = monthDate.getFullYear() + '-' + String(monthDate.getMonth() + 1).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+4828:       const svc = pick(rng, SERVICE_TYPES);
+4829:       const trangThai = pickOrderStatus(rng, monthsAgo);
+4830:       const giaTri = 150000 + Math.floor(rng() * 250000);
+4831:       const maDonHang = 'DH' + String(monthDate.getFullYear()).slice(2) + String(monthDate.getMonth() + 1).padStart(2,'0') + '-' + String(1000 + Math.floor(rng() * 9000));
+4832:       orders.push({
+4833:         maDonHang,
+4834:         ngay: ngayISO,
+4835:         ngaySort: new Date(ngayISO + 'T00:00:00').getTime(),
+4836:         loaiDichVu: svc.name,
+4837:         canLapDat: svc.needInstall,
+4838:         hoTenKhachHang: pick(rng, CUSTOMER_SURNAMES) + ' ' + pick(rng, CUSTOMER_GIVEN_NAMES),
+4839:         sdtKhachHang: randomPhone(rng),
+4840:         tenNVKD: STAFF_DEMO.hoTen,
+4841:         tenCTV: ctv ? ctv.hoTen : '',
+4842:         sdtCTV: ctv ? ctv.sdt : '',
+4843:         tenNVKyThuat: svc.needInstall ? pick(rng, TECHNICIAN_NAMES) : '',
+4844:         trangThai,
+4845:         giaTri,
+4846:         nguoiBanKey: personKey,
+4847:       });
+4848:     }
+4849:     return orders;
+4850:   }
+4851: 
+4852:   // Cache theo personKey vì genMonthlySales() giờ sinh cả danh sách đơn hàng chi tiết (tốn hơn
+4853:   // phép tính trực tiếp trước đây) và được gọi lại nhiều lần khi render lại dashboard/biểu đồ.
+4854:   const _monthlySalesCache = new Map();
+4855: 
+4856:   function genMonthlySales(personKey){
+4857:     if(_monthlySalesCache.has(personKey)) return _monthlySalesCache.get(personKey);
+4858:     const rng = mulberry32(hashSeed(personKey));
+4859:     const n = MONTHS_12.length;
+4860:     const result = MONTHS_12.map((d, idx) => {
+4861:       const monthsAgo = n - 1 - idx;
+4862:       const thueBaoMoi = 5 + Math.floor(rng() * 25); // số đơn hàng phát sinh trong tháng
+4863:       const orders = genOrdersForMonth(rng, personKey, d, monthsAgo, thueBaoMoi);
+4864:       // Doanh số ghi nhận CHỈ tính đơn đã "Hoàn thành" (đơn đang xử lý/đã hủy chưa ghi nhận doanh thu).
+4865:       const doanhSo = orders.filter(o => o.trangThai === 'Hoàn thành').reduce((s, o) => s + o.giaTri, 0);
+4866:       const hoaHong = Math.round(doanhSo * 0.08); // hoa hồng demo ~8% doanh số đã ghi nhận
+4867:       return { ym: monthKey(d), thueBaoMoi, doanhSo, hoaHong, orders };
+4868:     });
+4869:     _monthlySalesCache.set(personKey, result);
+4870:     return result;
+4871:   }
+4872: 
+4873:   function monthsForRange(rangeKey){
+4874:     if(rangeKey === 'thang-nay')   return MONTHS_12.slice(11, 12);
+4875:     if(rangeKey === 'thang-truoc') return MONTHS_12.slice(10, 11);
+4876:     if(rangeKey === '3-thang')     return MONTHS_12.slice(9, 12);
+4877:     return MONTHS_12.slice(0, 12); // '12-thang'
+4878:   }
+4879: 
+4880:   function aggregateSales(personKey, rangeKey, createdDate){
+4881:     const monthly = genMonthlySales(personKey);
+4882:     const wanted = new Set(monthsForRange(rangeKey).map(monthKey));
+4883:     const createdYm = createdDate ? monthKey(createdDate) : null;
+4884:     let doanhSo = 0, thueBaoMoi = 0, hoaHong = 0;
+4885:     monthly.forEach(m => {
+4886:       if(!wanted.has(m.ym)) return;
+4887:       if(createdYm && m.ym < createdYm) return; // CTV chưa tồn tại ở tháng đó -> chưa có doanh số
+4888:       doanhSo += m.doanhSo; thueBaoMoi += m.thueBaoMoi; hoaHong += m.hoaHong;
+4889:     });
+4890:     return { doanhSo, thueBaoMoi, hoaHong };
+4891:   }
+4892: 
+4893:   // Chuỗi số liệu theo từng tháng (dùng để vẽ biểu đồ xu hướng) — cùng logic "chưa tồn tại thì = 0"
+4894:   // như aggregateSales(), nhưng trả về đủ 12 điểm dữ liệu thay vì gộp thành 1 tổng.
+4895:   function monthlySeriesForChart(personKey, createdDate){
+4896:     const monthly = genMonthlySales(personKey);
+4897:     const createdYm = createdDate ? monthKey(createdDate) : null;
+4898:     return monthly.map(m => ({
+4899:       ym: m.ym,
+4900:       doanhSo: (createdYm && m.ym < createdYm) ? 0 : m.doanhSo,
+4901:     }));
+4902:   }
+4903: 
+4904:   // Gộp danh sách đơn hàng chi tiết (không chỉ tổng số) của 1 người trong 1 kỳ — dùng cho bảng
+4905:   // chi tiết đơn hàng + export CSV đơn hàng. Tôn trọng cùng quy tắc "CTV chưa tồn tại -> chưa có đơn".
+4906:   function collectOrders(personKey, rangeKey, createdDate){
+4907:     const monthly = genMonthlySales(personKey);
+4908:     const wanted = new Set(monthsForRange(rangeKey).map(monthKey));
+4909:     const createdYm = createdDate ? monthKey(createdDate) : null;
+4910:     let orders = [];
+4911:     monthly.forEach(m => {
+4912:       if(!wanted.has(m.ym)) return;
+4913:       if(createdYm && m.ym < createdYm) return;
+4914:       orders = orders.concat(m.orders);
+4915:     });
+4916:     return orders;
+4917:   }
+4918: 
+4919:   // Gộp đơn hàng của NVKD + toàn bộ CTV trực thuộc trong 1 kỳ, sắp xếp mới nhất trước.
+4920:   function collectAllOrdersForRange(rangeKey){
+4921:     let orders = collectOrders('staff', rangeKey, null);
+4922:     ctvList.forEach(c => {
+4923:       orders = orders.concat(collectOrders('ctv:' + c.id, rangeKey, new Date(c.ngayTaoISO)));
+4924:     });
+4925:     orders.sort((a, b) => b.ngaySort - a.ngaySort);
+4926:     return orders;
+4927:   }
+4928: 
+4929:   const RANGE_LABELS = {
+4930:     'thang-nay':'Tháng này', 'thang-truoc':'Tháng trước', '3-thang':'3 tháng gần nhất', '12-thang':'12 tháng gần nhất'
+4931:   };
+4932: 
+4933:   /* ---------- Tiện ích dùng chung cho biểu đồ ---------- */
+4934:   // Nhãn dữ liệu chưa tin cậy (họ tên CTV do người dùng tự nhập) -> luôn escape trước khi
+4935:   // chèn vào innerHTML, tránh lỗi hiển thị/HTML injection nếu tên chứa ký tự đặc biệt.
+4936:   function escapeHtml(s){
+4937:     return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+4938:   }
+4939: 
+4940:   // Rút gọn số tiền lớn để nhãn biểu đồ không bị dài (vd 9.271.104 -> "9,3tr")
+4941:   function formatCompact(n){
+4942:     const abs = Math.abs(n);
+4943:     if(abs >= 1000000) return (n/1000000).toFixed(1).replace(/\.0$/,'').replace('.', ',') + 'tr';
+4944:     if(abs >= 1000) return Math.round(n/1000) + 'k';
+4945:     return String(Math.round(n));
+4946:   }
+4947: 
+4948:   // Làm tròn trần lên một mốc "đẹp" (1/2/5 x 10^n) để chia trục Y biểu đồ đọc dễ hơn
+4949:   function niceCeil(v){
+4950:     if(v <= 0) return 1;
+4951:     const exp = Math.floor(Math.log10(v));
+4952:     const base = Math.pow(10, exp);
+4953:     const frac = v / base;
+4954:     const niceFrac = frac <= 1 ? 1 : frac <= 2 ? 2 : frac <= 5 ? 5 : 10;
+4955:     return niceFrac * base;
+4956:   }
+4957: 
+4958:   // Đặt tooltip biểu đồ theo vị trí con trỏ, giới hạn trong .chart-card cha để không tràn ra ngoài
+4959:   function positionTooltip(tooltip, anchorEl, evt){
+4960:     const card = anchorEl.closest('.chart-card') || anchorEl;
+4961:     const rect = card.getBoundingClientRect();
+4962:     let x = evt.clientX - rect.left + 14;
+4963:     const y = evt.clientY - rect.top - 12;
+4964:     const maxX = rect.width - tooltip.offsetWidth - 6;
+4965:     if(x > maxX) x = evt.clientX - rect.left - tooltip.offsetWidth - 14;
+4966:     tooltip.style.left = Math.max(4, x) + 'px';
+4967:     tooltip.style.top = Math.max(4, y) + 'px';
+4968:   }
+4969: 
+4970:   /* ---------- Bảng chi tiết đơn hàng: huy hiệu trạng thái + dòng bảng dùng chung ---------- */
+4971:   // Trạng thái không chỉ dựa vào màu (đủ điều kiện tương phản/không phân biệt màu) — luôn có nhãn chữ.
+4972:   const STATUS_BADGE_CLASS = {
+4973:     'Đang thực hiện': 'status-dang-thuc-hien',
+4974:     'Đang triển khai': 'status-dang-trien-khai',
+4975:     'Hoàn thành': 'status-hoan-thanh',
+4976:     'Đã hủy': 'status-da-huy',
+4977:   };
+4978:   function statusBadge(status){
+4979:     const cls = STATUS_BADGE_CLASS[status] || '';
+4980:     return `<span class="status-badge ${cls}">${escapeHtml(status)}</span>`;
+4981:   }
+4982: 
+4983:   // Dòng bảng đơn hàng dùng chung cho cả 2 nơi hiển thị (NVKD xem toàn đội / CTV xem của riêng mình).
+4984:   // showPersonCols=true -> hiển thị thêm cột NVKD + CTV (chỉ cần cho màn NVKD, vì màn CTV tự biết đó là mình).
+4985:   function orderRowHtml(o, showPersonCols){
+4986:     const personCols = showPersonCols
+4987:       ? `<td>${escapeHtml(o.tenNVKD)}</td><td>${o.tenCTV ? escapeHtml(o.tenCTV) + '<div class="ctv-meta">' + escapeHtml(o.sdtCTV) + '</div>' : '<span style="color:var(--text-muted);">— (bán trực tiếp)</span>'}</td>`
+4988:       : `<td>${escapeHtml(o.tenNVKD)}</td>`;
+4989:     return `
+4990:       <tr>
+4991:         <td>${escapeHtml(o.maDonHang)}</td>
+4992:         <td>${formatVNDate(o.ngay)}</td>
+4993:         <td>${escapeHtml(o.loaiDichVu)}</td>
+4994:         <td>${escapeHtml(o.hoTenKhachHang)}</td>
+4995:         <td>${escapeHtml(o.sdtKhachHang)}</td>
+4996:         ${personCols}
+4997:         <td>${o.tenNVKyThuat ? escapeHtml(o.tenNVKyThuat) : '<span style="color:var(--text-muted);">—</span>'}</td>
+4998:         <td>${statusBadge(o.trangThai)}</td>
+4999:         <td>${formatVND(o.giaTri)}</td>
+5000:       </tr>`;
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

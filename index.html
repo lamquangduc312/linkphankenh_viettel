@@ -1487,7 +1487,7 @@
             <thead>
               <tr>
                 <th>Số điện thoại</th><th>Nguồn giới thiệu</th><th>Lần ghé gần nhất</th><th>Số lần ghé</th>
-                <th>Dịch vụ đã xem</th><th>Phân loại</th><th>Khuyến nghị</th><th>Ghi chú</th><th>Hành động</th>
+                <th>Dịch vụ đã xem</th><th>Phân loại</th><th>Ghi chú</th><th>Hành động</th>
               </tr>
             </thead>
             <tbody id="staff-leads-table-body"></tbody>
@@ -1655,7 +1655,7 @@
             <thead>
               <tr>
                 <th>Số điện thoại</th><th>Lần ghé gần nhất</th><th>Số lần ghé</th>
-                <th>Dịch vụ đã xem</th><th>Phân loại</th><th>Khuyến nghị</th><th>Ghi chú</th><th>Hành động</th>
+                <th>Dịch vụ đã xem</th><th>Phân loại</th><th>Ghi chú</th><th>Hành động</th>
               </tr>
             </thead>
             <tbody id="ctv-leads-table-body"></tbody>
@@ -7537,8 +7537,7 @@ Vui lòng bấm nút "Tải về" để có bản chuẩn và hình ảnh chất
         <td>${formatVNDate(entry.lanCuoiISO.slice(0,10))}</td>
         <td>${entry.soLanGhe}</td>
         <td>${svcCell}</td>
-        <td>${leadBadgeHtml(kind)}</td>
-        <td style="font-size:12.5px;color:var(--text-muted);max-width:220px;">${escapeHtml(meta.khuyenNghi(entry))}${doneNote}</td>
+        <td>${leadBadgeHtml(kind)}${doneNote}</td>
         <td style="font-size:12.5px;max-width:240px;">${ghiChuCellHtml(entry)}</td>
         <td>
           <div class="lead-actions">

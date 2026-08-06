@@ -2387,6 +2387,7 @@ Vui lòng bấm nút "Tải về" để có bản chuẩn và hình ảnh chất
   // thêm cột "Nguồn giới thiệu" để phân biệt lead của chính mình hay của CTV nào. Số bị "loại trừ" ẩn hẳn
   // khỏi bảng (không chỉ gắn badge) đúng theo yêu cầu ban đầu.
   function leadRowHtml(entry, showSource){
+    if(!entry.sdt) return '';
     const kind = classifyVisitor(entry);
     if(kind === 'loai-tru') return '';
     const meta = LEAD_META[kind];
@@ -2410,8 +2411,7 @@ Vui lòng bấm nút "Tải về" để có bản chuẩn và hình ảnh chất
         <td>${formatVNDate(entry.lanCuoiISO.slice(0,10))}</td>
         <td>${entry.soLanGhe}</td>
         <td>${svcCell}</td>
-        <td>${leadBadgeHtml(kind)}</td>
-        <td style="font-size:12.5px;color:var(--text-muted);max-width:220px;">${escapeHtml(meta.khuyenNghi(entry))}${doneNote}</td>
+        <td>${leadBadgeHtml(kind)}${doneNote}</td>
         <td style="font-size:12.5px;max-width:240px;">${ghiChuCellHtml(entry)}</td>
         <td>
           <div class="lead-actions">

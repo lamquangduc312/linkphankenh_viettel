@@ -504,7 +504,7 @@
             <thead>
               <tr>
                 <th>Số điện thoại</th><th>Nguồn giới thiệu</th><th>Lần ghé gần nhất</th><th>Số lần ghé</th>
-                <th>Dịch vụ đã xem</th><th>Phân loại</th><th>Khuyến nghị</th><th>Ghi chú</th><th>Hành động</th>
+                <th>Dịch vụ đã xem</th><th>Phân loại</th><th>Ghi chú</th><th>Hành động</th>
               </tr>
             </thead>
             <tbody id="staff-leads-table-body"></tbody>
@@ -672,7 +672,7 @@
             <thead>
               <tr>
                 <th>Số điện thoại</th><th>Lần ghé gần nhất</th><th>Số lần ghé</th>
-                <th>Dịch vụ đã xem</th><th>Phân loại</th><th>Khuyến nghị</th><th>Ghi chú</th><th>Hành động</th>
+                <th>Dịch vụ đã xem</th><th>Phân loại</th><th>Ghi chú</th><th>Hành động</th>
               </tr>
             </thead>
             <tbody id="ctv-leads-table-body"></tbody>

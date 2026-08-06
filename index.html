@@ -7514,6 +7514,7 @@ Vui lòng bấm nút "Tải về" để có bản chuẩn và hình ảnh chất
   // thêm cột "Nguồn giới thiệu" để phân biệt lead của chính mình hay của CTV nào. Số bị "loại trừ" ẩn hẳn
   // khỏi bảng (không chỉ gắn badge) đúng theo yêu cầu ban đầu.
   function leadRowHtml(entry, showSource){
+    if(!entry.sdt) return '';
     const kind = classifyVisitor(entry);
     if(kind === 'loai-tru') return '';
     const meta = LEAD_META[kind];

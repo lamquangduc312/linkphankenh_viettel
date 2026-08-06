@@ -5392,7 +5392,8 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
   }
 
   /* ---------- MOCKUP DỮ LIỆU ĐĂNG KÝ MỚI THEO CTV VÀ NVKD ---------- */
-  const NOW = new Date();
+  // Giả lập thời điểm hiện tại là cuối tháng 8/2026 để biểu đồ demo hiển thị đầy đủ số liệu tháng 8
+  const NOW = new Date('2026-08-31T23:59:59');
   const MONTHS_12 = Array.from({length: 12}).map((_, i) => new Date(NOW.getFullYear(), NOW.getMonth() - 11 + i, 1));
 
   function monthKey(d) {
@@ -5436,6 +5437,14 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
     const ten = tenPool[Math.floor(randomSeeded(h + 8) * tenPool.length)];
     return ho + ' ' + ten;
   }
+
+  // Bổ sung các gói cước demo cho từng dịch vụ
+  const MOCK_PLANS = {
+    'ftth': ['(Gói SUN1T)', '(Gói SUN2T)', '(Gói SUN3T)', '(Gói STAR1T)', '(Gói STAR2T)', '(Gói STAR3T)', '(Gói FAST2)'],
+    'combo': ['(Gói SUN1T + TV360)', '(Gói STAR1T + TV360)', '(Gói SUN2T + TV360)'],
+    'truyen-hinh': ['(Gói TV360 Basic)', '(Gói TV360 Standard)'],
+    'mua-goi-data': ['(Gói ST15K)', '(Gói ST30K)', '(Gói V90C)', '(Gói SD135)', '(Gói MXH120)']
+  };
 
   function collectOrders(personKey, rangeKey, createdDate) {
     const wanted = new Set(monthsForRange(rangeKey).map(monthKey));
@@ -5490,6 +5499,14 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
             : rStatus < 0.88 ? 'Đang triển khai'
             : 'Đã hủy';
 
+          // Bổ sung tên gói cước (nếu có)
+          let loaiDichVuName = svc.name;
+          if (MOCK_PLANS[svc.key]) {
+            const planPool = MOCK_PLANS[svc.key];
+            const planName = planPool[Math.floor(randomSeeded(h + 9) * planPool.length)];
+            loaiDichVuName += ' ' + planName;
+          }
+
           orders.push({
             id: 'OD-' + h,
             maDonHang: 'OD' + h.toString().padStart(8, '0').slice(-8),
@@ -5498,7 +5515,7 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
             giaTri: val,
             trangThai,
             dichVuKey: svc.key,
-            loaiDichVu: svc.name,
+            loaiDichVu: loaiDichVuName,
             hoTenKhachHang: randomCustomerName(h),
             sdtKhachHang: '09' + String(h % 100000000).padStart(8, '0'),
             tenNVKD: STAFF_DEMO.hoTen,

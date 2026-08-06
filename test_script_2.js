@@ -1731,6 +1731,36 @@
   });
   confirmModalOverlay.addEventListener('click', (e) => { if(e.target === confirmModalOverlay) closeConfirmModal(); });
 
+  // Modal Preview Tài liệu Marketing
+  const docPreviewModalOverlay = document.getElementById('doc-preview-modal-overlay');
+  window.openDocPreview = function(ma) {
+    const doc = TAI_LIEU_MARKETING.find(d => d.ma === ma);
+    if(!doc) return;
+    document.getElementById('doc-preview-title').textContent = doc.ten;
+    document.getElementById('doc-preview-meta').textContent = `${doc.loaiNoiDung} · Định dạng: ${doc.dinhDang} · Đăng ngày ${formatVNDate(doc.ngayDang)}`;
+    document.getElementById('doc-preview-download-btn').href = doc.link;
+    
+    // Convert Google Drive link to preview link for iframe
+    let previewLink = doc.link;
+    if(previewLink.includes('drive.google.com') && previewLink.includes('/view')) {
+      previewLink = previewLink.replace('/view?usp=drivesdk', '/preview').replace('/view?usp=sharing', '/preview').replace('/view', '/preview');
+    }
+    
+    document.getElementById('doc-preview-iframe').src = previewLink;
+    docPreviewModalOverlay.classList.add('show');
+  };
+
+  document.getElementById('doc-preview-modal-close').addEventListener('click', () => {
+    docPreviewModalOverlay.classList.remove('show');
+    document.getElementById('doc-preview-iframe').src = '';
+  });
+  docPreviewModalOverlay.addEventListener('click', (e) => {
+    if(e.target === docPreviewModalOverlay) {
+      docPreviewModalOverlay.classList.remove('show');
+      document.getElementById('doc-preview-iframe').src = '';
+    }
+  });
+
   ctvAvatarInput.addEventListener('change', () => {
     const file = ctvAvatarInput.files[0];
     if(!file || !pendingAvatarCtvId) return;
@@ -2717,36 +2747,42 @@
         </div>
         <div class="doc-card-desc">${escapeHtml(doc.moTa)}</div>
         <div class="doc-card-meta">Định dạng: ${escapeHtml(doc.dinhDang)} · Đăng ngày ${formatVNDate ? formatVNDate(doc.ngayDang) : doc.ngayDang} · ${escapeHtml(doc.phongBan)}</div>
-        <div class="doc-card-footer">
-          <a class="doc-download-btn" href="${doc.link}" target="_blank" rel="noopener">⭳ Tải về</a>
+        <div class="doc-card-footer" style="display:flex;gap:10px;margin-top:12px;">
+          <button class="btn-outline" style="flex:1;padding:8px 0;font-size:13.5px;" onclick="openDocPreview('${doc.ma}')">👁 Xem trước</button>
+          <a class="btn-primary" style="flex:1;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;font-size:13.5px;border-radius:8px;" href="${doc.link}" target="_blank" rel="noopener">⭳ Tải về</a>
         </div>
       </div>`;
   }
 
-  // Render lưới tài liệu theo 2 bộ lọc (Dịch vụ + Loại nội dung) — dùng chung cho cả NVKD lẫn CTV
+  // Render lưới tài liệu theo 3 bộ lọc (Dịch vụ + Loại nội dung + Tìm kiếm) — dùng chung cho cả NVKD lẫn CTV
   // vì kho tài liệu là chung, không phân biệt theo người xem.
-  function renderDocGrid(gridId, emptyId, filterDichVuId, filterLoaiId){
+  function renderDocGrid(gridId, emptyId, filterDichVuId, filterLoaiId, filterSearchId){
     const grid = document.getElementById(gridId);
     const emptyNote = document.getElementById(emptyId);
     if(!grid) return;
     const dichVu = document.getElementById(filterDichVuId)?.value || 'all';
     const loai = document.getElementById(filterLoaiId)?.value || 'all';
+    const search = (document.getElementById(filterSearchId)?.value || '').trim().toLowerCase();
+    
     const filtered = TAI_LIEU_MARKETING.filter(d => {
-      return (dichVu === 'all' || d.dichVu === dichVu) && (loai === 'all' || d.loaiNoiDung === loai);
+      const matchSearch = search === '' || d.ten.toLowerCase().includes(search) || d.moTa.toLowerCase().includes(search);
+      return (dichVu === 'all' || d.dichVu === dichVu) && (loai === 'all' || d.loaiNoiDung === loai) && matchSearch;
     });
     grid.innerHTML = filtered.map(docCardHtml).join('');
     if(emptyNote) emptyNote.style.display = filtered.length ? 'none' : 'block';
   }
 
-  function renderStaffDocs(){ renderDocGrid('staff-doc-grid', 'staff-doc-empty', 'staff-doc-filter-dichvu', 'staff-doc-filter-loai'); }
-  function renderCtvDocs(){ renderDocGrid('ctv-doc-grid', 'ctv-doc-empty', 'ctv-doc-filter-dichvu', 'ctv-doc-filter-loai'); }
+  function renderStaffDocs(){ renderDocGrid('staff-doc-grid', 'staff-doc-empty', 'staff-doc-filter-dichvu', 'staff-doc-filter-loai', 'staff-doc-search'); }
+  function renderCtvDocs(){ renderDocGrid('ctv-doc-grid', 'ctv-doc-empty', 'ctv-doc-filter-dichvu', 'ctv-doc-filter-loai', 'ctv-doc-search'); }
 
   document.querySelector('#staff-main-tabs [data-staff-tab="tailieu"]')?.addEventListener('click', renderStaffDocs);
   document.querySelector('#ctv-dashboard [data-tab="ctv-tab-tailieu"]')?.addEventListener('click', renderCtvDocs);
   document.getElementById('staff-doc-filter-dichvu')?.addEventListener('change', renderStaffDocs);
   document.getElementById('staff-doc-filter-loai')?.addEventListener('change', renderStaffDocs);
+  document.getElementById('staff-doc-search')?.addEventListener('input', renderStaffDocs);
   document.getElementById('ctv-doc-filter-dichvu')?.addEventListener('change', renderCtvDocs);
   document.getElementById('ctv-doc-filter-loai')?.addEventListener('change', renderCtvDocs);
+  document.getElementById('ctv-doc-search')?.addEventListener('input', renderCtvDocs);
 
   // "Phiên giới thiệu" đang hoạt động (đọc được từ URL ?NV=... khi khách hàng bấm link chia sẻ) — null nghĩa
   // là khách vào trang bình thường, không qua giới thiệu. showInternetSummary()/showDataSummary() đọc biến

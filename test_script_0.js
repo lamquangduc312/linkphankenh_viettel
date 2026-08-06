@@ -112,6 +112,23 @@
   </div>
 </div>
 
+<!-- ================= MODAL: XEM TRƯỚC TÀI LIỆU ================= -->
+<div class="login-overlay" id="doc-preview-modal-overlay">
+  <div class="login-modal" style="max-width:800px; width:90%; padding:20px; height:85vh; display:flex; flex-direction:column;">
+    <button class="login-close" id="doc-preview-modal-close" aria-label="Đóng">&times;</button>
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid var(--border); padding-bottom:14px; margin-bottom:16px; gap:20px;">
+      <div style="flex:1;">
+        <h3 class="login-title" id="doc-preview-title" style="margin:0 0 6px 0;font-size:18px;text-align:left;"></h3>
+        <p style="font-size:13px;color:var(--text-muted);margin:0;line-height:1.4;" id="doc-preview-meta"></p>
+      </div>
+      <a class="btn-primary" id="doc-preview-download-btn" href="#" target="_blank" rel="noopener" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding:9px 18px; white-space:nowrap; flex-shrink:0;">⭳ Tải về</a>
+    </div>
+    <div style="flex:1; background:#f0f2f5; border-radius:8px; overflow:hidden; position:relative;">
+      <iframe id="doc-preview-iframe" style="width:100%; height:100%; border:none;" src=""></iframe>
+    </div>
+  </div>
+</div>
+
 <!-- ================= MODAL: CHI TIẾT GIỚI THIỆU GÓI CƯỚC ================= -->
 <div class="login-overlay" id="pkg-detail-overlay">
   <div class="login-modal pkg-detail-modal">
@@ -464,6 +481,24 @@
         <p style="font-size:12.5px;color:var(--text-muted);margin:-4px 0 16px;">
           Danh sách khách hàng đã truy cập qua link phân kênh của bạn hoặc của các CTV trực thuộc — đã tự động loại trừ số điện thoại nội bộ (NVKD/CTV).
         </p>
+        <div class="order-filter-row" style="margin-bottom:12px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;">
+          <div class="staff-range-tabs" style="margin-bottom:0;">
+            <button class="staff-range-btn active" data-lead-range="thang-nay">Tháng này</button>
+            <button class="staff-range-btn" data-lead-range="thang-truoc">Tháng trước</button>
+            <button class="staff-range-btn" data-lead-range="3-thang">3 tháng trước</button>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:13px;color:var(--text-muted);">Từ ngày</span>
+              <input type="date" class="order-person-filter" style="padding:6px 10px;height:auto;" id="staff-lead-from-date">
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:13px;color:var(--text-muted);">Đến ngày</span>
+              <input type="date" class="order-person-filter" style="padding:6px 10px;height:auto;" id="staff-lead-to-date">
+            </div>
+            <button class="btn-outline" style="padding:7px 14px;" id="btn-export-staff-leads">⭳ Export dữ liệu</button>
+          </div>
+        </div>
         <div style="overflow-x:auto;">
           <table class="sim-table">
             <thead>
@@ -488,6 +523,7 @@
           Tài liệu do phòng ban quản lý sản phẩm Di động/Cố định đăng tải. Tải về để sử dụng khi tư vấn khách hàng hoặc đăng nội dung lên mạng xã hội.
         </p>
         <div class="doc-filter-row">
+          <input type="text" class="order-person-filter" id="staff-doc-search" placeholder="🔍 Tìm kiếm tài liệu..." style="flex:1; min-width:200px; padding:6px 12px; height:auto;">
           <select class="order-person-filter" id="staff-doc-filter-dichvu">
             <option value="all">Tất cả dịch vụ</option>
             <option value="Di động">Di động</option>
@@ -613,6 +649,24 @@
         <p style="font-size:12.5px;color:var(--text-muted);margin:-4px 0 16px;">
           Danh sách khách hàng đã truy cập qua liên kết giới thiệu của riêng bạn.
         </p>
+        <div class="order-filter-row" style="margin-bottom:12px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;">
+          <div class="staff-range-tabs" style="margin-bottom:0;">
+            <button class="staff-range-btn active" data-lead-range="thang-nay">Tháng này</button>
+            <button class="staff-range-btn" data-lead-range="thang-truoc">Tháng trước</button>
+            <button class="staff-range-btn" data-lead-range="3-thang">3 tháng trước</button>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:13px;color:var(--text-muted);">Từ ngày</span>
+              <input type="date" class="order-person-filter" style="padding:6px 10px;height:auto;" id="ctv-lead-from-date">
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:13px;color:var(--text-muted);">Đến ngày</span>
+              <input type="date" class="order-person-filter" style="padding:6px 10px;height:auto;" id="ctv-lead-to-date">
+            </div>
+            <button class="btn-outline" style="padding:7px 14px;" id="btn-export-ctv-leads">⭳ Export dữ liệu</button>
+          </div>
+        </div>
         <div style="overflow-x:auto;">
           <table class="sim-table">
             <thead>
@@ -635,6 +689,7 @@
           Tài liệu do phòng ban quản lý sản phẩm Di động/Cố định đăng tải. Tải về để sử dụng khi tư vấn khách hàng hoặc đăng nội dung lên mạng xã hội.
         </p>
         <div class="doc-filter-row">
+          <input type="text" class="order-person-filter" id="ctv-doc-search" placeholder="🔍 Tìm kiếm tài liệu..." style="flex:1; min-width:200px; padding:6px 12px; height:auto;">
           <select class="order-person-filter" id="ctv-doc-filter-dichvu">
             <option value="all">Tất cả dịch vụ</option>
             <option value="Di động">Di động</option>

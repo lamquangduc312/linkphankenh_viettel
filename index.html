@@ -1095,6 +1095,23 @@
   </div>
 </div>
 
+<!-- ================= MODAL: XEM TRƯỚC TÀI LIỆU ================= -->
+<div class="login-overlay" id="doc-preview-modal-overlay">
+  <div class="login-modal" style="max-width:800px; width:90%; padding:20px; height:85vh; display:flex; flex-direction:column;">
+    <button class="login-close" id="doc-preview-modal-close" aria-label="Đóng">&times;</button>
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid var(--border); padding-bottom:14px; margin-bottom:16px; gap:20px;">
+      <div style="flex:1;">
+        <h3 class="login-title" id="doc-preview-title" style="margin:0 0 6px 0;font-size:18px;text-align:left;"></h3>
+        <p style="font-size:13px;color:var(--text-muted);margin:0;line-height:1.4;" id="doc-preview-meta"></p>
+      </div>
+      <a class="btn-primary" id="doc-preview-download-btn" href="#" target="_blank" rel="noopener" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding:9px 18px; white-space:nowrap; flex-shrink:0;">⭳ Tải về</a>
+    </div>
+    <div style="flex:1; background:#f0f2f5; border-radius:8px; overflow:hidden; position:relative;">
+      <iframe id="doc-preview-iframe" style="width:100%; height:100%; border:none;" src=""></iframe>
+    </div>
+  </div>
+</div>
+
 <!-- ================= MODAL: CHI TIẾT GIỚI THIỆU GÓI CƯỚC ================= -->
 <div class="login-overlay" id="pkg-detail-overlay">
   <div class="login-modal pkg-detail-modal">
@@ -6841,6 +6858,36 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
   });
   confirmModalOverlay.addEventListener('click', (e) => { if(e.target === confirmModalOverlay) closeConfirmModal(); });
 
+  // Modal Preview Tài liệu Marketing
+  const docPreviewModalOverlay = document.getElementById('doc-preview-modal-overlay');
+  window.openDocPreview = function(ma) {
+    const doc = TAI_LIEU_MARKETING.find(d => d.ma === ma);
+    if(!doc) return;
+    document.getElementById('doc-preview-title').textContent = doc.ten;
+    document.getElementById('doc-preview-meta').textContent = `${doc.loaiNoiDung} · Định dạng: ${doc.dinhDang} · Đăng ngày ${formatVNDate(doc.ngayDang)}`;
+    document.getElementById('doc-preview-download-btn').href = doc.link;
+    
+    // Convert Google Drive link to preview link for iframe
+    let previewLink = doc.link;
+    if(previewLink.includes('drive.google.com') && previewLink.includes('/view')) {
+      previewLink = previewLink.replace('/view?usp=drivesdk', '/preview').replace('/view?usp=sharing', '/preview').replace('/view', '/preview');
+    }
+    
+    document.getElementById('doc-preview-iframe').src = previewLink;
+    docPreviewModalOverlay.classList.add('show');
+  };
+
+  document.getElementById('doc-preview-modal-close').addEventListener('click', () => {
+    docPreviewModalOverlay.classList.remove('show');
+    document.getElementById('doc-preview-iframe').src = '';
+  });
+  docPreviewModalOverlay.addEventListener('click', (e) => {
+    if(e.target === docPreviewModalOverlay) {
+      docPreviewModalOverlay.classList.remove('show');
+      document.getElementById('doc-preview-iframe').src = '';
+    }
+  });
+
   ctvAvatarInput.addEventListener('change', () => {
     const file = ctvAvatarInput.files[0];
     if(!file || !pendingAvatarCtvId) return;
@@ -7827,8 +7874,9 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
         </div>
         <div class="doc-card-desc">${escapeHtml(doc.moTa)}</div>
         <div class="doc-card-meta">Định dạng: ${escapeHtml(doc.dinhDang)} · Đăng ngày ${formatVNDate ? formatVNDate(doc.ngayDang) : doc.ngayDang} · ${escapeHtml(doc.phongBan)}</div>
-        <div class="doc-card-footer">
-          <a class="doc-download-btn" href="${doc.link}" target="_blank" rel="noopener">⭳ Tải về</a>
+        <div class="doc-card-footer" style="display:flex;gap:10px;margin-top:12px;">
+          <button class="btn-outline" style="flex:1;padding:8px 0;font-size:13.5px;" onclick="openDocPreview('${doc.ma}')">👁 Xem trước</button>
+          <a class="btn-primary" style="flex:1;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;font-size:13.5px;border-radius:8px;" href="${doc.link}" target="_blank" rel="noopener">⭳ Tải về</a>
         </div>
       </div>`;
   }

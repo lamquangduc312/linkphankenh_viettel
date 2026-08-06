@@ -1447,6 +1447,24 @@
         <p style="font-size:12.5px;color:var(--text-muted);margin:-4px 0 16px;">
           Danh sách khách hàng đã truy cập qua link phân kênh của bạn hoặc của các CTV trực thuộc — đã tự động loại trừ số điện thoại nội bộ (NVKD/CTV).
         </p>
+        <div class="order-filter-row" style="margin-bottom:12px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;">
+          <div class="staff-range-tabs" style="margin-bottom:0;">
+            <button class="staff-range-btn active" data-lead-range="thang-nay">Tháng này</button>
+            <button class="staff-range-btn" data-lead-range="thang-truoc">Tháng trước</button>
+            <button class="staff-range-btn" data-lead-range="3-thang">3 tháng trước</button>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:13px;color:var(--text-muted);">Từ ngày</span>
+              <input type="date" class="order-person-filter" style="padding:6px 10px;height:auto;" id="staff-lead-from-date">
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:13px;color:var(--text-muted);">Đến ngày</span>
+              <input type="date" class="order-person-filter" style="padding:6px 10px;height:auto;" id="staff-lead-to-date">
+            </div>
+            <button class="btn-outline" style="padding:7px 14px;" id="btn-export-staff-leads">⭳ Export dữ liệu</button>
+          </div>
+        </div>
         <div style="overflow-x:auto;">
           <table class="sim-table">
             <thead>
@@ -1596,6 +1614,24 @@
         <p style="font-size:12.5px;color:var(--text-muted);margin:-4px 0 16px;">
           Danh sách khách hàng đã truy cập qua liên kết giới thiệu của riêng bạn.
         </p>
+        <div class="order-filter-row" style="margin-bottom:12px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;">
+          <div class="staff-range-tabs" style="margin-bottom:0;">
+            <button class="staff-range-btn active" data-lead-range="thang-nay">Tháng này</button>
+            <button class="staff-range-btn" data-lead-range="thang-truoc">Tháng trước</button>
+            <button class="staff-range-btn" data-lead-range="3-thang">3 tháng trước</button>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:13px;color:var(--text-muted);">Từ ngày</span>
+              <input type="date" class="order-person-filter" style="padding:6px 10px;height:auto;" id="ctv-lead-from-date">
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:13px;color:var(--text-muted);">Đến ngày</span>
+              <input type="date" class="order-person-filter" style="padding:6px 10px;height:auto;" id="ctv-lead-to-date">
+            </div>
+            <button class="btn-outline" style="padding:7px 14px;" id="btn-export-ctv-leads">⭳ Export dữ liệu</button>
+          </div>
+        </div>
         <div style="overflow-x:auto;">
           <table class="sim-table">
             <thead>

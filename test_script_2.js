@@ -1744,21 +1744,25 @@
     
     // Tạo nội dung demo mô phỏng thay vì dùng iframe Google Drive
     if(doc.dinhDang === 'SVG' || doc.loaiNoiDung === 'Hình ảnh SP') {
-       htmlContent = `<div style="display:flex; justify-content:center; align-items:center; height:100%; min-height:300px; background:#f5f5f5; border-radius:8px; border:2px dashed #ccc;">
-          <div style="text-align:center; color:#666;">
-            <div style="font-size:48px; margin-bottom:10px;">🖼️</div>
-            <div style="font-size:16px; font-weight:bold;">${escapeHtml(doc.ten)}</div>
-            <div style="font-size:13px; margin-top:5px;">(Ảnh demo minh họa)</div>
+       htmlContent = `<div style="display:flex; justify-content:center; align-items:center; height:100%; min-height:400px; background:#f9f9fa; border-radius:8px; border:2px dashed #e5e7eb;">
+          <div style="text-align:center; color:#9ca3af;">
+            <div style="font-size:64px; margin-bottom:12px;">🖼️</div>
+            <div style="font-size:18px; font-weight:600; color:#4b5563;">${escapeHtml(doc.ten)}</div>
+            <div style="font-size:14px; margin-top:8px;">(Ảnh demo minh họa hiển thị ở kích thước thật)</div>
           </div>
        </div>`;
     } else {
        htmlContent = `
-       <div style="max-width:640px; margin:0 auto; font-size:14px; line-height:1.6;">
-         <h2 style="font-size:20px; margin-top:0; margin-bottom:16px; color:var(--text-dark);">${escapeHtml(doc.ten)}</h2>
-         <p><strong>Nền tảng:</strong> ${escapeHtml(doc.nenTang || 'Đa nền tảng')}</p>
-         <p><strong>Mô tả:</strong> ${escapeHtml(doc.moTa)}</p>
-         <hr style="border:none; border-top:1px dashed #ccc; margin:20px 0;">
-         <div style="background:#f9f9fa; padding:16px; border-left:4px solid var(--viettel-red); border-radius:4px; white-space:pre-wrap; color:#333;">[Nội dung Demo]
+       <div style="font-size:15px; line-height:1.7; color:#374151;">
+         <h2 style="font-size:24px; margin-top:0; margin-bottom:20px; color:#111827; font-weight:700;">${escapeHtml(doc.ten)}</h2>
+         <div style="display:flex; gap:24px; margin-bottom:24px; font-size:14px; color:#6b7280; flex-wrap:wrap;">
+           <span><strong>Nền tảng:</strong> ${escapeHtml(doc.nenTang || 'Đa nền tảng')}</span>
+           <span><strong>Định dạng:</strong> ${escapeHtml(doc.dinhDang)}</span>
+         </div>
+         <p style="margin-bottom:24px;"><strong>Mô tả:</strong> ${escapeHtml(doc.moTa)}</p>
+         
+         <div style="background:#fef2f2; padding:20px; border-left:4px solid var(--viettel-red); border-radius:6px; white-space:pre-wrap; color:#1f2937; margin-top:32px;">
+<span style="color:var(--viettel-red); font-weight:bold; font-size:13px; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:12px;">— Nội dung Demo —</span>
 
 Kính gửi Quý Khách hàng,
 
@@ -1770,7 +1774,7 @@ Nhân viên Kinh doanh / Cộng tác viên có thể copy nội dung này hoặc
 - Đảm bảo tính nhất quán của nhận diện thương hiệu Viettel
 - Hỗ trợ giải đáp khách hàng hiệu quả
 
-Vui lòng bấm nút "Tải về" để có bản chuẩn và hình ảnh chất lượng cao nhất.
+Vui lòng bấm nút "Tải về" để lấy nội dung chuẩn và hình ảnh đính kèm chất lượng cao nhất.
          </div>
        </div>`;
     }

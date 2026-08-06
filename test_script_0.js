@@ -116,15 +116,15 @@
 <div class="login-overlay" id="doc-preview-modal-overlay">
   <div class="login-modal" style="max-width:800px; width:90%; padding:20px; height:85vh; display:flex; flex-direction:column;">
     <button class="login-close" id="doc-preview-modal-close" aria-label="Đóng">&times;</button>
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid var(--border); padding-bottom:14px; margin-bottom:16px; gap:20px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid var(--border); padding-bottom:16px; margin-bottom:20px; gap:20px; padding-right:32px;">
       <div style="flex:1;">
         <h3 class="login-title" id="doc-preview-title" style="margin:0 0 6px 0;font-size:18px;text-align:left;"></h3>
         <p style="font-size:13px;color:var(--text-muted);margin:0;line-height:1.4;" id="doc-preview-meta"></p>
       </div>
-      <a class="btn-primary" id="doc-preview-download-btn" href="#" target="_blank" rel="noopener" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding:9px 18px; white-space:nowrap; flex-shrink:0;">⭳ Tải về</a>
+      <a class="btn-primary" id="doc-preview-download-btn" href="#" target="_blank" rel="noopener" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding:9px 20px; white-space:nowrap; flex-shrink:0; border-radius:8px; font-size:14px; box-shadow:0 2px 4px rgba(238,0,51,0.2);">⭳ Tải về</a>
     </div>
-    <div style="flex:1; background:#f0f2f5; border-radius:8px; overflow:hidden; position:relative;">
-      <div id="doc-preview-content" style="width:100%; height:100%; overflow-y:auto; padding:20px; background:#fff; box-sizing:border-box;"></div>
+    <div style="flex:1; background:#f0f2f5; border-radius:8px; overflow-y:auto; padding:24px; display:flex; flex-direction:column; align-items:center;">
+      <div id="doc-preview-content" style="width:100%; max-width:680px; background:#fff; padding:32px; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,0.05); box-sizing:border-box; min-height:100%;"></div>
     </div>
   </div>
 </div>

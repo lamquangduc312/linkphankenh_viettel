@@ -1489,6 +1489,7 @@
           Tài liệu do phòng ban quản lý sản phẩm Di động/Cố định đăng tải. Tải về để sử dụng khi tư vấn khách hàng hoặc đăng nội dung lên mạng xã hội.
         </p>
         <div class="doc-filter-row">
+          <input type="text" class="order-person-filter" id="staff-doc-search" placeholder="🔍 Tìm kiếm tài liệu..." style="flex:1; min-width:200px; padding:6px 12px; height:auto;">
           <select class="order-person-filter" id="staff-doc-filter-dichvu">
             <option value="all">Tất cả dịch vụ</option>
             <option value="Di động">Di động</option>
@@ -1654,6 +1655,7 @@
           Tài liệu do phòng ban quản lý sản phẩm Di động/Cố định đăng tải. Tải về để sử dụng khi tư vấn khách hàng hoặc đăng nội dung lên mạng xã hội.
         </p>
         <div class="doc-filter-row">
+          <input type="text" class="order-person-filter" id="ctv-doc-search" placeholder="🔍 Tìm kiếm tài liệu..." style="flex:1; min-width:200px; padding:6px 12px; height:auto;">
           <select class="order-person-filter" id="ctv-doc-filter-dichvu">
             <option value="all">Tất cả dịch vụ</option>
             <option value="Di động">Di động</option>
@@ -7831,30 +7833,35 @@ document.querySelectorAll('.hero-pill').forEach(pill => {
       </div>`;
   }
 
-  // Render lưới tài liệu theo 2 bộ lọc (Dịch vụ + Loại nội dung) — dùng chung cho cả NVKD lẫn CTV
+  // Render lưới tài liệu theo 3 bộ lọc (Dịch vụ + Loại nội dung + Tìm kiếm) — dùng chung cho cả NVKD lẫn CTV
   // vì kho tài liệu là chung, không phân biệt theo người xem.
-  function renderDocGrid(gridId, emptyId, filterDichVuId, filterLoaiId){
+  function renderDocGrid(gridId, emptyId, filterDichVuId, filterLoaiId, filterSearchId){
     const grid = document.getElementById(gridId);
     const emptyNote = document.getElementById(emptyId);
     if(!grid) return;
     const dichVu = document.getElementById(filterDichVuId)?.value || 'all';
     const loai = document.getElementById(filterLoaiId)?.value || 'all';
+    const search = (document.getElementById(filterSearchId)?.value || '').trim().toLowerCase();
+    
     const filtered = TAI_LIEU_MARKETING.filter(d => {
-      return (dichVu === 'all' || d.dichVu === dichVu) && (loai === 'all' || d.loaiNoiDung === loai);
+      const matchSearch = search === '' || d.ten.toLowerCase().includes(search) || d.moTa.toLowerCase().includes(search);
+      return (dichVu === 'all' || d.dichVu === dichVu) && (loai === 'all' || d.loaiNoiDung === loai) && matchSearch;
     });
     grid.innerHTML = filtered.map(docCardHtml).join('');
     if(emptyNote) emptyNote.style.display = filtered.length ? 'none' : 'block';
   }
 
-  function renderStaffDocs(){ renderDocGrid('staff-doc-grid', 'staff-doc-empty', 'staff-doc-filter-dichvu', 'staff-doc-filter-loai'); }
-  function renderCtvDocs(){ renderDocGrid('ctv-doc-grid', 'ctv-doc-empty', 'ctv-doc-filter-dichvu', 'ctv-doc-filter-loai'); }
+  function renderStaffDocs(){ renderDocGrid('staff-doc-grid', 'staff-doc-empty', 'staff-doc-filter-dichvu', 'staff-doc-filter-loai', 'staff-doc-search'); }
+  function renderCtvDocs(){ renderDocGrid('ctv-doc-grid', 'ctv-doc-empty', 'ctv-doc-filter-dichvu', 'ctv-doc-filter-loai', 'ctv-doc-search'); }
 
   document.querySelector('#staff-main-tabs [data-staff-tab="tailieu"]')?.addEventListener('click', renderStaffDocs);
   document.querySelector('#ctv-dashboard [data-tab="ctv-tab-tailieu"]')?.addEventListener('click', renderCtvDocs);
   document.getElementById('staff-doc-filter-dichvu')?.addEventListener('change', renderStaffDocs);
   document.getElementById('staff-doc-filter-loai')?.addEventListener('change', renderStaffDocs);
+  document.getElementById('staff-doc-search')?.addEventListener('input', renderStaffDocs);
   document.getElementById('ctv-doc-filter-dichvu')?.addEventListener('change', renderCtvDocs);
   document.getElementById('ctv-doc-filter-loai')?.addEventListener('change', renderCtvDocs);
+  document.getElementById('ctv-doc-search')?.addEventListener('input', renderCtvDocs);
 
   // "Phiên giới thiệu" đang hoạt động (đọc được từ URL ?NV=... khi khách hàng bấm link chia sẻ) — null nghĩa
   // là khách vào trang bình thường, không qua giới thiệu. showInternetSummary()/showDataSummary() đọc biến

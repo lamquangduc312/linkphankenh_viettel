@@ -7423,7 +7423,12 @@ Vui lòng bấm nút "Tải về" để lấy nội dung chuẩn và hình ảnh
 
     const vList = loadVisitorLog();
     const isAgree = result === 'Y';
-    const ghiChu = `Khách hàng phản hồi ${result} (${isAgree ? 'Đồng ý' : 'Từ chối'} qua SMS) - Gói ${pending.pkg.ma}`;
+    const ghiChuText = `Khách hàng phản hồi ${result} (${isAgree ? 'Đồng ý' : 'Từ chối'} qua SMS) - Gói ${pending.pkg.ma}`;
+    const ghiChuObj = {
+      ngay: new Date().toISOString(),
+      tacGia: 'Hệ thống (SMS)',
+      noiDung: ghiChuText
+    };
     
     let visitor = vList.find(x => x.sdt === pending.phone);
     if (!visitor) {
@@ -7447,7 +7452,7 @@ Vui lòng bấm nút "Tải về" để lấy nội dung chuẩn và hình ảnh
       if (!visitor.dichVuDaXem.includes(pending.pkg.ma)) visitor.dichVuDaXem.push(pending.pkg.ma);
       visitor.trangThaiXuLy = isAgree ? 'dong-y' : 'tu-choi';
       if (!visitor.ghiChu) visitor.ghiChu = [];
-      visitor.ghiChu.push(ghiChu);
+      visitor.ghiChu.push(ghiChuObj);
     }
     saveVisitorLog(vList);
 
@@ -7701,7 +7706,15 @@ Vui lòng bấm nút "Tải về" để lấy nội dung chuẩn và hình ảnh
   function ghiChuCellHtml(entry){
     const notes = entry.ghiChu || [];
     if(!notes.length) return '<span style="color:var(--text-muted);">—</span>';
-    const sorted = [...notes].sort((a, b) => new Date(a.ngay) - new Date(b.ngay));
+    // Đảm bảo tương thích nếu dữ liệu cũ đang lưu mảng string thay vì object
+    const normalizedNotes = notes.map(n => {
+      if (typeof n === 'string') {
+        return { ngay: entry.lanCuoiISO || entry.ngayTaoISO || new Date().toISOString(), tacGia: 'Hệ thống (SMS)', noiDung: n };
+      }
+      return n;
+    });
+
+    const sorted = [...normalizedNotes].sort((a, b) => new Date(a.ngay) - new Date(b.ngay));
     const latest = sorted[sorted.length - 1];
     const historyTitle = sorted.map(n => `${formatVNDate(n.ngay)} - ${n.tacGia}: ${n.noiDung}`).join('\n');
     const moreTag = sorted.length > 1

@@ -456,6 +456,22 @@
         d.setDate(d.getDate() + 1);
       }
     });
+    
+    // TRỘN THÊM CÁC ĐƠN HÀNG THỰC TẾ (TỪ SMS)
+    try {
+      const realOrders = JSON.parse(localStorage.getItem('viettel_real_orders_log')) || [];
+      realOrders.forEach(ro => {
+        if (wanted.has(ro.ngay.slice(0, 7))) {
+          // Lọc xem đơn này có thuộc personKey không
+          const isStaff = personKey === 'staff' && ro.tenNVKD;
+          const isCTV = personKey.startsWith('ctv:') && ctvInfo && ro.tenCTV === ctvInfo.hoTen;
+          if (isStaff || isCTV) {
+            orders.push(ro);
+          }
+        }
+      });
+    } catch(e) {}
+
     return orders;
   }
 
@@ -1152,6 +1168,11 @@
         if(svgEl) downloadQrPng(svgEl, `QR-${pkg.ma}-${seller.type === 'staff' ? STAFF_DEMO.maNV : seller.code}.png`);
       };
       shareSection.style.display = 'block';
+      // Init SMS
+      window.currentSmsPackage = pkg;
+      document.getElementById('pkg-invite-phone').value = '';
+      document.getElementById('pkg-invite-error').style.display = 'none';
+      document.getElementById('pkg-invite-success').style.display = 'none';
     } else {
       shareSection.style.display = 'none';
     }
@@ -2151,6 +2172,164 @@ Vui lòng bấm nút "Tải về" để lấy nội dung chuẩn và hình ảnh
 
   // Cầu nối để modal đăng nhập chung (khối script đăng nhập khách hàng) gọi vào sau khi xác
   // thực OTP thành công với vai trò Nhân viên KD / Cộng tác viên.
+  
+  /* ============================================================================
+     TÍNH NĂNG GỬI LỜI MỜI SMS (SMS INVITE)
+     ============================================================================ */
+  const SMS_INVITE_LOG_KEY = 'viettel_sms_invite_log';
+  function getSmsInviteLog() {
+    try { return JSON.parse(localStorage.getItem(SMS_INVITE_LOG_KEY)) || []; } catch(e){ return []; }
+  }
+  function saveSmsInviteLog(log) {
+    localStorage.setItem(SMS_INVITE_LOG_KEY, JSON.stringify(log));
+  }
+
+  const pkgInviteBtn = document.getElementById('pkg-invite-btn');
+  const pkgInvitePhone = document.getElementById('pkg-invite-phone');
+  const pkgInviteError = document.getElementById('pkg-invite-error');
+  const pkgInviteSuccess = document.getElementById('pkg-invite-success');
+  const smsSimModal = document.getElementById('sms-sim-modal-overlay');
+  
+  if (pkgInviteBtn) {
+    pkgInviteBtn.addEventListener('click', () => {
+      pkgInviteError.style.display = 'none';
+      pkgInviteSuccess.style.display = 'none';
+      
+      const phone = pkgInvitePhone.value.trim();
+      if (!phone || phone.length < 9) {
+        pkgInviteError.textContent = 'Vui lòng nhập SĐT hợp lệ.';
+        pkgInviteError.style.display = 'block';
+        return;
+      }
+      
+      const now = new Date();
+      const hour = now.getHours();
+      if (hour < 7 || hour > 22) {
+        pkgInviteError.textContent = 'Chỉ được phép gửi lời mời từ 07:00 đến 22:00.';
+        pkgInviteError.style.display = 'block';
+        return;
+      }
+      
+      const seller = currentSeller();
+      if (!seller) return;
+      
+      const log = getSmsInviteLog();
+      const todayStr = now.toISOString().split('T')[0];
+      
+      // Giới hạn 5 lời mời / user / ngày
+      const sellerTodayInvites = log.filter(x => x.date === todayStr && x.sellerCode === seller.code);
+      if (sellerTodayInvites.length >= 5) {
+        pkgInviteError.textContent = 'Bạn đã đạt giới hạn gửi 5 lời mời trong hôm nay.';
+        pkgInviteError.style.display = 'block';
+        return;
+      }
+      
+      // Chống trùng lặp SĐT + gói trong ngày
+      const isDuplicate = log.some(x => x.date === todayStr && x.phone === phone && x.packageCode === window.currentSmsPackage.ma);
+      if (isDuplicate) {
+        pkgInviteError.textContent = 'SĐT này đã nhận lời mời cho gói ' + window.currentSmsPackage.ma + ' trong hôm nay.';
+        pkgInviteError.style.display = 'block';
+        return;
+      }
+      
+      window.pendingSmsInvite = {
+        phone,
+        pkg: window.currentSmsPackage,
+        seller,
+        todayStr
+      };
+      
+      document.getElementById('sms-sim-phone').textContent = 'Đến: ' + phone;
+      document.getElementById('sms-sim-content').innerHTML = `Quý khách nhận được lời mời đăng ký gói cước <b>${window.currentSmsPackage.ma}</b> từ Viettel.`;
+      smsSimModal.classList.add('show');
+    });
+  }
+
+  document.getElementById('sms-sim-btn-n').addEventListener('click', () => {
+    handleSmsSimResult('N');
+  });
+  document.getElementById('sms-sim-btn-y').addEventListener('click', () => {
+    handleSmsSimResult('Y');
+  });
+
+  function handleSmsSimResult(result) {
+    smsSimModal.classList.remove('show');
+    const pending = window.pendingSmsInvite;
+    if (!pending) return;
+
+    const log = getSmsInviteLog();
+    log.push({
+      date: pending.todayStr,
+      sellerCode: pending.seller.code,
+      phone: pending.phone,
+      packageCode: pending.pkg.ma,
+      result: result
+    });
+    saveSmsInviteLog(log);
+
+    const vList = loadVisitorLog();
+    const isAgree = result === 'Y';
+    const ghiChu = `Khách hàng phản hồi ${result} (${isAgree ? 'Đồng ý' : 'Từ chối'} qua SMS) - Gói ${pending.pkg.ma}`;
+    
+    let visitor = vList.find(x => x.sdt === pending.phone);
+    if (!visitor) {
+      visitor = {
+        visitorId: 'sms-' + Date.now(),
+        nguoiGioiThieuCode: pending.seller.code,
+        loaiNguoiGioiThieu: pending.seller.type,
+        soLanGhe: 1,
+        thoiGianLuuTrungBinh: 10,
+        lanCuoiISO: new Date().toISOString(),
+        dichVuDaXem: [pending.pkg.ma],
+        sdt: pending.phone,
+        trangThaiXuLy: isAgree ? 'dong-y' : 'tu-choi',
+        ghiChu: [ghiChu],
+        ngayTaoISO: new Date().toISOString()
+      };
+      vList.push(visitor);
+    } else {
+      visitor.lanCuoiISO = new Date().toISOString();
+      visitor.soLanGhe++;
+      if (!visitor.dichVuDaXem.includes(pending.pkg.ma)) visitor.dichVuDaXem.push(pending.pkg.ma);
+      visitor.trangThaiXuLy = isAgree ? 'dong-y' : 'tu-choi';
+      if (!visitor.ghiChu) visitor.ghiChu = [];
+      visitor.ghiChu.push(ghiChu);
+    }
+    saveVisitorLog(vList);
+
+    if (isAgree) {
+      const realOrders = JSON.parse(localStorage.getItem('viettel_real_orders_log')) || [];
+      const svcCat = SERVICE_CATALOG.find(c => c.name === (pending.pkg.nhom || 'Gói Internet')) || SERVICE_CATALOG[0];
+      realOrders.push({
+        id: 'OD-SMS-' + Date.now(),
+        maDonHang: 'OD' + String(Date.now()).slice(-8),
+        ngay: pending.todayStr,
+        ngaySort: Date.now(),
+        giaTri: pending.pkg.gia || 0,
+        trangThai: 'Đang thực hiện',
+        dichVuKey: svcCat.key,
+        loaiDichVu: svcCat.name,
+        tenGoiCuoc: pending.pkg.ma,
+        hoTenKhachHang: 'Khách hàng SMS',
+        sdtKhachHang: pending.phone,
+        tenNVKD: pending.seller.type === 'staff' ? STAFF_DEMO.hoTen : null,
+        tenCTV: pending.seller.type === 'ctv' ? (ctvList.find(c => c.id === pending.seller.code)?.hoTen) : null,
+        sdtCTV: pending.seller.type === 'ctv' ? (ctvList.find(c => c.id === pending.seller.code)?.sdt) : null,
+        tenNVKyThuat: null
+      });
+      localStorage.setItem('viettel_real_orders_log', JSON.stringify(realOrders));
+    }
+
+    pkgInvitePhone.value = '';
+    pkgInviteSuccess.textContent = `Đã gửi lời mời và khách hàng đã phản hồi ${result}.`;
+    pkgInviteSuccess.style.display = 'block';
+
+    renderStaffLeads();
+    renderCtvLeads();
+    renderOrdersTable();
+    renderStaffOverview();
+  }
+
   window.StaffPortal = {
     loginStaff: (phone) => setStaffLoggedIn(phone),
     loginCtv: (phone) => handleCtvLogin(phone),

@@ -150,6 +150,15 @@
       <div class="pkg-share-note" style="text-align:center;margin-bottom:0;">
         Khách vào link/mã QR sẽ mở thẳng gói <b id="pkg-share-note-ma"></b>. Đơn hàng sẽ tự động ghi nhận cho bạn.
       </div>
+      <div style="margin-top:16px; border-top:1px dashed var(--border); padding-top:16px;">
+        <div class="pkg-detail-section-title" style="text-align:center;font-size:12.5px;">💬 Gửi lời mời SMS</div>
+        <div style="display:flex; gap:8px;">
+          <input type="tel" id="pkg-invite-phone" class="order-person-filter" placeholder="Nhập SĐT khách..." style="flex:1; padding:6px 10px; height:auto; margin:0;" pattern="[0-9]*" maxlength="11">
+          <button class="btn-primary" id="pkg-invite-btn" style="padding:6px 12px; font-size:13px; white-space:nowrap;">Mời</button>
+        </div>
+        <div id="pkg-invite-error" style="color:var(--viettel-red); font-size:11.5px; margin-top:6px; text-align:center; display:none;"></div>
+        <div id="pkg-invite-success" style="color:#1E7A45; font-size:11.5px; margin-top:6px; text-align:center; display:none;"></div>
+      </div>
     </div>
 
     <!-- Thông tin gói cước sẽ tự động text-wrap xung quanh thẻ float -->

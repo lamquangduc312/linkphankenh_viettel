@@ -1733,6 +1733,24 @@
   Trang demo dựng lại giao diện &amp; dữ liệu gói cước Viettel &middot; Dự án Viettel Tammi &middot; Dữ liệu tham khảo, không dùng để giao dịch thật.
 </footer>
 
+<!-- ================= MODAL: GIẢ LẬP SMS KHÁCH HÀNG ================= -->
+<div class="login-overlay" id="sms-sim-modal-overlay" style="z-index: 10000;">
+  <div class="login-modal" style="max-width:320px; background:#f0f2f5; border-radius:24px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.15);">
+    <div style="text-align:center; margin-bottom:16px;">
+      <div style="font-weight:600; color:#333; font-size:15px;">Tin nhắn hệ thống</div>
+      <div style="font-size:12px; color:#888;" id="sms-sim-phone">Đến: 09...</div>
+    </div>
+    <div style="background:#fff; border-radius:16px; padding:16px; font-size:14px; line-height:1.5; color:#333; margin-bottom:20px; box-shadow:0 2px 5px rgba(0,0,0,0.05); position:relative;">
+      <div style="position:absolute; bottom:-8px; right:20px; width:16px; height:16px; background:#fff; transform:rotate(45deg);"></div>
+      <p style="margin:0 0 10px 0;" id="sms-sim-content"></p>
+      <p style="margin:0; color:#555; font-size:13px;">Soạn <b style="color:var(--viettel-red);">Y</b> để ĐỒNG Ý đăng ký.<br>Soạn <b style="color:#555;">N</b> để TỪ CHỐI.</p>
+    </div>
+    <div style="display:flex; gap:12px;">
+      <button class="btn-outline" id="sms-sim-btn-n" style="flex:1; border-radius:12px; font-weight:600; color:#666;">N (Từ chối)</button>
+      <button class="btn-primary" id="sms-sim-btn-y" style="flex:1; border-radius:12px; font-weight:600;">Y (Đồng ý)</button>
+    </div>
+  </div>
+</div>
 <script>
 /* ======================================================
    THƯ VIỆN TẠO MÃ QR (nhúng offline, không gọi API ngoài)
@@ -8140,23 +8158,5 @@ Vui lòng bấm nút "Tải về" để lấy nội dung chuẩn và hình ảnh
 
 })();
 </script>
-<!-- ================= MODAL: GIẢ LẬP SMS KHÁCH HÀNG ================= -->
-<div class="login-overlay" id="sms-sim-modal-overlay" style="z-index: 10000;">
-  <div class="login-modal" style="max-width:320px; background:#f0f2f5; border-radius:24px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.15);">
-    <div style="text-align:center; margin-bottom:16px;">
-      <div style="font-weight:600; color:#333; font-size:15px;">Tin nhắn hệ thống</div>
-      <div style="font-size:12px; color:#888;" id="sms-sim-phone">Đến: 09...</div>
-    </div>
-    <div style="background:#fff; border-radius:16px; padding:16px; font-size:14px; line-height:1.5; color:#333; margin-bottom:20px; box-shadow:0 2px 5px rgba(0,0,0,0.05); position:relative;">
-      <div style="position:absolute; bottom:-8px; right:20px; width:16px; height:16px; background:#fff; transform:rotate(45deg);"></div>
-      <p style="margin:0 0 10px 0;" id="sms-sim-content"></p>
-      <p style="margin:0; color:#555; font-size:13px;">Soạn <b style="color:var(--viettel-red);">Y</b> để ĐỒNG Ý đăng ký.<br>Soạn <b style="color:#555;">N</b> để TỪ CHỐI.</p>
-    </div>
-    <div style="display:flex; gap:12px;">
-      <button class="btn-outline" id="sms-sim-btn-n" style="flex:1; border-radius:12px; font-weight:600; color:#666;">N (Từ chối)</button>
-      <button class="btn-primary" id="sms-sim-btn-y" style="flex:1; border-radius:12px; font-weight:600;">Y (Đồng ý)</button>
-    </div>
-  </div>
-</div>
 </body>
 </html>

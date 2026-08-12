@@ -2269,7 +2269,12 @@ Vui lòng bấm nút "Tải về" để lấy nội dung chuẩn và hình ảnh
 
     const vList = loadVisitorLog();
     const isAgree = result === 'Y';
-    const ghiChu = `Khách hàng phản hồi ${result} (${isAgree ? 'Đồng ý' : 'Từ chối'} qua SMS) - Gói ${pending.pkg.ma}`;
+    const ghiChuText = `Khách hàng phản hồi ${result} (${isAgree ? 'Đồng ý' : 'Từ chối'} qua SMS) - Gói ${pending.pkg.ma}`;
+    const ghiChuObj = {
+      ngay: new Date().toISOString(),
+      tacGia: 'Hệ thống (SMS)',
+      noiDung: ghiChuText
+    };
     
     let visitor = vList.find(x => x.sdt === pending.phone);
     if (!visitor) {
@@ -2293,7 +2298,7 @@ Vui lòng bấm nút "Tải về" để lấy nội dung chuẩn và hình ảnh
       if (!visitor.dichVuDaXem.includes(pending.pkg.ma)) visitor.dichVuDaXem.push(pending.pkg.ma);
       visitor.trangThaiXuLy = isAgree ? 'dong-y' : 'tu-choi';
       if (!visitor.ghiChu) visitor.ghiChu = [];
-      visitor.ghiChu.push(ghiChu);
+      visitor.ghiChu.push(ghiChuObj);
     }
     saveVisitorLog(vList);
 
@@ -2547,7 +2552,15 @@ Vui lòng bấm nút "Tải về" để lấy nội dung chuẩn và hình ảnh
   function ghiChuCellHtml(entry){
     const notes = entry.ghiChu || [];
     if(!notes.length) return '<span style="color:var(--text-muted);">—</span>';
-    const sorted = [...notes].sort((a, b) => new Date(a.ngay) - new Date(b.ngay));
+    // Đảm bảo tương thích nếu dữ liệu cũ đang lưu mảng string thay vì object
+    const normalizedNotes = notes.map(n => {
+      if (typeof n === 'string') {
+        return { ngay: entry.lanCuoiISO || entry.ngayTaoISO || new Date().toISOString(), tacGia: 'Hệ thống (SMS)', noiDung: n };
+      }
+      return n;
+    });
+
+    const sorted = [...normalizedNotes].sort((a, b) => new Date(a.ngay) - new Date(b.ngay));
     const latest = sorted[sorted.length - 1];
     const historyTitle = sorted.map(n => `${formatVNDate(n.ngay)} - ${n.tacGia}: ${n.noiDung}`).join('\n');
     const moreTag = sorted.length > 1
@@ -2674,14 +2687,49 @@ Vui lòng bấm nút "Tải về" để lấy nội dung chuẩn và hình ảnh
   // nhất 2 cặp khách quay lại), kèm lịch sử ghi chú (mảng `ghiChu`) để lần ghé/log tiếp theo vẫn hiển
   // thị lại được các ghi chú trước đó — đúng yêu cầu "nắm được bối cảnh của khách hàng".
   function seedDemoVisitorLogIfEmpty(){
-    if(loadVisitorLog().length > 0) return;
+    let list = loadVisitorLog();
     const iso = d => d + 'T00:00:00.000Z';
+    const nvCode = staffChannelNvCode();
+    const gc = (ngay, tacGia, noiDung) => ({ ngay, tacGia, noiDung });
+
+    // Force inject SMS mocks if they don't exist
+    if (list.length > 0 && !list.find(x => x.visitorId === 'vl-sms-y')) {
+      const smsMocks = [
+        { visitorId:'vl-sms-y', sdt:'0955667788', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+          lanDauISO:iso('2026-08-12'), lanCuoiISO:iso('2026-08-12'), soLanGhe:1, dichVuDaXem:['MESHVT1_T'],
+          nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'dong-y',
+          ghiChu:[ gc('2026-08-12T10:00:00.000Z','Hệ thống (SMS)','Khách hàng phản hồi Y (Đồng ý qua SMS) - Gói MESHVT1_T') ] },
+        { visitorId:'vl-sms-n', sdt:'0966778899', nguoiGioiThieuCode:nvCode, loaiNguoiGioiThieu:'staff',
+          lanDauISO:iso('2026-08-12'), lanCuoiISO:iso('2026-08-12'), soLanGhe:1, dichVuDaXem:['MESHVT1_T'],
+          nguonThuThapSdt:'chu-dong', loaiTru:false, trangThaiXuLy:'tu-choi',
+          ghiChu:[ gc('2026-08-12T10:05:00.000Z','Hệ thống (SMS)','Khách hàng phản hồi N (Từ chối qua SMS) - Gói MESHVT1_T') ] }
+      ];
+      list = [...smsMocks, ...list];
+      saveVisitorLog(list);
+      
+      // Inject mock order for the 'Y' response
+      let realOrders = JSON.parse(localStorage.getItem('viettel_real_orders_log') || '[]');
+      if (!realOrders.find(o => o.khachHang === '0955667788')) {
+        realOrders.push({
+          id: 'OD-SMS-MOCK-1',
+          maDonHang: 'OD88776655',
+          khachHang: '0955667788',
+          dichVu: 'Gói Internet',
+          ngayTaoISO: '2026-08-12T10:00:00.000Z',
+          trangThai: 'dang-thuc-hien',
+          nguoiGioiThieuCode: nvCode,
+          loaiNguoiGioiThieu: 'staff',
+          goiCuoc: 'MESHVT1_T', 
+        });
+        localStorage.setItem('viettel_real_orders_log', JSON.stringify(realOrders));
+      }
+    }
+
+    if(list.length > 0) return;
     const ctvKiet = ctvList.find(c => c.sdt === '0989858785') || { sdt:'0989858785', hoTen:'Hoàng Tuấn Kiệt' };
     const ctvLanHuong = ctvList.find(c => c.sdt === '0912000111') || { sdt:'0912000111', hoTen:'Trần Thị Lan Hương' };
     const ctvHoangNam = ctvList.find(c => c.sdt === '0987000222') || { sdt:'0987000222', hoTen:'Lê Hoàng Nam' };
     const ctvNgocThao = ctvList.find(c => c.sdt === '0977000333') || { sdt:'0977000333', hoTen:'Phạm Ngọc Thảo' };
-    const nvCode = staffChannelNvCode();
-    const gc = (ngay, tacGia, noiDung) => ({ ngay, tacGia, noiDung });
 
     const entries = [
       // ----- Gốc (vl-0001 .. vl-0010) -----
